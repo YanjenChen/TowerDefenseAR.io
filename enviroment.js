@@ -1,5 +1,5 @@
 $(document).ready(function() {
-	$.getJSON('/map.json', function(map) {
+	$.getJSON('map.json', function(map) {
 		var enviroment = document.querySelector('#enviroment');
 		for (i = 0; i < map.rangeX; i++) {
 			for (j = 0; j < map.rangeZ; j++) {
