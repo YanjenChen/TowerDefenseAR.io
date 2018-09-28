@@ -124,12 +124,12 @@
   "buffers": [
     {
       "byteLength": 4656,
-      "uri": "field/low_poly_tree_5/scene.bin"
+      "uri": "field/tree_5_ao/scene.bin"
     }
   ],
   "images": [
     {
-      "uri": "field/low_poly_tree_5/textures/Scene_-_Root_baseColor.png"
+      "uri": "field/tree_5_ao/textures/Scene_-_Root_baseColor.png"
     }
   ],
   "materials": [
