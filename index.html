@@ -3,19 +3,31 @@
 
 <head>
     <title>Tower Defense AR</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/aframe/0.7.1/aframe.min.js"></script>
-    <!--script src="https://cdn.rawgit.com/jeromeetienne/AR.js/1.5.0/aframe/build/aframe-ar.js"></script-->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/96/three.js"></script>
+    <script src="https://aframe.io/releases/0.8.0/aframe.min.js"></script>
+    <script src="https://cdn.rawgit.com/jeromeetienne/AR.js/1.5.0/aframe/build/aframe-ar.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 </head>
 
 <body>
-    <a-scene>
+    <a-scene stats embedded arjs>
         <a-assets>
-            <a-asset-item id="tree01" src="filed\low_poly_tree_1\scene.gltf"></a-asset-item>
+            <a-asset-item id="tree" src="field\tree_7_ao\scene.gltf"></a-asset-item>
         </a-assets>
 
-        <a-gltf-model src="#tree01"></a-gltf-model>
+        <!--a-entity camera="active: true" look-controls wasd-controls position="0 5 5" rotation="-45 0 0"></a-entity!-->
+        <a-marker preset="hiro">
+            <a-entity id="enviroment" position="0 0 0" scale="0.1 0.1 0.1">
+                <a-plane color="#BDB76B" rotation="-90 0 0" height="16" width="20"></a-plane>
+                <a-ring color="#A9A9A9" rotation="-90 0 0" position="0 0.1 0" radius-inner="4" radius-outer="6"></a-ring>
+                <a-plane color="#A9A9A9" rotation="-90 0 0" position="7 0.1 0" height="2" width="6"></a-plane>
+                <a-plane color="#A9A9A9" rotation="-90 0 0" position="-7 0.1 0" height="2" width="6"></a-plane>
+            </a-entity>
+        </a-marker>
+
+        <a-entity camera></a-entity>
     </a-scene>
+
+    <script src="enviroment.js"></script>
 </body>
 
 </html>
