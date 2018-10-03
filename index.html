@@ -4,30 +4,56 @@
 <head>
     <title>Tower Defense AR</title>
     <script src="https://aframe.io/releases/0.8.0/aframe.min.js"></script>
+    <script src="https://cdn.rawgit.com/donmccurdy/aframe-extras/v4.2.0/dist/aframe-extras.min.js"></script>
     <script src="https://cdn.rawgit.com/jeromeetienne/AR.js/1.5.0/aframe/build/aframe-ar.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 </head>
 
 <body>
     <a-scene stats embedded arjs>
+    <!--a-scene stats-->
         <a-assets>
-            <a-asset-item id="tree" src="field\tree_5_ao\scene.gltf"></a-asset-item>
+            <a-asset-item id="tree" src="field\tree_7_ao\scene.gltf"></a-asset-item>
+            <a-asset-item id="mimikyu" src="field\mimikyu\scene.gltf"></a-asset-item>
         </a-assets>
 
-        <!--a-entity camera="active: true" look-controls wasd-controls position="0 5 5" rotation="-45 0 0"></a-entity!-->
+        <!--a-entity id="enviroment" position="0 0 0" scale="0.5 0.5 0.5">
+            <a-plane color="#BDB76B" rotation="-90 0 0" height="7" width="7"></a-plane>
+            <a-gltf-model src="#tree"></a-gltf-model>
+            <a-entity>
+                <a-entity position="3 0 0">
+                    <a-gltf-model src="#mimikyu" animation-mixer scale="0.2 0.2 0.2"></a-gltf-model>
+                </a-entity>
+                <a-animation attribute="rotation"
+                    to="0 -360 0"
+                    dur="10000"
+                    easing="linear"
+                    repeat="indefinite"></a-animation>
+            </a-entity>
+        </a-entity-->
+
+        <!--a-entity camera="active: true" look-controls wasd-controls position="0 5 5" rotation="-45 0 0"></a-entity-->
         <a-marker preset="hiro">
-            <a-entity id="enviroment" position="0 0 0" scale="0.1 0.1 0.1">
-                <a-plane color="#BDB76B" rotation="-90 0 0" height="16" width="20"></a-plane>
-                <a-ring color="#A9A9A9" rotation="-90 0 0" position="0 0.1 0" radius-inner="4" radius-outer="6"></a-ring>
-                <a-plane color="#A9A9A9" rotation="-90 0 0" position="7 0.1 0" height="2" width="6"></a-plane>
-                <a-plane color="#A9A9A9" rotation="-90 0 0" position="-7 0.1 0" height="2" width="6"></a-plane>
+            <a-entity id="enviroment" position="0 0 0" scale="0.5 0.5 0.5">
+                <a-plane color="#BDB76B" rotation="-90 0 0" height="7" width="7"></a-plane>
+                <a-gltf-model src="#tree"></a-gltf-model>
+                <a-entity>
+                    <a-entity position="3 0 0">
+                        <a-gltf-model src="#mimikyu" animation-mixer scale="0.2 0.2 0.2"></a-gltf-model>
+                    </a-entity>
+                    <a-animation attribute="rotation"
+                        to="0 -360 0"
+                        dur="10000"
+                        easing="linear"
+                        repeat="indefinite"></a-animation>
+                </a-entity>
             </a-entity>
         </a-marker>
 
         <a-entity camera></a-entity>
     </a-scene>
 
-    <script src="enviroment.js"></script>
+    <!--script src="enviroment.js"></script-->
 </body>
 
 </html>
