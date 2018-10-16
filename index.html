@@ -11,43 +11,47 @@
 
 <body>
     <a-scene stats embedded arjs>
-    <!--a-scene stats-->
+        <!--a-scene stats background="color: grey"-->
         <a-assets>
-            <a-asset-item id="tree" src="field\tree_7_ao\scene.gltf"></a-asset-item>
+            <!--a-asset-item id="tree" src="field\tree_7_ao\scene.gltf"></a-asset-item>
             <a-asset-item id="mimikyu" src="field\mimikyu\scene.gltf"></a-asset-item>
+            <a-asset-item id="glass_mountain" src="field\glass_mountain\scene.gltf"></a-asset-item-->
+            <a-asset-item id="nature_pack" src="field\nature_pack\scene.gltf"></a-asset-item>
         </a-assets>
 
-        <!--a-entity id="enviroment" position="0 0 0" scale="0.5 0.5 0.5">
+        <!--a-entity id="enviroment" position="0 0 0" scale="0.3 0.3 0.3">
             <a-plane color="#BDB76B" rotation="-90 0 0" height="7" width="7"></a-plane>
             <a-gltf-model src="#tree"></a-gltf-model>
             <a-entity>
                 <a-entity position="3 0 0">
                     <a-gltf-model src="#mimikyu" animation-mixer scale="0.2 0.2 0.2"></a-gltf-model>
                 </a-entity>
-                <a-animation attribute="rotation"
-                    to="0 -360 0"
-                    dur="10000"
-                    easing="linear"
-                    repeat="indefinite"></a-animation>
+                <a-animation attribute="rotation" to="0 -360 0" dur="10000" easing="linear" repeat="indefinite"></a-animation>
             </a-entity>
-        </a-entity-->
+            <a-gltf-model src="#nature_pack" position="-9 0 7"></a-gltf-model>
+        </a-entity>
+        <a-light position="0 3 6" rotation="0 0 0" intensity="0.7" color="#f8f4dc"></a-light>
+        <a-light position="0 3 -6" rotation="0 180 0" intensity="0.7" color="#f8f4dc"></a-light>
+        <a-light position="-8 3 0" rotation="0 -90 0" intensity="0.7" color="#f8f4dc"></a-light>
+        <a-light position="8 3 0" rotation="0 90 0" intensity="0.7" color="#f8f4dc"></a-light>
 
-        <!--a-entity camera="active: true" look-controls wasd-controls position="0 5 5" rotation="-45 0 0"></a-entity-->
+        <a-entity camera="active: true" look-controls wasd-controls position="0 5 5" rotation="-45 0 0"></a-entity-->
         <a-marker preset="hiro">
-            <a-entity id="enviroment" position="0 0 0" scale="0.5 0.5 0.5">
+            <a-entity id="enviroment" position="0 0 0" scale="0.2 0.2 0.2">
                 <a-plane color="#BDB76B" rotation="-90 0 0" height="7" width="7"></a-plane>
-                <a-gltf-model src="#tree" scale="1.7 1.7 1.7"></a-gltf-model>
+                <a-gltf-model src="#tree"></a-gltf-model>
                 <a-entity>
                     <a-entity position="3 0 0">
                         <a-gltf-model src="#mimikyu" animation-mixer scale="0.2 0.2 0.2"></a-gltf-model>
                     </a-entity>
-                    <a-animation attribute="rotation"
-                        to="0 -360 0"
-                        dur="10000"
-                        easing="linear"
-                        repeat="indefinite"></a-animation>
+                    <a-animation attribute="rotation" to="0 -360 0" dur="10000" easing="linear" repeat="indefinite"></a-animation>
                 </a-entity>
+                <a-gltf-model src="#nature_pack" position="-9 0 7"></a-gltf-model>
             </a-entity>
+            <!--a-light position="0 3 6" rotation="0 0 0" intensity="0.7" color="#f8f4dc"></a-light>
+            <a-light position="0 3 -6" rotation="0 180 0" intensity="0.7" color="#f8f4dc"></a-light>
+            <a-light position="-8 3 0" rotation="0 -90 0" intensity="0.7" color="#f8f4dc"></a-light>
+            <a-light position="8 3 0" rotation="0 90 0" intensity="0.7" color="#f8f4dc"></a-light-->
         </a-marker>
 
         <a-entity camera></a-entity>
