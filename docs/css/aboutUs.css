@@ -1,5 +1,17 @@
-.block {
+.masthead {
   min-height: 700px; }
+  .masthead #logo {
+    margin-top: 5.5rem;
+    margin-bottom: 1rem; }
   @media only screen and (max-width: 700px) {
-    .block {
+    .masthead {
       min-height: 350px; } }
+
+.ui.vertical.stripe {
+  padding: 8rem 0; }
+
+.ui.cards {
+  margin-top: 3rem; }
+
+.column p {
+  font-size: 1.4rem; }

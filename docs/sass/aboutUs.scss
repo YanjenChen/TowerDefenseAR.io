@@ -5,10 +5,27 @@ $mobile-media: 700px;
         @content;
 }}
 
-.block {
+.masthead {
     min-height: 700px;
+
+    #logo {
+        margin-top: 5.5rem;
+        margin-bottom: 1rem;
+    }
 
     @include mobile-query {
         min-height: 350px;
     }
+}
+
+.ui.vertical.stripe {
+    padding: 8rem 0;
+}
+
+.ui.cards {
+    margin-top: 3rem;
+}
+
+.column p {
+    font-size: 1.4rem;
 }
