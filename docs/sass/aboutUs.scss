@@ -1,0 +1,14 @@
+$mobile-media: 700px;
+
+@mixin mobile-query() {
+    @media only screen and (max-width: $mobile-media) {
+        @content;
+}}
+
+.block {
+    min-height: 700px;
+
+    @include mobile-query {
+        min-height: 350px;
+    }
+}
