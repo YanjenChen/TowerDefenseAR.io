@@ -845,7 +845,7 @@
   "buffers": [
     {
       "byteLength": 35684,
-      "uri": "field/mimikyu/scene.bin"
+      "uri": "renderer/assets/mimikyu/scene.bin"
     }
   ],
   "extensionsUsed": [
@@ -853,10 +853,10 @@
   ],
   "images": [
     {
-      "uri": "field/mimikyu/textures/eyes_baseColor.png"
+      "uri": "renderer/assets/mimikyu/textures/eyes_baseColor.png"
     },
     {
-      "uri": "field/mimikyu/textures/body_baseColor.png"
+      "uri": "renderer/assets/mimikyu/textures/body_baseColor.png"
     }
   ],
   "materials": [

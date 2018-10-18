@@ -124,12 +124,12 @@
   "buffers": [
     {
       "byteLength": 7848,
-      "uri": "field/tree_7_ao/scene.bin"
+      "uri": "renderer/assets/tree_7_ao/scene.bin"
     }
   ],
   "images": [
     {
-      "uri": "field/tree_7_ao/textures/Scene_-_Root_baseColor.png"
+      "uri": "renderer/assets/tree_7_ao/textures/Scene_-_Root_baseColor.png"
     }
   ],
   "materials": [

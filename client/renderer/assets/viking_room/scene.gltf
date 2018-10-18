@@ -3,74 +3,74 @@
     {
       "bufferView": 2,
       "componentType": 5126,
-      "count": 88,
+      "count": 4675,
       "max": [
-        0.60693198442459106,
-        0.70537102222442627,
-        3.6960949897766113
+        13.323686599731445,
+        16.662933349609375,
+        13.366377830505371
       ],
       "min": [
-        -0.7220730185508728,
-        -0.61805999279022217,
-        -0.053068999201059341
+        -12.990525245666504,
+        -1.939388632774353,
+        -10.545746803283691
       ],
       "type": "VEC3"
     },
     {
       "bufferView": 2,
-      "byteOffset": 1056,
+      "byteOffset": 56100,
       "componentType": 5126,
-      "count": 88,
+      "count": 4675,
       "max": [
-        0.99856090545654297,
-        0.92728841304779053,
-        0.43218815326690674
+        1,
+        1,
+        1
       ],
       "min": [
-        -0.91669124364852905,
-        -0.97129088640213013,
-        -0.99339187145233154
+        -1,
+        -1,
+        -1
       ],
       "type": "VEC3"
     },
     {
       "bufferView": 3,
       "componentType": 5126,
-      "count": 88,
+      "count": 4675,
       "max": [
-        0.76472705602645874,
-        0.93340551853179932,
-        0.99954348802566528,
+        1,
+        1,
+        1,
         1
       ],
       "min": [
-        -0.77362746000289917,
-        -0.99713385105133057,
-        -0.98829078674316406,
-        1
+        -1,
+        -1,
+        -1,
+        -1
       ],
       "type": "VEC4"
     },
     {
       "bufferView": 1,
       "componentType": 5126,
-      "count": 88,
+      "count": 4675,
       "max": [
-        0.97756099700927734,
-        0.99682402610778809
+        0.99825763702392578,
+        0.99865067005157471
       ],
       "min": [
-        0.23045599460601807,
-        0.059571001678705215
+        0.0087673068046569824,
+        0.00049566663801670074
       ],
       "type": "VEC2"
     },
     {
       "bufferView": 0,
       "componentType": 5125,
-      "count": 108,
+      "count": 11484,
       "max": [
-        87
+        4674
       ],
       "min": [
         0
@@ -80,42 +80,42 @@
   ],
   "asset": {
     "extras": {
-      "author": "Vladislav Laryushin (https://sketchfab.com/Zorg741)",
+      "author": "nigelgoh (https://sketchfab.com/nigelgoh)",
       "license": "CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)",
-      "source": "https://sketchfab.com/models/2061e27aa6df4cff80a4e7b46889a696",
-      "title": "Tree 5 AO"
+      "source": "https://sketchfab.com/models/a49f1b8e4f5c4ecf9e1fe7d81915ad38",
+      "title": "Viking room"
     },
-    "generator": "Sketchfab-3.18.7",
+    "generator": "Sketchfab-3.18.5",
     "version": "2.0"
   },
   "bufferViews": [
     {
       "buffer": 0,
-      "byteLength": 432,
+      "byteLength": 45936,
       "byteOffset": 0,
       "name": "floatBufferViews",
       "target": 34963
     },
     {
       "buffer": 0,
-      "byteLength": 704,
-      "byteOffset": 432,
+      "byteLength": 37400,
+      "byteOffset": 45936,
       "byteStride": 8,
       "name": "floatBufferViews",
       "target": 34962
     },
     {
       "buffer": 0,
-      "byteLength": 2112,
-      "byteOffset": 1136,
+      "byteLength": 112200,
+      "byteOffset": 83336,
       "byteStride": 12,
       "name": "floatBufferViews",
       "target": 34962
     },
     {
       "buffer": 0,
-      "byteLength": 1408,
-      "byteOffset": 3248,
+      "byteLength": 74800,
+      "byteOffset": 195536,
       "byteStride": 16,
       "name": "floatBufferViews",
       "target": 34962
@@ -123,13 +123,13 @@
   ],
   "buffers": [
     {
-      "byteLength": 4656,
-      "uri": "field/tree_5_ao/scene.bin"
+      "byteLength": 270336,
+      "uri": "renderer/assets/viking_room/scene.bin"
     }
   ],
   "images": [
     {
-      "uri": "field/tree_5_ao/textures/Scene_-_Root_baseColor.png"
+      "uri": "renderer/assets/viking_room/textures/Texture1_baseColor.png"
     }
   ],
   "materials": [
@@ -140,7 +140,7 @@
         0,
         0
       ],
-      "name": "Scene_-_Root",
+      "name": "Texture1",
       "pbrMetallicRoughness": {
         "baseColorFactor": [
           1,
@@ -159,6 +159,7 @@
   ],
   "meshes": [
     {
+      "name": "mesh_all1_Texture1_0",
       "primitives": [
         {
           "attributes": {
@@ -197,11 +198,41 @@
       "children": [
         3
       ],
-      "name": "287f6dc1e74741049748e073ca849996.obj.cleaner.materialmerger.gles"
+      "matrix": [
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1,
+        0,
+        0,
+        -1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1
+      ],
+      "name": "vikingroom.fbx"
+    },
+    {
+      "children": [
+        4
+      ],
+      "name": "RootNode"
+    },
+    {
+      "children": [
+        5
+      ],
+      "name": "mesh_all1"
     },
     {
       "mesh": 0,
-      "name": ""
+      "name": "mesh_all1_Texture1_0"
     }
   ],
   "samplers": [
