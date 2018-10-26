@@ -1,0 +1,44 @@
+$mobile-media: 700px;
+$purple: #6435c9;
+$light-grey: #f2f3f5;
+$main-color: $purple;
+
+@mixin mobile-query() {
+    @media only screen and (max-width: $mobile-media) {
+        @content;
+}}
+
+.bar {
+    background-color: transparent;
+    padding: 1.5em;
+    position: fixed;
+    transition: 0.4s;
+    width: 100%;
+    z-index: 1;
+
+    .ui.massive.menu {
+        background-color: transparent;
+        border: none;
+        box-shadow: none;
+    }
+    &.following {
+        background-color: $main-color;
+        padding: 0.5em;
+    }
+}
+
+.masthead {
+    background-image: url('../assets/header.jpg');
+    background-position: center bottom;
+    background-size: cover;
+    background-repeat: no-repeat;
+    padding: 6em 0 2em 0;
+}
+
+.stripe {
+    padding: 3em 0;
+
+    &.alternate {
+        background-color: $light-grey;
+    }
+}
