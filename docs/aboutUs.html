@@ -9,50 +9,58 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.3.3/semantic.min.js"></script>
 </head>
 
-<nav class="ui container">
-    <div class="ui menu">
-        <a class="active item"><i class="home icon"></i>Home</a>
-        <a class="item"><i class="code icon"></i>Blog</a>
-        <div class="right compact menu">
-            <a class="item"><i class="github icon"></i>Github</a>
+<nav class="bar">
+    <div class="ui container">
+        <div class="ui massive borderless menu">
+            <a class="item"><i class="home icon"></i>Home</a>
+            <a class="item"><i class="code icon"></i>Blog</a>
+            <div class="right compact menu">
+                <a class="item" href="https://github.com/YanjenChen/TowerDefenseAR.io"><i class="github icon"></i>Github</a>
+            </div>
         </div>
     </div>
 </nav>
 
 <body>
-    <section>
-        <div class="ui container middle aligned grid">
-            <div class="eight wide column">
-                <h2 class="ui header">Web AR Experiment</h2>
-                <p>Tower Defense AR is a web-based augmanted reality tower defense game. It is a final project in WP2018. The goal of this project is exploring the posibility of current web AR technology, and create a 60-fps smooth game which can
-                    run on
-                    mobile.</p>
-                <h2 class="ui header">Tower Defense</h2>
-                <p>Tower Defense AR is a web-based augmanted reality tower defense game. It is a final project in WP2018. The goal of this project is exploring the posibility of current web AR technology, and create a 60-fps smooth game which can
-                    run on
-                    mobile.</p>
-            </div>
-            <div class="six wide right float column">
+    <header class="masthead">
+        <div class="ui text center aligned container">
+            <img src="assets/logo.svg" class="ui large centered image">
+            <button class="ui button">
+                Play
+                <i class="right arrow icon"></i>
+            </button>
+        </div>
+    </header>
 
-                <img src="assets/logo.svg" class="ui large image">
-                <button class="ui button">
-                    Play
-                    <i class="right arrow icon"></i>
-                </button>
-            </div>
+    <section class="stripe alternate">
+        <div class="ui text container">
+            <h2 class="ui center aligned header">Web AR Experiment & Tower Defense</h2>
+            <p>Tower Defense AR is a web-based augmanted reality tower defense game. It is a final project in WP2018. The goal of this project is exploring the posibility of current web AR technology, and create a 60-fps smooth game which can run on mobile.
+            </p>
         </div>
     </section>
 
-    <section>
+    <section class="stripe">
         <div class="ui container">
             <h2 class="ui center aligned header">Meet The Team</h2>
             <div class="ui four cards">
                 <div class="ui card">
                     <div class="image">
-                        <img src="assets/blank_image.png">
+                        <img src="assets/IMG_1901.jpg">
                     </div>
                     <div class="content">
                         <a class="header">John Chen</a>
+                        <div class="meta">
+                            <a>Client team leader</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="ui card">
+                    <div class="image">
+                        <img src="assets/IMG_1902.jpg">
+                    </div>
+                    <div class="content">
+                        <a class="header">Glen Liu</a>
                         <div class="meta">
                             <a>Front-end engineer</a>
                         </div>
@@ -60,62 +68,53 @@
                 </div>
                 <div class="ui card">
                     <div class="image">
-                        <img src="assets/blank_image.png">
+                        <img src="assets/IMG_1903.jpg">
                     </div>
                     <div class="content">
                         <a class="header">John Chen</a>
                         <div class="meta">
-                            <a>Front-end engineer</a>
+                            <a>Back-end engineer</a>
                         </div>
                     </div>
                 </div>
                 <div class="ui card">
                     <div class="image">
-                        <img src="assets/blank_image.png">
+                        <img src="assets/IMG_1904.jpg">
                     </div>
                     <div class="content">
-                        <a class="header">John Chen</a>
+                        <a class="header">Syn Chang</a>
                         <div class="meta">
-                            <a>Front-end engineer</a>
+                            <a>Server team leader</a>
                         </div>
                     </div>
                 </div>
                 <div class="ui card">
                     <div class="image">
-                        <img src="assets/blank_image.png">
+                        <img src="assets/IMG_1905.jpg">
                     </div>
                     <div class="content">
-                        <a class="header">John Chen</a>
+                        <a class="header">Nick Chung</a>
                         <div class="meta">
-                            <a>Front-end engineer</a>
+                            <a>Scene designer</a>
                         </div>
                     </div>
                 </div>
                 <div class="ui card">
                     <div class="image">
-                        <img src="assets/blank_image.png">
+                        <img src="assets/IMG_1906.jpg">
                     </div>
                     <div class="content">
-                        <a class="header">John Chen</a>
+                        <a class="header">Peter Yang</a>
                         <div class="meta">
-                            <a>Front-end engineer</a>
-                        </div>
-                    </div>
-                </div>
-                <div class="ui card">
-                    <div class="image">
-                        <img src="assets/blank_image.png">
-                    </div>
-                    <div class="content">
-                        <a class="header">John Chen</a>
-                        <div class="meta">
-                            <a>Front-end engineer</a>
+                            <a>Back-end engineer</a>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
     </section>
+
+    <script src="javascript/aboutUs.js"></script>
 </body>
 
 </html>
