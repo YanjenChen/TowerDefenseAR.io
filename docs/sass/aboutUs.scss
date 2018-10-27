@@ -1,4 +1,4 @@
-$mobile-media: 700px;
+$mobile-media: 768px;
 $purple: #6435c9;
 $light-grey: #f2f3f5;
 $main-color: $purple;
@@ -8,9 +8,17 @@ $main-color: $purple;
         @content;
 }}
 
+@mixin desktop-query() {
+    @media only screen and (min-width: $mobile-media) {
+        @content;
+}}
+
+.loading {
+    overflow: hidden;
+}
+
 .bar {
     background-color: transparent;
-    padding: 1.5em;
     position: fixed;
     transition: 0.4s;
     width: 100%;
@@ -21,9 +29,26 @@ $main-color: $purple;
         border: none;
         box-shadow: none;
     }
-    &.following {
-        background-color: $main-color;
+    &.desktop {
+        padding: 1.5em;
+
+        @include mobile-query() {
+            display: none;
+        }
+        &.following {
+            background-color: $main-color;
+            padding: 0.5em;
+        }
+    }
+    &.mobile {
         padding: 0.5em;
+
+        @include desktop-query() {
+            display: none;
+        }
+        &.following {
+            background-color: $main-color;
+        }
     }
 }
 
@@ -40,5 +65,16 @@ $main-color: $purple;
 
     &.alternate {
         background-color: $light-grey;
+    }
+    &.inverted {
+        background-color: $main-color;
+        color: white;
+
+        a {
+            color: white;
+        }
+    }
+    &.thin {
+        padding: 1em 0;
     }
 }
