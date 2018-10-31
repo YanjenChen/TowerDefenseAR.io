@@ -1,36 +1,20 @@
-/*
-	THIS IS TESTING FOR AFRAME JAVASCRIPT API.
-	Use JS to auto add element to scense.
-*/
+(() => {
+    var sceneEl = document.querySelector('a-scene');
+    jQuery.getJSON('renderer/maps/demo.json', (map) => {
+        /* CURVE LOADER */
+        map.enemyPath.forEach((path) => {
+            var curveEl = document.createElement('a-curve');
+            curveEl.setAttribute('id', path.type + '-path');
+            path.points.forEach((point) => {
+                var pointEl = document.createElement('a-curve-point');
+                pointEl.setAttribute('position', point);
+                curveEl.appendChild(pointEl);
+            });
+            sceneEl.appendChild(curveEl);
+        });
 
-$(document).ready(function() {
-    $.getJSON('map.json', function(map) {
-        var enviroment = document.querySelector('#enviroment');
-        for (i = 0; i < map.rangeX; i++) {
-            for (j = 0; j < map.rangeZ; j++) {
-                if (map.map[i][j] == 0) {
-                    continue;
-                }
-
-                var entity = document.createElement('a-gltf-model');
-                entity.setAttribute('src', '#' + map.componenets[map.map[i][j]].tag);
-                entity.setAttribute('position', getRenderCoordnate(map, [i + 0.5, j + 0.5]));
-                entity.setAttribute('scale', '1 1 1');
-                enviroment.appendChild(entity);
-
-                /*
-                $('#enviroment').add('a-gltf-model').attr({
-                	src: '#' + map.componenets[map.map[i][j]].tag,
-                	position: getRenderCoordnate(map, [i, j]),
-                	scale: '1 1 1'
-                });
-                */
-            }
-        }
+        var testEl = document.createElement('a-entity');
+        testEl.setAttribute('wave-spawner', {});
+        sceneEl.appendChild(testEl);
     });
-});
-
-function getRenderCoordnate(map, coord) {
-    // shift map coordinate to enviroment coordinate
-    return (coord[0] - map.rangeX / 2).toString() + ' 0 ' + (coord[1] - map.rangeZ / 2).toString();
-};
+})();
