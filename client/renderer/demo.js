@@ -13,6 +13,16 @@
             sceneEl.appendChild(curveEl);
         });
 
+        var testTower = document.createElement('a-entity');
+        testTower.setAttribute('ply-model', {
+            src: 'url(renderer/assets/tower.ply)'
+        });
+        testTower.setAttribute('position', '-6 1.6 -6');
+        testTower.setAttribute('scale', '0.025 0.025 0.025');
+        testTower.setAttribute('rotation', '-90 0 0');
+        testTower.setAttribute('tower', {});
+        sceneEl.appendChild(testTower);
+
         var testEl = document.createElement('a-entity');
         testEl.setAttribute('wave-spawner', {});
         sceneEl.appendChild(testEl);

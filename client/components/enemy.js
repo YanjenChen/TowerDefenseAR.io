@@ -31,14 +31,21 @@
                 dur: (this.data.duration / this.data.speed).toString()
             });
             this.el.addEventListener('movingended', this.onArrived.bind(this));
-            this.el.emit('enemy-spawned', {
-                el: this.el
+            /*this.el.emit('enemyspawned', {
+                id: this.el.getAttribute('id')
+            });*/
+            this.el.sceneEl.querySelectorAll('[tower]').forEach((towerEl) => {
+                towerEl.emit('enemy-spawned', {
+                    id: this.el.getAttribute('id')
+                });
             });
         },
         onArrived: function() {
             //console.log('Enemy arrived target point.');
-            this.el.emit('enemy-despawned', {
-                el: this.el
+            this.el.sceneEl.querySelectorAll('[tower]').forEach((towerEl) => {
+                towerEl.emit('enemy-despawned', {
+                    id: this.el.getAttribute('id')
+                });
             });
             this.el.parentNode.removeChild(this.el);
         }
