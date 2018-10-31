@@ -1,7 +1,5 @@
 (() => {
 	var sceneEl = document.querySelector('a-scene');
-	//var sceneEl = document.querySelector('#scene');
-
 	jQuery.getJSON('renderer/maps/demo.json', (map) => {
 		/* CURVE LOADER */
 		map.enemyPath.forEach((path) => {
