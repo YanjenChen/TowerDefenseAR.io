@@ -3,45 +3,46 @@
         schema: {
             amount: {
                 type: "number",
-                default: 3
+                default: 1
             },
             duration: {
                 type: "number",
-                default: 5000
+                default: 10000
             },
             timeOffSet: {
                 type: "number",
-                default: 750
+                default: 300
             }
         },
         init: function() {
-            this.el.timeCounter = 0;
-            this.el.spawnCounter = 0;
+            this.timeCounter = 0;
+            this.spawnCounter = 0;
             this.el.addState('activate');
         },
         tick: function(time, timeDelta) {
             if (this.el.is('activate')) {
-                if (this.el.timeCounter > this.data.timeOffSet) {
+                if (this.timeCounter > this.data.timeOffSet) {
+                    this.spawnCounter++;
                     this._spawnEnemy({});
-                    if (this.el.spawnCounter++ > this.data.amount) {
-                        this.el.spawnCounter = 0;
+                    if (this.spawnCounter >= this.data.amount) {
+                        this.spawnCounter = 0;
                         this.el.removeState('activate');
                     }
-                    this.el.timeCounter = 0
+                    this.timeCounter = 0
                 } else
-                    this.el.timeCounter += timeDelta;
+                    this.timeCounter += timeDelta;
             } else {
-                if (this.el.timeCounter > this.data.duration)
+                if (this.timeCounter > this.data.duration)
                     this.el.addState('activate');
                 else
-                    this.el.timeCounter += timeDelta;
+                    this.timeCounter += timeDelta;
             }
         },
         _spawnEnemy: function(schema) {
             var enemyEl = document.createElement('a-entity');
             enemyEl.setAttribute('enemy', schema);
             document.querySelector('a-scene').appendChild(enemyEl);
-            this.el.spawnCounter++;
+            this.spawnCounter++;
         }
     });
 })();
