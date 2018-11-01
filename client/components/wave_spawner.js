@@ -3,11 +3,11 @@
         schema: {
             amount: {
                 type: "number",
-                default: 1
+                default: 4
             },
             duration: {
                 type: "number",
-                default: 10000
+                default: 3000
             },
             timeOffSet: {
                 type: "number",
@@ -42,7 +42,6 @@
             var enemyEl = document.createElement('a-entity');
             enemyEl.setAttribute('enemy', schema);
             document.querySelector('a-scene').appendChild(enemyEl);
-            this.spawnCounter++;
         }
     });
 })();

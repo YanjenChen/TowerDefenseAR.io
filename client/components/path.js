@@ -3,10 +3,13 @@
         //dependencies: ['position'],
         schema: {},
         init: function() {
-            this.el.addEventListener('componentchanged', this.changeHandler.bind(this));
+            this.el.addEventListener('componentchanged', this._changeHandler.bind(this));
             this.el.emit('path-point-change');
         },
-        changeHandler: function(evt) {
+        remove: function() {
+            this.el.removeEventListener('componentchanged', this._changeHandler.bind(this));
+        },
+        _changeHandler: function(evt) {
             if (evt.detail.name == 'position')
                 this.el.emit('path-point-change');
         }
@@ -20,24 +23,29 @@
             this.lines = [];
             this.el.addEventListener('path-point-change', this.update.bind(this));
         },
+        remove: function() {
+            delete this.pathPoints;
+            delete this.lines;
+            this.el.removeEventListener('path-point-change', this.update.bind(this));
+        },
         update: function(oldData) {
             this.points = Array.from(this.el.querySelectorAll("[path-point]"));
             if (this.points.length <= 1) {
                 console.warn("At least 2 curve-points needed to draw a path");
             } else {
-                var pointsArray = this.points.map((point) => {
+                this.pathPoints = this.points.map((point) => {
                     if (point.x !== undefined && point.y !== undefined && point.z !== undefined)
                         return point;
-                    //return point.object3D.getWorldPosition();
                     return point.object3D.getWorldPosition();
                 });
-                this.pathPoints = pointsArray;
 
                 this.lines = [];
                 for (i = 0; i < this.pathPoints.length - 1; i++) {
                     this.lines.push(new THREE['LineCurve3'](this.pathPoints[i], this.pathPoints[i + 1]));
                 }
             }
+
+            delete this.points;
         }
     });
 
@@ -54,7 +62,7 @@
             },
             speed: {
                 type: 'number',
-                default: 1
+                default: 5
             }
         },
         init: function() {
@@ -63,6 +71,13 @@
             this.currentLine = 0;
             this.timeCounter = 0;
             this.completeDist = 0;
+        },
+        remove: function() {
+            delete this.lines;
+            delete this.linesLength;
+            delete this.currentLine;
+            delete this.timeCounter;
+            delete this.completeDist;
         },
         tick: function(time, timeDelta) {
             if (!this.el.is('endofpath')) {

@@ -13,7 +13,7 @@
             },
             speed: {
                 type: "number",
-                default: 1
+                default: 6
             },
             type: {
                 type: "string",
