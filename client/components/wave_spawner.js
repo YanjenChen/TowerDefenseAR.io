@@ -2,15 +2,20 @@
     AFRAME.registerComponent('wave-spawner', {
         schema: {
             amount: {
-                type: "number",
+                type: 'number',
                 default: 4
             },
             duration: {
-                type: "number",
+                type: 'number',
                 default: 3000
             },
+            faction: {
+                type: 'string',
+                default: 'A',
+                oneOf: ['A', 'B']
+            },
             timeOffSet: {
-                type: "number",
+                type: 'number',
                 default: 300
             }
         },
@@ -23,7 +28,9 @@
             if (this.el.is('activate')) {
                 if (this.timeCounter > this.data.timeOffSet) {
                     this.spawnCounter++;
-                    this._spawnEnemy({});
+                    this._spawnEnemy({
+                        faction: this.data.faction
+                    });
                     if (this.spawnCounter >= this.data.amount) {
                         this.spawnCounter = 0;
                         this.el.removeState('activate');
@@ -38,10 +45,14 @@
                     this.timeCounter += timeDelta;
             }
         },
+        remove: function() {
+            delete this.timeCounter;
+            delete this.spawnCounter;
+        },
         _spawnEnemy: function(schema) {
             var enemyEl = document.createElement('a-entity');
             enemyEl.setAttribute('enemy', schema);
-            document.querySelector('a-scene').appendChild(enemyEl);
+            this.el.sceneEl.appendChild(enemyEl);
         }
     });
 })();
