@@ -1,6 +1,5 @@
 (() => {
     AFRAME.registerComponent('path-point', {
-        //dependencies: ['position'],
         schema: {},
         init: function() {
             this.el.addEventListener('componentchanged', this._changeHandler.bind(this));
@@ -16,7 +15,6 @@
     });
 
     AFRAME.registerComponent('path', {
-        //dependencies: ['path-point'],
         schema: {},
         init: function() {
             this.pathPoints = null;
@@ -46,11 +44,11 @@
             }
 
             delete this.points;
+            this.el.emit('path-updated');
         }
     });
 
     AFRAME.registerComponent('moveonpath', {
-        //dependencies: ['path'],
         schema: {
             path: {
                 type: 'selector',
@@ -95,6 +93,38 @@
                     this.el.setAttribute('position', p);
                 }
             }
+        }
+    });
+
+    AFRAME.registerComponent('draw-path', {
+        schema: {
+            path: {
+                type: 'selector',
+                default: null
+            }
+        },
+        init: function() {
+            this.data.path.addEventListener('path-updated', this.update.bind(this));
+        },
+        update: function() {
+            var mesh = this.el.getOrCreateObject3D('mesh', THREE.Line);
+
+            lineMaterial = mesh.material ? mesh.material : new THREE.LineBasicMaterial({
+                color: "#ff0000"
+            });
+
+            var lineGeometry = new THREE.Geometry();
+            lineGeometry.vertices = [];
+
+            this.data.path.components['path'].lines.forEach(line => {
+                lineGeometry.vertices = lineGeometry.vertices.concat(line.getPoints());
+            });
+
+            this.el.setObject3D('mesh', new THREE.Line(lineGeometry, lineMaterial));
+        },
+        remove: function() {
+            this.data.path.removeEventListener('path-updated', this.update.bind(this));
+            this.el.getObject3D('mesh').geometry = new THREE.Geometry();
         }
     });
 })();

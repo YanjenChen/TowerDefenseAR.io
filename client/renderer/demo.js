@@ -13,6 +13,11 @@
                     pointEl.setAttribute('position', point);
                     curveEl.appendChild(pointEl);
                 });
+
+                curveEl.setAttribute('draw-path', {
+                    path: '#' + faction.name + 'faction' + path.type + 'path'
+                });
+
                 sceneEl.appendChild(curveEl);
             });
         });
@@ -31,23 +36,27 @@
         var testTower1 = document.createElement('a-entity');
         testTower1.setAttribute('geometry', {
             primitive: 'box',
+            width: 0.5,
+            height: 0.5,
             depth: 2
         });
         testTower1.setAttribute('position', '-3 0 0');
         testTower1.setAttribute('tower', {
             faction: 'B',
-            range: 10
+            range: 5
         });
         sceneEl.appendChild(testTower1);
 
         var testTower2 = document.createElement('a-entity');
         testTower2.setAttribute('geometry', {
             primitive: 'box',
+            width: 0.5,
+            height: 0.5,
             depth: 2
         });
-        testTower2.setAttribute('position', '3 0 -7');
+        testTower2.setAttribute('position', '9 0 0');
         testTower2.setAttribute('tower', {
-            faction: 'B',
+            faction: 'A',
             range: 5
         });
         sceneEl.appendChild(testTower2);

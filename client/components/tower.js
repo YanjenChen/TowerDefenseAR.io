@@ -34,17 +34,27 @@
             this.targetFac = (this.data.faction == 'A') ? 'B' : 'A';
         },
         tick: function() {
-            //console.log(this.el.targetId);
             if (this.el.is('activate')) {
                 if (this._checkTargetDistance()) {
-                    //console.log(this.el.sceneEl.querySelector('#' + this.el.targetId).object3D.getWorldPosition());
                     this.el.object3D.lookAt(this.targetEl.object3D.getWorldPosition());
                 } else {
+                    // ONLY USE IN DEVELOPER TESTING
+                    this.targetEl.setAttribute('glow', {
+                        enabled: false
+                    });
+                    ////////////////////////////////
+
                     this.targetEl = null;
                     this.el.removeState('activate');
                 }
             } else {
                 if (this._getNearestEnemy()) {
+                    // ONLY USE IN DEVELOPER TESTING
+                    this.targetEl.setAttribute('glow', {
+                        enabled: true
+                    });
+                    ////////////////////////////////
+
                     this.el.addState('activate');
                     this.el.object3D.lookAt(this.targetEl.object3D.getWorldPosition());
                 }
