@@ -1,11 +1,6 @@
 (() => {
     AFRAME.registerComponent('moveontrace', {
         schema: {
-            algorithm: {
-                type: 'string',
-                default: 'world-position',
-                oneOf: ['world-position', 'local-position']
-            },
             maxRange: {
                 type: 'number',
                 default: 1
@@ -18,45 +13,57 @@
                 type: 'selector',
                 default: null
             },
+            triggerRange: {
+                type: 'number',
+                default: 0.08
+            },
             timeRatio: {
                 type: 'number',
                 default: 0.001
             }
         },
         init: function() {
+            if (!this._isTargetExist())
+                console.warn('Target does not exist.');
+
             this.timeCounter = 0;
             this.completeDist = 0;
-            this.updatePosition = (this.data.algorithm == 'world-position') ? this._traceOnWorldPosition.bind(this) : this._traceOnLocalPosition.bind(this);
         },
         tick: function(time, timeDelta) {
-            if (this.data.target) {
+            if (this._isTargetExist()) {
                 this.timeCounter += (timeDelta * this.data.timeRatio);
                 if (this.timeCounter * this.data.speed <= this.data.maxRange) {
-                    this.updatePosition(timeDelta);
+                    p1 = this.el.object3D.getWorldPosition();
+                    p2 = this.data.target.object3D.getWorldPosition();
+                    rDelta = p1.distanceTo(p2);
+
+                    if (rDelta < this.data.triggerRange) {
+                        this.el.emit('reached-target');
+                    } else {
+                        direction = p2.sub(p1).normalize();
+                        p = p1.add(direction.multiplyScalar(timeDelta * this.data.timeRatio * this.data.speed));
+                        this.el.setAttribute('position', p);
+                    }
                 } else {
+                    //console.log('Element out of range.');
+                    //console.warn('Element out of range.');
+
                     this.el.parentNode.removeChild(this.el);
                 }
             } else {
+                //console.log('Element lost target.');
+
                 this.el.parentNode.removeChild(this.el);
             }
         },
         remove: function() {
             delete this.timeCounter;
             delete this.completeDist;
-            delete this.updatePosition;
         },
-        _traceOnLocalPosition: function(timeDelta) {
-            console.warn('Utility not implement yet.');
-            /*
-            direction = this.data.target.object3D.position.sub(this.el.object3D.position).normalize();
-            p = this.el.object3D.position.add(direction.multiplyScalar(timeDelta * this.data.timeRatio * this.data.speed));
-            this.el.setAttribute('position', p);
-            */
-        },
-        _traceOnWorldPosition: function(timeDelta) {
-            direction = this.data.target.object3D.getWorldPosition().sub(this.el.object3D.getWorldPosition()).normalize();
-            p = this.el.object3D.getWorldPosition().add(direction.multiplyScalar(timeDelta * this.data.timeRatio * this.data.speed));
-            this.el.setAttribute('position', p);
+        _isTargetExist: function() {
+            if (this.data.target == null)
+                return false;
+            return this.el.sceneEl.querySelector('#' + this.data.target.id);
         }
     });
 })();

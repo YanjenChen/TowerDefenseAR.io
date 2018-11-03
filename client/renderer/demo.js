@@ -14,9 +14,11 @@
                     curveEl.appendChild(pointEl);
                 });
 
+                // ONLY USE IN DEVELOPER TESTING
                 curveEl.setAttribute('draw-path', {
                     path: '#' + faction.name + 'faction' + path.type + 'path'
                 });
+                ////////////////////////////////
 
                 sceneEl.appendChild(curveEl);
             });
@@ -42,8 +44,9 @@
         });
         testTower1.setAttribute('position', '-3 0 0');
         testTower1.setAttribute('tower', {
+            dps: 10,
             faction: 'B',
-            range: 5
+            range: 10
         });
         sceneEl.appendChild(testTower1);
 
@@ -56,6 +59,7 @@
         });
         testTower2.setAttribute('position', '9 0 0');
         testTower2.setAttribute('tower', {
+            dps: 20,
             faction: 'A',
             range: 5
         });
@@ -63,8 +67,8 @@
 
         var testWavespawner1 = document.createElement('a-entity');
         testWavespawner1.setAttribute('wave-spawner', {
-            amount: 1,
-            duration: 3000,
+            amount: 5,
+            duration: 5000,
             faction: 'A',
             timeOffSet: 300
         });
@@ -72,11 +76,12 @@
 
         var testWavespawner2 = document.createElement('a-entity');
         testWavespawner2.setAttribute('wave-spawner', {
-            amount: 1,
-            duration: 4000,
+            amount: 5,
+            duration: 6000,
             faction: 'B',
             timeOffSet: 300
         });
         sceneEl.appendChild(testWavespawner2);
+
     });
 })();

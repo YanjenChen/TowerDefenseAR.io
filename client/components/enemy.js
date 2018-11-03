@@ -49,6 +49,7 @@
         },
         init: function() {
             //console.log('Initial enemy.');
+            this.currentHP = this.data.healthPoint;
             this.el.setAttribute('geometry', {
                 primitive: 'sphere',
                 radius: 0.4,
@@ -60,15 +61,25 @@
                 path: '#' + this.data.faction + 'faction' + this.data.type + 'path',
                 speed: this.data.speed
             });
+            this.el.addEventListener('be-attacked', this._onBeAttacked.bind(this));
             this.el.addEventListener('movingended', this._onArrived.bind(this));
         },
         remove: function() {
+            delete this.currentHP;
             this.system.unregisterEnemy(this.el);
+            this.el.removeEventListener('be-attacked', this._onBeAttacked.bind(this));
             this.el.removeEventListener('movingended', this._onArrived.bind(this));
         },
         _onArrived: function() {
-            //console.log('Enemy arrived target point.');
             this.el.parentNode.removeChild(this.el);
+        },
+        _onBeAttacked: function(evt) {
+            //console.log(this.el.id + ' be attacked.');
+
+            this.currentHP -= evt.detail.damage;
+            if (this.currentHP <= 0) {
+                this.el.parentNode.removeChild(this.el);
+            }
         }
     });
 })();

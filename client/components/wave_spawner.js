@@ -29,7 +29,9 @@
                 if (this.timeCounter > this.data.timeOffSet) {
                     this.spawnCounter++;
                     this._spawnEnemy({
-                        faction: this.data.faction
+                        faction: this.data.faction,
+                        healthPoint: 6,
+                        speed: 4
                     });
                     if (this.spawnCounter >= this.data.amount) {
                         this.spawnCounter = 0;
