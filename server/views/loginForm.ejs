@@ -1,0 +1,53 @@
+<html>
+    <head>
+            <title>Web TDAR Login</title>
+
+            <script type="text/javascript" src="https://cdn.bootcss.com/jquery/2.1.1/jquery.min.js"></script> 
+            <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/themes/smoothness/jquery-ui.css"> 
+
+            <!-- 新 Bootstrap 核心 CSS 文件 --> 
+            <link href="https://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet"> 
+            <!-- 最新的 Bootstrap 核心 JavaScript 文件 --> 
+            <script src="https://cdn.bootcss.com/bootstrap/3.3.7/js/bootstrap.min.js"></script> 
+
+            <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.2.9/semantic.min.css"/>
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.2.9/semantic.min.js"></script>
+
+            <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+            <!-- 載入 socket.io 的 js 檔，從後端抓的 --> 
+            <script src="/socket.io/socket.io.js"></script> 
+    
+            <script src="loginForm.js"></script>
+    </head>
+    
+    <body>
+        <br><br>
+        <div class="ui segment center aligned container" style="width:70%;">
+        <h1 style="font-size:50px;">登入頁面</h1>
+        <div class="ui left aligned container" style="width:70%;position:relative;left:13%;">
+            <form id="loginForm" action="/" method="post">
+                <input id="loginName" name="loginName" type="hidden" />
+                <input id="loginPass" name="loginPass" type="hidden" />
+                <input id="loginHash" name="loginHash" type="hidden" />
+
+            </form>
+            <br><br>
+            <div>
+                <div class="ui input" style="font-size:30px;text-align:left center;">
+                    <span style="position:relative;top:10px">帳號 : </span>&nbsp;&nbsp;&nbsp;<input id="loginNameInput" name="loginNameInput" type="text" placeholder="輸入帳號..." style="height:50px;" />
+                </div>
+                <br><br>
+                <div class="ui input" style="font-size:30px;">
+                    <span style="position:relative;top:10px">密碼 : </span>&nbsp;&nbsp;&nbsp;<input id="loginPassInput" name="loginPassInput" type="text" placeholder="輸入密碼..." style="height:50px;" />
+                </div>
+            </div>
+
+            <br>
+            
+        
+        </div>
+        <button id="login" class="ui basic teal button" style="width:200px;font-size:20px;">登入</button>
+        <button id="register" class="ui basic blue button" style="width:200px;font-size:20px;">進入註冊頁面</button>
+        </div>
+    </body>
+</html>
