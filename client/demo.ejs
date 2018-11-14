@@ -28,16 +28,23 @@
     <script src="components/wave_spawner.js"></script>
     <script src="components/bullet.js"></script>
     <script src="components/tower.js"></script>
+    <script src="renderer/game.js"></script>
 </head>
 
 <body>
+    <input id='room_id' value="<%=inobj['room_id']%>" type='hidden'>
+    <input id='user' value="<%=inobj['user']%>" type='hidden'>
+    <input id='user_faction' value="<%=inobj['user']%>" type='hidden'>
     <!--
     ENABLE THE FOLLOWING SECTION TO RUN AFRAME TEST
         This part demos how you can test the scense you created without AR.
         Aframe is VR library, we use it as the 3d renderer.
         For more information, google "aframe" and read it's tutorial.
     -->
-    <a-scene stats background="color: grey">
+    <a-scene stats background="color: grey" tdar-game>
+        <a-assets>
+            <a-asset-item src="renderer/assets/tower.ply"></a-asset-item>
+        </a-assets>
         <a-camera position="0 10 0" rotation="-90 0 0" look-controls-enabled="false">
     </a-scene>
 
@@ -53,7 +60,7 @@
         <a-marker-camera preset='hiro'></a-marker-camera>
     </a-scene-->
 
-    <script src="renderer/demo.js"></script>
+    <!--script src="renderer/demo.js"></script-->
 </body>
 
 </html>

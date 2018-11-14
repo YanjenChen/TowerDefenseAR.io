@@ -62,7 +62,15 @@
             if (this._isTargetExist()) {
                 //console.log('bullet attack ' + this.data.target.id);
 
+                /* following is local method */
+                /*
                 this.data.target.emit('be-attacked', {
+                    damage: this.data.damagePoint
+                });
+                */
+                this.el.sceneEl.emit('broadcast', {
+                    event_name: 'enemy_be_attacked',
+                    id: this.data.target.getAttribute('id'),
                     damage: this.data.damagePoint
                 });
             }
