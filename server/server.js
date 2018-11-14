@@ -58,7 +58,7 @@ function checkEngNumHash(str){
 //============================這段，使用 express 基本的伺服器設定
 var express = require('express');
 var app = express();
-var port = 11525;
+var port = 8081;
 app.use(express.static('public'));
 app.set('views', __dirname + '/views');
 app.set('view engine', 'ejs');
@@ -157,7 +157,7 @@ sqlite.connect('./tdar.db');
 // 初始化，創建需要的 Tabel
 create_table_sql_arr = [
     // 創建 User 資料表
-    "CREATE TABLE IF NOT EXISTS Users (id integer PRIMARY KEY AUTOINCREMENT, name char(50),password char(70),login_hash char(70) DEFAULT NULL, logout_hash char(70) DEFAULT NULL, create_room_hash char(70) DEFAULT NULL, join_room_hash char(70) DEFAULT NULL, leave_room_hash char(70) DEFAULT NULL, change_team_hash char(70) DEFAULT NULL, change_ready_hash char(70) DEFAULT NULL,isAdmin bit DEFAULT 0, hasLogin bit DEFAULT 0,isPlaying bit DEFAULT 0,join_room_id char(50) DEFAULT NULL,playing_room_id char(70) , team_id integer DEFAULT 0)"
+    "CREATE TABLE IF NOT EXISTS Users (id integer PRIMARY KEY AUTOINCREMENT, name char(50),password char(70),login_hash char(70) DEFAULT NULL, logout_hash char(70) DEFAULT NULL, create_room_hash char(70) DEFAULT NULL, join_room_hash char(70) DEFAULT NULL, leave_room_hash char(70) DEFAULT NULL, change_team_hash char(70) DEFAULT NULL, change_ready_hash char(70) DEFAULT NULL , start_game_hash char(70) DEFAULT NULL, end_game_hash char(70) DEFAULT NULL,isAdmin bit DEFAULT 0, hasLogin bit DEFAULT 0,isPlaying bit DEFAULT 0,join_room_id char(50) DEFAULT NULL,playing_room_id char(70) , team_id integer DEFAULT 0)"
 
     // 注意 team_id 寫 1 或 2 ，代表是 team1 或 team2
     ,
@@ -173,7 +173,11 @@ create_table_sql_arr = [
     "CREATE TABLE IF NOT EXISTS ProcessHashs (id integer PRIMARY KEY AUTOINCREMENT,name char(50) DEFAULT NULL,password char(50) DEFAULT NULL)"
     ,
     // 創建 註冊用的紀錄亂碼
-    "CREATE TABLE IF NOT EXISTS RegisterHashs (id integer PRIMARY KEY AUTOINCREMENT,user char(50) DEFAULT NULL,nonHash char(70) DEFAULT NULL)"
+    "CREATE TABLE IF NOT EXISTS RegisterHashs (id integer PRIMARY KEY AUTOINCREMENT,user char(50) DEFAULT NULL,nonHash char(70) DEFAULT NULL)",
+    // 創建 Admin Login Hash Table
+    "CREATE TABLE IF NOT EXISTS AdminLoginHashs (id integer PRIMARY KEY AUTOINCREMENT,admin char(50) DEFAULT NULL,nonHash char(70) DEFAULT NULL)",
+    // 創建 Admin Logout Hash Table
+    "CREATE TABLE IF NOT EXISTS AdminLogoutHashs (id integer PRIMARY KEY AUTOINCREMENT,admin char(50) DEFAULT NULL,nonHash char(70) DEFAULT NULL)"
 
 
 ]
@@ -239,9 +243,7 @@ if(!init_insert_check_obj["hasInitInsert"]){
     init_insert_sql_arr = [
 	    // 加入自己作為管理員
 	    "INSERT INTO Users (name,password,isAdmin) VALUES ('syn55698','"+bcrypt.hashSync("syn2596", 10)+"',1)",
-        "INSERT INTO Users (name,password,isAdmin) VALUES ('fhrol55698','"+bcrypt.hashSync("fhrol2596", 10)+"',1)",
-        "INSERT INTO Users (name,password,isAdmin) VALUES ('ttt','"+bcrypt.hashSync("abc", 10)+"',1)",
-        "INSERT INTO Users (name,password,isAdmin) VALUES ('rrr','"+bcrypt.hashSync("12345", 10)+"',1)"
+        "INSERT INTO Users (name,password,isAdmin) VALUES ('fhrol55698','"+bcrypt.hashSync("fhrol2596", 10)+"',1)"
 	    ,
 	    // 加入 各情況的 Hash
 	    // UserRegister , UserLogin , UserCreateRoom , UserJoinRoom , UserLeaveRoom , UserReady , UserChangeTeam
@@ -255,7 +257,10 @@ if(!init_insert_check_obj["hasInitInsert"]){
 	    "INSERT INTO ProcessHashs (name,password) VALUES ('UserLeaveRoom','n1r22t1njutl5')",
 	    "INSERT INTO ProcessHashs (name,password) VALUES ('UserChangeReady','t5es4js5ryj4esrzh')",
 	    "INSERT INTO ProcessHashs (name,password) VALUES ('UserChangeTeam','w4r5j45te4aj5t4j5')",
-
+        "INSERT INTO ProcessHashs (name,password) VALUES ('UserStartGame','4r45e45bre4b54r54bh545ert4b5')",
+        "INSERT INTO ProcessHashs (name,password) VALUES ('UserEndGame','nertb4re4n5tn5jty5n')",
+        "INSERT INTO ProcessHashs (name,password) VALUES ('AdminLogin,'kuyttfht5te4aj5t4j5')",
+        "INSERT INTO ProcessHashs (name,password) VALUES ('AdminLogout','w4r5j45gkoewkgo5t4j5')",
 
         //測試用，新增一個 room
         "INSERT INTO PlayRooms (room_id,create_date_string) VALUES ('Room1','"+ds+"')",
@@ -285,6 +290,12 @@ if(!init_insert_check_obj["hasInitInsert"]){
 
 //============================ 監控是否在線
 var all_player_monitor = Object()
+
+// {"room1":{"人稱":socket物件}}
+var in_nonPlaying_room = Object()
+var in_playing_room = Object()
+var wait_model_all_ready = Object()
+var game_enemy = Object() // 記錄各隊伍的 enemy counter
 function check_offline(user){
     // 先確定，若這使用者有加入任何ROOM，就把那個ROOM內的使用者名單刪掉
     sql = "select * from Users where name ='"+String(user)+"'"
@@ -297,7 +308,7 @@ function check_offline(user){
     //console.log("VVVVV sql : "+sql)
     //console.log(JSON.stringify(obj["res"]))
     //console.log(obj["res"].length+" , "+(obj["res"].length==1))
-    if(obj["res"].length==1){
+    if(obj["res"].length==1){ // 若有這使用者，才會執行以下內容
         for(i in [0,1]){ // PS i 就直接是 index 0,1 ，可不管陣列內容，反正陣列就裝兩元素
 	        tuser = obj["res"][0]
 	        if(tuser[user_cols[i]]){
@@ -336,21 +347,41 @@ function check_offline(user){
 	            }
 	        }
 	    }
+    
+        // 重要，把使用者從 in_nonPlaying_room 中取消掉
+        room = obj["res"][0]["join_room_id"]
+        if( (room!=null) && (room!="null") && (room!="undefined") && (room!=undefined)){
+            
+            // 刪掉 in_nonPlaying_room 的，若 user 有在
+            if(in_nonPlaying_room[room]){
+                if(in_nonPlaying_room[room][obj["res"][0]["name"]]){
+                    delete in_nonPlaying_room[room][obj["res"][0]["name"]]
+                }
+            }
+            
+            // 刪掉 in_playing_room 的，若 user 有在
+            if(in_playing_room[room]){
+                if(in_playing_room[room][obj["res"][0]["name"]]){
+                    delete in_playing_room[room][obj["res"][0]["name"]]
+                }
+            }                
+        }
+
+
+        // 這邊也要放, playing_room_id = NULL , join_room_id = NULL , isPlaying = 0 ，因為是強制登出步驟
+        // team_id  也要寫0，強制退出時
+        erase_hasLogin =  'UPDATE Users SET login_hash = NULL , hasLogin = 0 , logout_hash = NULL , playing_room_id = NULL , join_room_id = NULL , team_id = 0 , isPlaying = 0 where name="'+String(user)+'";';
+        usedb(erase_hasLogin,Object())
+        delete all_player_monitor[String(user)]
+        console.log("User "+user+" Check offline")
+    
+        
     }
-
-
-
-    // 這邊也要放, playing_room_id = NULL , join_room_id = NULL , isPlaying = 0 ，因為是強制登出步驟
-    // team_id  也要寫0，強制退出時
-    erase_hasLogin =  'UPDATE Users SET login_hash = NULL , hasLogin = 0 , logout_hash = NULL , playing_room_id = NULL , join_room_id = NULL , team_id = 0 , isPlaying = 0 where name="'+String(user)+'";';
-    usedb(erase_hasLogin,Object())
-    delete all_player_monitor[String(user)]
-    console.log("User "+user+" Check offline")
 }
 
 // join_room_user_str 類似這樣 {"syn55698":1} .. 類似這樣，1 可寫 1 或 2 代表 team_id
 // 當有使用者加入room，處理 Room 資料行東西
-function addUserToRoomUserStr(user,room_id,col,team_id){ // col 是 join_room_user_str 或 playing_room_user_str，user 是使用者名稱
+function addUserToRoomUserStr(user,room_id,col,team_id,user_socket){ // col 是 join_room_user_str 或 playing_room_user_str，user 是使用者名稱
             roomsql = "select * from PlayRooms where room_id='"+room_id+"'"
             obj2 = Object()
             usedb(roomsql,obj2)
@@ -401,10 +432,21 @@ function addUserToRoomUserStr(user,room_id,col,team_id){ // col 是 join_room_us
                         new_roomuser_sql =  "UPDATE PlayRooms SET "+col+" = '"+new_roomuser_str+"' , join_team_str = '"+new_join_team_str+"' where room_id ='"+room_id+"';";
                         usedb(new_roomuser_sql,Object())
                         //console.log("B4")    
+
+
+                        // 先不要
+                        /*
+                        // 加入到 in_nonPlaying_room 
+                        if(!in_nonPlaying_room[room_id]){ // 若未有這房間 key，就先創一個，給 Object()
+                            in_nonPlaying_room[room_id] = Object()
+                        }
+
+                        in_nonPlaying_room[room_id][user] = user_socket
+                        */
                 }
             }
 }
-// 當有使用者加入room，處理 Room 資料行東西
+// 當有使用者退出room，處理 Room 資料行東西
 function delUserToRoomUserStr(user,room_id,col,team_id){ // col 是 join_room_user_str 或 playing_room_user_str，user 是使用者名稱
             roomsql = "select * from PlayRooms where room_id='"+room_id+"'"
             obj2 = Object()
@@ -485,7 +527,7 @@ function monitor(){
     }
 }
 
-// 使用者進到 Room 時，先隨便分一對
+// 使用者進到 Room 時，先隨便分一對，回傳 1 或2
 function getJoinTeamId(room_id){
 
     room_sql = "select * from PlayRooms where room_id = '"+room_id+"'"
@@ -526,7 +568,78 @@ function getJoinTeamId(room_id){
     
 }
 
+// 結束遊戲
+function endGameBackLobby(room_id){
+    obj7 = Object()
+    obj7["room_id"] = room_id
+    //obj7["user"] = user
+    obj7["event_name"] = "serverInformEndGame"
+    
+    // 保險起見，還是用二階跳轉
+    
+    hash_str = getHashTypeStr('UserEndGame')
+    da = new Date()
+    ds = da.getFullYear()+"-"+da.getMonth()+"-"+da.getDay()+" "+da.getHours()+":"+da.getMinutes()+":"+da.getSeconds()+":"+da.getMilliseconds()
+    ds = hash_str+"_"+room_id+"_"+ds
+    
 
+
+    // 二階跳轉版
+    if(in_playing_room[room_id]){
+        
+        // 這段就先不用
+        /*
+        // 刪掉DB中 PlayingRooms 的這間 Room，直接刪掉，因為玩過了
+        del_room_sql = "delete from PlayRooms where room_id ='"+room_id+"'"
+        out5 = Object()
+        usedb(del_room_sql,out5)
+        */
+
+        // 先把每人的 end_game_hash 設好
+        set_user_end_hash_sql = "UPDATE Users SET end_game_hash = '"+ds+"' , start_game_hash = NULL where join_room_id='"+room["room_id"]+"'"
+        usedb(set_user_end_hash_sql,Object())
+
+        //直接刪掉啊，管他的，反正刪掉一次就好，玩過的Room在遊戲結束時就會消失
+        delete in_playing_room[room_id]
+        del_room_sql = "delete from PlayRooms where room_id = '"+room_id+"'"
+        usedb(del_room_sql,Object())
+    
+
+
+        // 注意，這兩行要放在 if 內，不然會有一堆問題
+        // 不放在內，就會跑多次  io.to(room_id).emit("playingEvent",obj7)
+        // 只需要跑一次就好了啦
+        obj7["end_game_hash"] = bcrypt.hashSync(ds,10)
+        // 管他的，直接來這招了啦，無聊，Room 功能直接打開
+        io.to(room_id).emit("playingEvent",obj7)
+
+
+
+        // 刪掉 room 剩下的
+        // delete wait_model_all_ready[room_id] // 這個不用，在開始遊戲時就會刪掉
+        delete game_enemy[room_id]
+        
+        
+    }
+
+
+    // 不用這一段了啦 = = 
+    /*
+    // 如果 room 還在 PlayingRooms + in_playing_room ，就刪一次就好了，免得一直開關DB浪費資源
+    if(in_playing_room[room_id]){
+        // 刪掉DB中 PlayingRooms 的這間 Room，直接刪掉，因為玩過了
+        del_room_sql = "delete from PlayRooms where room_id ='"+room_id+"'"
+        out5 = Object()
+        usedb(del_room_sql,out5)
+
+
+        delete in_playing_room[room_id]
+    }
+    */
+
+    
+    
+}
 setInterval(monitor,1050) // 別直接用1000，有可能會自己被登出
 // delete_sql = "DELETE FROM Tests WHERE id>2;"
 bb=0
@@ -542,6 +655,11 @@ setInterval(function(){
 app.get("/test",function(req,res){
     res.send("<h1>測試用</h1>")
 })
+app.get("/cc",function(req,res){
+    res.render("admin.ejs",{})
+})
+
+
 // 直接請求，會跳轉到登入頁面
 app.get("/",function(req,res){
     //console.log("A1")
@@ -550,6 +668,7 @@ app.get("/",function(req,res){
     
     res.redirect(301,"/login")
 })
+
 // 進入 Register 註冊頁面
 app.get("/register",function(req,res){
     res.render("registerForm.ejs",{})
@@ -637,10 +756,11 @@ app.post("/",function(req,res){
         return
     }
 
+    // 處理使用者主動離開Room時
     //console.log("VVVVV : \n"+JSON.stringify(req.body))
     //console.log(Boolean((req.body["leaveRoomUser"])&&(req.body["leaveRoomId"])&&(req.body["leaveRoomHash"])))
     if((req.body["leaveRoomUser"])&&(req.body["leaveRoomId"])&&(req.body["leaveRoomHash"])){
-        console.log("這邊")
+        //console.log("這邊")
         if((!checkEngNum(req.body["leaveRoomUser"]))||(!checkEngNum(req.body["leaveRoomId"]))||(!checkEngNumHash(req.body["leaveRoomHash"]))){
             // 別用 check_offline(user) ，因為可能有 sql injection ，總之先別管就對了。因為 在註冊時，也會擋 sql inejction 
             
@@ -713,6 +833,86 @@ app.post("/",function(req,res){
         return
     }
 
+    // 處理使用者玩完遊戲，回到大廳時
+    if((req.body["endGameBackUser"])&&(req.body["endGameBackHash"])){
+
+
+        //console.log("P1")
+        if((!checkEngNum(req.body["endGameBackUser"]))||(!checkEngNum(req.body["endGameBackRoom"]))||(!checkEngNumHash(req.body["endGameBackHash"]))){
+            // 別用 check_offline(user) ，因為可能有 sql injection ，總之先別管就對了。因為 在註冊時，也會擋 sql inejction 
+            
+            res.redirect(301,"/login")
+            return
+        }
+
+        // 找這個使用者
+        out = Object()
+	    sqlstr = "select * from Users where name = '"+req.body["endGameBackUser"]+"';";
+	    usedb(sqlstr,out)
+	     //console.log("P2")
+	    if(out["res"].length!=1){ // 驗證失敗 v1 : 找不到 user
+	        res.redirect(301,"/login")
+	        return
+	    }
+	    
+	
+	    endGameUser = out["res"][0]
+
+         //console.log("P3")
+        // 檢查 joinRoomHash
+	    if(!req.body["endGameBackHash"]){ // 驗證失敗 v2 : 連驗證碼都沒有
+	        // 乾脆都放好了www
+	        clear_joinRoomUserHash = 'UPDATE Users SET end_game_hash = NULL  , hasLogin = 0 , playing_room_id = NULL , join_room_id = NULL , isPlaying = 0 , team_id = 0 where id='+endGameUser["id"]+';';
+	        usedb(clear_joinRoomUserHash,Object())
+	
+	
+	        res.redirect(301,"/login")
+	        return
+	    }
+       // console.log("P4")
+	    // 如果尚未登入，則無法進行 退出房間 動作
+	    if(!endGameUser["hasLogin"]){
+	        // 乾脆都放好了www
+	        clear_joinRoomUserHash = 'UPDATE Users SET end_game_hash = NULL  , hasLogin = 0 , playing_room_id = NULL , join_room_id = NULL , isPlaying = 0 , team_id = 0  where id='+endGameUser["id"]+';';
+	        usedb(clear_joinRoomUserHash,Object())
+	
+	        res.redirect(301,"/login")
+	        return
+	    }
+
+        //console.log("P5")
+        vv=bcrypt.compareSync(   (endGameUser["end_game_hash"]), (req.body["endGameBackHash"]) )
+	    if(!vv){ // 驗證失敗 v3 : 驗證碼錯誤
+	        // 刪除 createRoomHash + 改成未登入
+	        clear_joinRoomUserHash = 'UPDATE Users SET end_game_hash = NULL  , hasLogin = 0 , playing_room_id = NULL , join_room_id = NULL , isPlaying = 0 , team_id = 0 where id='+endGameUser["id"]+';';
+	        usedb(clear_joinRoomUserHash,Object())
+	        
+	        res.redirect(301,"/login")
+	        return
+	    }
+
+        //console.log("P6")
+        //
+        // 驗證通過，可刪除彥正碼了 
+        // 驗證通過，可刪除彥正碼了 + 把使用者的 join_room_id , playing_room_id 都刪掉，也設 isPlaying = 0
+        // , start_game_hash = NULL 居然得在這才能刪掉 =  。隨便啦
+	    clear_joinRoomUserHash = 'UPDATE Users SET end_game_hash = NULL , start_game_hash = NULL , join_room_id = NULL , playing_room_id = NULL , isPlaying = 0 , team_id = 0  where id='+endGameUser["id"]+';';
+	    usedb(clear_joinRoomUserHash,Object())
+
+
+        // 注意，這邊重要，把 user 從 in_playing_room 刪掉
+        room_id = req.body["endGameBackRoom"]
+        if(in_playing_room[room_id]){
+            delete in_playing_room[room_id][endGameUser["name"]]
+        }
+        //console.log("P7")
+
+        // 顯示 lobby 顯示大廳網頁
+        res.render("room_lobby.ejs",{username:endGameUser["name"]})
+        return
+
+    }
+
 
     // 防止 sql injection
     if((!checkEngNum(req.body["loginName"]))||(!checkEngNum(req.body["loginPass"]))||(!checkEngNumHash(req.body["loginHash"]))){
@@ -734,18 +934,29 @@ app.post("/",function(req,res){
 
     vv = bcrypt.compareSync(req.body["loginPass"],loginUser["password"])
     if(!vv){ // 驗證失敗 v2 : 密碼錯誤
+         clear_loginUser_loginHash = 'UPDATE Users SET login_hash = NULL , hasLogin = 0 , playing_room_id = NULL , join_room_id = NULL , isPlaying = 0  , team_id = 0 where id='+loginUser["id"]+';';
+        usedb(clear_loginUser_loginHash,Object())
         res.redirect(301,"/login")
         return
     }
 
     // 檢查 loginHash
     if(!req.body["loginHash"]){ // 驗證失敗 v3 : 連驗證碼都沒有
+         clear_loginUser_loginHash = 'UPDATE Users SET login_hash = NULL , hasLogin = 0 , playing_room_id = NULL , join_room_id = NULL , isPlaying = 0  , team_id = 0 where id='+loginUser["id"]+';';
+        usedb(clear_loginUser_loginHash,Object())
         res.redirect(301,"/login")
         return
     }
 
-    
 
+    // 防止使用者已經登入還玩
+    if(loginUser["hasLogin"]){
+        clear_loginUser_loginHash = 'UPDATE Users SET login_hash = NULL , hasLogin = 0 , playing_room_id = NULL , join_room_id = NULL , isPlaying = 0  , team_id = 0 where id='+loginUser["id"]+';';
+        usedb(clear_loginUser_loginHash,Object())
+        res.redirect(301,"/login")
+        return
+    }
+    
     // 在已登入時，網頁按F5重整時，這句 bcrypt.compareSync 會出錯，所以先來做點保險
     if((!loginUser["login_hash"])||(!req.body["loginHash"])){
         // req.body["loginName"] 還能抓到原本登入的帳號名稱，先把 hasLogin 改回0
@@ -1358,15 +1569,501 @@ app.post("/changeReady",function(req,res){
     res.send(JSON.stringify({result:"OK",new_ready_id:req.body["new_ready_id"]}))
 })
 
+// 管理者登入  介面
+app.get("/monitor",function(req,res){
+    res.render("adminLogin.ejs",{})
+})
+// 管理者 登入 post 請求
+app.post("/monitor",function(req,res){
+    
+    
+    // 防止 sql injection
+    if((!checkEngNum(req.body["adminLoginName"]))||(!checkEngNum(req.body["adminLoginPass"]))||(!checkEngNumHash(req.body["adminLoginHash"]))){
+        res.redirect(301,"/monitor")
+        return
+    }
+    out = Object()
+    sqlstr = "select * from Users where name = '"+req.body["adminLoginName"]+"' and isAdmin = 1;";
+    usedb(sqlstr,out)
+    
+    if(out["res"].length!=1){ // 驗證失敗 v1 : 找不到 user
+        res.redirect(301,"/monitor")
+        return
+    }
+    
+
+    // 檢查使用者的密碼
+    loginAdmin = out["res"][0]
+    //console.log("CCC : "+JSON.stringify(loginAdmin))
+    vv = bcrypt.compareSync(req.body["adminLoginPass"],loginAdmin["password"])
+    if(!vv){ // 驗證失敗 v2 : 密碼錯誤
+        res.redirect(301,"/monitor")
+        return
+    }
+
+    //console.log("到這邊")
+
+    // 防止使用者已經登入還玩
+    if(loginAdmin["hasLogin"]){
+        clear_loginUser_loginHash = 'UPDATE Users SET login_hash = NULL , hasLogin = 0 , playing_room_id = NULL , join_room_id = NULL , isPlaying = 0  , team_id = 0 where id='+loginAdmin["id"]+';';
+        usedb(clear_loginUser_loginHash,Object())
+        
+        // 刪掉 AdminLoginhash
+        clear_hash = "delete from AdminLoginHashs where admin ='"+req.body["adminLoginName"]+"'"
+        usedb(clear_hash,Object())
+
+        res.redirect(301,"/monitor")
+        return
+    }
+    //console.log("2到這邊")
+
+    // 檢查 loginHash
+    if(!req.body["adminLoginHash"]){ // 驗證失敗 v3 : 連驗證碼都沒有
+        res.redirect(301,"/monitor")
+        return
+    }
+
+
+    //console.log("3到這邊")
+
+    
+    
+
+    //取出 DB 中驗證碼
+    sql_hash = "select * from AdminLoginHashs where admin = '"+loginAdmin["name"]+"'"
+
+    obj6 = Object()
+    usedb(sql_hash,obj6)
+    //console.log(" : "+obj6["res"])
+    if(obj6["res"].length!=1){
+        clear_loginUser_loginHash = 'UPDATE Users SET login_hash = NULL , hasLogin = 0 , playing_room_id = NULL , join_room_id = NULL , isPlaying = 0  , team_id = 0 where id='+loginAdmin["id"]+';';
+        usedb(clear_loginUser_loginHash,Object())
+        
+        // 刪掉 AdminLoginhash
+        clear_hash = "delete from AdminLoginHashs where admin ='"+req.body["adminLoginName"]+"'"
+        usedb(clear_hash,Object())
+
+        res.redirect(301,"/monitor")
+        return
+    }
+    //console.log("4到這邊")
+    admin_login_hash = obj6["res"][0]
+    //console.log(JSON.stringify(admin_login_hash)+" , "+JSON.stringify(req.body))
+    vv=bcrypt.compareSync(   admin_login_hash["nonHash"], (req.body["adminLoginHash"]) )
+    if(!vv){ // 驗證失敗 v4 : 驗證碼錯誤
+
+        // 驗證碼錯誤，就直接刪掉驗證碼，但是不可把 hasLogin 寫1，那就寫0吧
+        clear_loginUser_loginHash = 'UPDATE Users SET login_hash = NULL , hasLogin = 0 , playing_room_id = NULL , join_room_id = NULL , isPlaying = 0  , team_id = 0 where id='+loginAdmin["id"]+';';
+        usedb(clear_loginUser_loginHash,Object())
+
+         // 刪掉 AdminLoginhash
+       clear_hash = "delete from AdminLoginHashs where admin ='"+req.body["adminLoginName"]+"'"
+        usedb(clear_hash,Object())
+
+        res.redirect(301,"/login")
+        return
+    }
+
+
+    //console.log("5到這邊")
+
+    //console.log("驗證成功")
+    // admin 設成登入中
+    clear_loginUser_loginHash = 'UPDATE Users SET login_hash = NULL , hasLogin = 1 where id='+loginAdmin["id"]+';';
+    usedb(clear_loginUser_loginHash,Object())
+
+    //刪除 DB AdminLoginHash 紀錄
+    // delete_sql = "DELETE FROM Tests WHERE id>2;"
+    
+    clear_hash = "delete from AdminLoginHashs where admin ='"+req.body["adminLoginName"]+"'"
+    //console.log("CCC : "+clear_hash)
+    usedb(clear_hash,Object())
+
+
+    //console.log("到這邊")
+    res.render("admin.ejs",{})
+})
+
+// 管理者 登出 post 請求
+app.post("/monitorLogout",function(req,res){
+
+
+    // 防止 sql injection
+    if((!checkEngNum(req.body["adminLogoutName"]))||(!checkEngNumHash(req.body["adminLogoutHash"]))){
+        res.redirect(301,"/login")
+        return
+    }
+
+    out = Object()
+    sqlstr = "select * from Users where name = '"+req.body["adminLogoutName"]+"';";
+    usedb(sqlstr,out)
+    
+    if(out["res"].length!=1){ // 驗證失敗 v1 : 找不到 user
+        res.redirect(301,"/monitor")
+        return
+    }
+
+
+
+    
+    logoutAdmin = out["res"][0]
+
+    // 檢查 logoutHash
+    if(!req.body["adminLogoutHash"]){ // 驗證失敗 v2 : 連驗證碼都沒有
+
+        clear_loginUser_loginHash = 'UPDATE Users SET login_hash = NULL , hasLogin = 0 , playing_room_id = NULL , join_room_id = NULL , isPlaying = 0  , team_id = 0 where id='+logoutAdmin["id"]+';';
+        usedb(clear_loginUser_loginHash,Object())
+
+         // 刪掉 AdminLogouthash
+        clear_hash = "delete from AdminLogoutHashs where admin ='"+req.body["adminLogoutName"]+"'"
+        usedb(clear_hash,Object())
+
+
+        res.redirect(301,"/monitor")
+        return
+    }
+
+
+    
+    
+    
+    // 如果尚未登入，則無法進行登出動作
+    if(!logoutUser["hasLogin"]){
+
+        clear_loginUser_loginHash = 'UPDATE Users SET login_hash = NULL , hasLogin = 0 , playing_room_id = NULL , join_room_id = NULL , isPlaying = 0  , team_id = 0 where id='+logoutAdmin["id"]+';';
+        usedb(clear_loginUser_loginHash,Object())
+
+         // 刪掉 AdminLogouthash
+        clear_hash = "delete from AdminLogoutHashs where admin ='"+req.body["adminLogoutName"]+"'"
+        usedb(clear_hash,Object())
+
+        res.redirect(301,"/monitor")
+        return
+    }
+
+    
+     // 刪掉 AdminLogouthash 可以擺上面，因為驗證碼檢查錯誤，一樣得刪掉驗證碼
+    clear_hash = "delete from AdminLogoutHashs where admin ='"+req.body["adminLogoutName"]+"'"
+    usedb(clear_hash,Object())
+
+    
+    vv=bcrypt.compareSync(   (logoutUser["logout_hash"]), (req.body["adminLogoutHash"]) )
+    if(!vv){ // 驗證失敗 v3 : 驗證碼錯誤
+
+        clear_loginUser_loginHash = 'UPDATE Users SET login_hash = NULL , hasLogin = 0 , playing_room_id = NULL , join_room_id = NULL , isPlaying = 0  , team_id = 0 where id='+logoutAdmin["id"]+';';
+        usedb(clear_loginUser_loginHash,Object())
+
+
+        res.redirect(301,"/monitor")
+        return
+    }
+
+    // 刪除 logoutHash
+    /*
+    clear_loginUser_loginHash = 'UPDATE Users SET logout_hash = NULL , hasLogin = 0 where id='+logoutUser["id"]+';';
+    usedb(clear_loginUser_loginHash,Object())
+    */
+    
+    res.send("<script>alert('登出成功');location.href='/monitor';</script>")
+
+})
+
+
+app.get("/cccc",function(req,res){
+    res.render("demo.ejs",{})
+})
+
+// 重要，post 請求，顯示遊戲網頁
+app.post("/game",function(req,res){
+
+    // {"startGameUser":"syn55698","startGameRoom":"Room11","startGameHash":"$2b$10$cjgtuEXJj2V84gRXlcYrxuXV5Sl8Md4twhEh0g89zRxny0Hqr7zx2"}
+    // console.log("HHHH : "+JSON.stringify(req.body))
+    //console.log("V0")
+    // 防止 sql injection
+    if((!checkEngNum(req.body["startGameUser"]))||(!checkEngNum(req.body["startGameRoom"]))||(!checkEngNumHash(req.body["startGameHash"]))){
+        res.redirect(301,"/login")
+        return
+    }
+
+    //console.log("V-1")
+    out = Object()
+    sqlstr = "select * from Users where name = '"+req.body["startGameUser"]+"';";
+    usedb(sqlstr,out)
+    
+    if(out["res"].length!=1){ // 驗證失敗 v1 : 找不到 user
+        res.redirect(301,"/login")
+        return
+    }
+    
+    //console.log("V1")
+    
+    startGameUser = out["res"][0]
+    // 檢查使用者未在遊戲中
+    if(startGameUser["isPlaying"]==1){
+        // 退出
+        clear_loginUser_loginHash = 'UPDATE Users SET start_game_hash = NULL , login_hash = NULL , hasLogin = 0 , playing_room_id = NULL , join_room_id = NULL , isPlaying = 0  , team_id = 0 where id='+startGameUser["id"]+';';
+        usedb(clear_loginUser_loginHash,Object())
+        res.redirect(301,"/login")
+        return
+    }
+
+    // 檢查這間房間還在並尚未在遊戲中
+    room_sql = "select * from PlayRooms where room_id='"+req.body["startGameRoom"]+"' and playing_room_id IS NULL"
+    out3 = Object()
+    usedb(room_sql,out3)
+    if(out3["res"].length!=1){
+        // 退出
+        clear_loginUser_loginHash = 'UPDATE Users SET start_game_hash = NULL , login_hash = NULL , hasLogin = 0 , playing_room_id = NULL , join_room_id = NULL , isPlaying = 0  , team_id = 0 where id='+startGameUser["id"]+';';
+        usedb(clear_loginUser_loginHash,Object())
+        res.redirect(301,"/login")
+        return
+    }
+
+    
+    // 檢查  start_game_hash
+    if(!req.body["startGameHash"]){ // 驗證失敗 v2 : 連驗證碼都沒有
+        clear_loginUser_loginHash = 'UPDATE Users SET start_game_hash = NULL , login_hash = NULL , hasLogin = 0 , playing_room_id = NULL , join_room_id = NULL , isPlaying = 0  , team_id = 0 where id='+startGameUser["id"]+';';
+        usedb(clear_loginUser_loginHash,Object())
+        res.redirect(301,"/login")
+        return
+    }
+    //console.log("V2")
+    vv = bcrypt.compareSync(startGameUser["start_game_hash"],req.body["startGameHash"],)
+    if(!vv){ // 驗證失敗 v3 : 密碼錯誤
+        clear_loginUser_loginHash = 'UPDATE Users SET start_game_hash = NULL , login_hash = NULL , hasLogin = 0 , playing_room_id = NULL , join_room_id = NULL , isPlaying = 0  , team_id = 0 where id='+startGameUser["id"]+';';
+        usedb(clear_loginUser_loginHash,Object())
+        res.redirect(301,"/login")
+        return
+    }
+
+
+    
+
+    //console.log("V3")
+
+    
+
+    room = out3["res"][0]
+
+     //console.log("V4 : "+room["join_room_user_str"])
+     // 先減15，這段很花時間，很容易就變成超時
+     all_player_monitor[startGameUser["name"]]["record"] = all_player_monitor[startGameUser["name"]]["record"] - 15
+
+    // 刪掉 start_game_hash + isPlaying = 1 設成遊戲中
+
+    // 媽的 start_game_hash 不知為啥就這個欄位改不了...這個只能在 遊戲結束時那邊才能刪掉
+    // 管他的，會先用 isPlaying == 1 先把還想再連線進來的同一使用者擋下來，不用擔心
+    //  UPDATE Users SET start_game_hash = NULL , login_hash = NULL , hasLogin = 1 , isPlaying = 1  where id=1;
+     clear_loginUser_loginHash = 'UPDATE Users SET  login_hash = NULL , hasLogin = 1 , isPlaying = 1  , start_game_hash = NULL where id = '+startGameUser["id"]+';';
+        usedb(clear_loginUser_loginHash,Object())
+    
+    /*
+    i3=0
+    while(i3<10){
+        clear_loginUser_loginHash = 'UPDATE Users SET  start_game_hash = NULL where id='+startGameUser["id"]+';';
+        console.log("FFF : "+clear_loginUser_loginHash)
+        ss= Object()
+        usedb(clear_loginUser_loginHash,ss)
+        console.log("end : "+JSON.stringify(ss))
+        ++i3.
+    }
+    */
+     // 把 
+
+     // 驗證通過，所有人開始跳轉頁面
+     // 注意，先別設 PlayingRooms 此間 room 的 playing_room_id，因為有多個人要檢查，一個人先設了，別的人檢查 playing_room_id 就不是 NULL，就會被擋，請注意
+     obj6 = Object()
+
+     obj6["room_id"] = req.body["startGameRoom"]
+     obj6["join_room_user_str"] = room["join_room_user_str"]
+     obj6["join_team_str"] = room["join_team_str"]
+     
+     
+     join_room_user = JSON.parse(room["join_room_user_str"])
+     obj6["user"] = req.body["startGameUser"]
+     user = obj6["user"]
+     obj6["user_fraction"] = join_room_user[user]["team_id"]
+     
+     obj6["user_team_id"] = join_room_user[req.body["startGameUser"]]["team_id"] // 1 或 2
+     res.render("demo.ejs",{inobj:obj6})
+
+     // 刪掉 in_nonPlaying_room 這間 Room 的，若有，通常只會刪掉一次
+     if(in_nonPlaying_room[req.body["startGameRoom"]]){
+         delete in_nonPlaying_room[req.body["startGameRoom"]]
+     }
+
+     if(!wait_model_all_ready[room_id]){
+        obj8 = Object()
+        //wait_model_all_ready[room_id] = 
+        
+        // room["join_room_user_str"]
+        room_user = JSON.parse(room["join_room_user_str"])
+        for (user in room_user){
+            obj8[user] = {name:user , ready:false}
+        }
+
+        wait_model_all_ready[room_id] = obj8
+
+        game_enemy[room_id] = Object()
+        
+        game_enemy[room_id]["counter"] = 0
+
+    }
+     
+     
+     setTimeout(function(){
+         console.log("啟動~~~~")
+         endGameBackLobby(obj6["room_id"])
+     },10000)
+     
+
+     
+})
+
 
 //============================這邊寫 WebScoket 基本設定+監聽訊息
+var PORT = 8081;
+var SSLPORT = 8085;
+
+var options = {
+  key: fs.readFileSync('openssl/server-key.pem'),
+  ca: [fs.readFileSync('openssl/cert.pem')],
+  cert: fs.readFileSync('openssl/server-cert.pem')
+};
+
+var https = require('https').createServer(options, app);
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
 
+// 回傳創造的 enemy_id
+function getCreateEnemyId(enemy_type,faction,room_id){
+    //da = new Date()
+    //ds = da.getFullYear()+"-"+da.getMonth()+"-"+da.getDay()+" "+da.getHours()+":"+da.getMinutes()+":"+da.getSeconds()+":"+da.getMilliseconds()
+    //ds = "enemy_"+enemy_type+"_"+faction+"_"+ds
+    ds = "enemy-"+game_enemy[room_id]["counter"]
+    game_enemy[room_id]["counter"] = game_enemy[room_id]["counter"]+1
+    // "enemy-A-12"
+    return ds
+}
+
+
+// check 每間房間，如果使用者都準備好了，發送訊息說要開始遊戲
+function checkAllRoom(){
+    rooms_sql = "select * from PlayRooms where playing_room_id IS NULL"
+    out2 = Object()
+    usedb(rooms_sql,out2)
+    //console.log("SSSS")
+    if(out2["res"].length!=0){
+        rooms = out2["res"]
+        for(i in rooms){
+            room = rooms[i]
+            all_ready = false
+            one_user = false // 至少有一個使用者
+            join_room_user = JSON.parse(room["join_room_user_str"])
+            join_team = JSON.parse(room["join_team_str"])
+            all_user_num = 0 // 統計全部使用者，限制得至少幾個人，才可開始遊戲
+
+            // 其中一隊人數為0，就不會開始遊戲，只有一隊是要玩甚麼www
+            if(  (join_team[0]["usernum"]==0) || (join_team[1]["usernum"]==0)  ){
+                continue;
+            }
+            for(user in join_room_user){
+                one_user = true
+                if(one_user){
+                    all_ready = true
+                }
+                if(join_room_user[user]["status"]==false){
+                    all_ready = false
+                    break
+                }
+                all_user_num = all_user_num+1
+            }
+            // console.log("DDD : "+room["room_id"]+" , "+room["join_room_user_str"])
+            // console.log("DDD : "+all_ready+" , "+room["room_id"]+" , "+room["join_room_user_str"])
+            if(all_ready && (all_user_num>=2)    ){ // 若已有playing_room_id ，代表在遊戲中了，就不用再進去更新了
+                // && (!room["playing_room_id"])
+                // 製造 hash ，讓 給每個 玩家的 start_game_hash
+                // 在 post 提交到 /game，會檢查 各玩家的start_game_hash，是否跟 自己資料行中的 start_game_hash(未加密) 一樣
+                // SQL操作先放到上面，免得操作SQL太頻繁，sqlite 又當機
+                UserStartGameHashStr= getHashTypeStr("UserStartGame")
+
+
+
+                
+
+                
+                
+
+                da = new Date()
+                ds = da.getFullYear()+"-"+da.getMonth()+"-"+da.getDay()+" "+da.getHours()+":"+da.getMinutes()+":"+da.getSeconds()+":"+da.getMilliseconds()
+                ds=UserStartGameHashStr+"_"+room["room_id"]+"_" + ds
+
+                // 'UPDATE Tests SET name="nn1",text="tt1" where id=2;';
+                set_user_start_game_hash_sql = "UPDATE Users SET start_game_hash = '"+ds+"' where join_room_id='"+room["room_id"]+"'"
+                cc = Object()
+                usedb(set_user_start_game_hash_sql,cc)
+                //console.log("BBBBB : "+JSON.stringify(cc))
+
+
+                // 設定 Room 資料行的 Playing id
+                /*
+                set_room_playing_id = "UPDATE PlayRooms SET playing_room_id = '"+ds+"' where room_id='"+room["room_id"]+"'"
+                cc = Object()
+                usedb(set_room_playing_id,cc)
+                */
+                // 對每個客戶端發送消息
+                for(user in in_nonPlaying_room[room["room_id"]]){
+                    //console.log("user : "+user)
+                    user_socket = in_nonPlaying_room[room["room_id"]][user]
+                    obj3 = Object()
+                    obj3["event_name"] = "serverInformStartGame"
+                    obj3["room_id"] = room["room_id"]
+                    obj3["user"] = String(user)
+                    obj3["start_game_hash"] = bcrypt.hashSync(ds,10)
+                    user_socket.emit("nonPlayingEvent",obj3)
+                    //console.log("GG : "+room["room_id"])
+                }
+
+            }
+        }
+    }
+}
+setInterval(checkAllRoom,1500)
+var util = require("util")
+
+// 確認一間 Room 的使用者退乾淨後，刪掉這間 room
+/*
+function checkDelRoom(){
+
+    for(room in in_playing_room){
+
+        vv=""
+        bb=false
+        try{
+            // 當可以成功轉換時，代表底下沒有 socket 物件屬性值了，代表沒有使用者了，可以刪掉這個Room了
+            vv= JSON.stringify(in_playing_room[room])
+            bb=true
+        }catch(e){
+
+        }
+        console.log("JJJJJJJJJ : "+util.inspect(in_playing_room[room],{}))
+        if(bb){
+            delete in_playing_room[room]
+            del_room_sql = "delete from PlayRooms where room_id = '"+room+"'"
+            usedb(del_room_sql,Object())
+
+            console.log("刪掉Room : "+room)
+        }
+    }
+}
+setInterval(checkDelRoom,2000)
+*/
 
 io.on('connection', function(socket){ 
     /* 下面可寫多個類似這樣的，監聽 由 Client 端觸發的事件 */
     /* 函式引數 msg 即為，從 Client 端傳送的訊息 */
+
+    // 傳輸非遊戲中的事件
     socket.on("nonPlayingEvent",function(msg){    
         // 處理 驗證 註冊請求
         if(msg["event_name"]=="requestRegister"){
@@ -1510,10 +2207,8 @@ io.on('connection', function(socket){
                 da = new Date()
                 ds = da.getFullYear()+"-"+da.getMonth()+"-"+da.getDay()+" "+da.getHours()+":"+da.getMinutes()+":"+da.getSeconds()+":"+da.getMilliseconds()
                 
+                // 注意，在上面有寫  UserLoginHashStr=getHashTypeStr("UserLogin") ，記得在上面先寫好，太頻繁操作DB，sqlite 會當掉
                 
-                ds = "LoginHash_"+msg["user"]+"_" + ds
-                //改用這個
-                //ds=getHashTypeStr("UserLogin")+"_"+msg["user"]+"_" + ds
                 ds=UserLoginHashStr+"_"+msg["user"]+"_" + ds
                 
                 //console.log("CCCCC : "+getHashTypeStr("UserLogin"))
@@ -1542,6 +2237,7 @@ io.on('connection', function(socket){
         // 定時檢查，是否還在線上
         else if(msg["event_name"]=="checkOnline"){
             //console.log("A Momitor "+msg["user"]+" --")
+           // console.log("PPP : "+msg["user"])
             if(all_player_monitor[msg["user"]]){
                 if(!  (all_player_monitor[msg["user"]]["record"] === undefined )){
                     obj = Object()
@@ -2243,7 +2939,7 @@ io.on('connection', function(socket){
             if(out["res"].length==1){
 
 
-                console.log("A2")
+                //console.log("A2")
                 changeReadyUser = out["res"][0]
                 if(!changeReadyUser["hasLogin"]){ // 代表未登入，無法進行 加入變換準備狀態動作
                     try{
@@ -2259,7 +2955,7 @@ io.on('connection', function(socket){
                     return
                 }
 
-                console.log("A3")
+                //console.log("A3")
                 
                 // 重要，確認這間房間存在 & 沒在遊戲中
                 check_room_can_join = "select * from PlayRooms where playing_room_id IS NULL and room_id = '"+String(msg["room_id"])+"';"
@@ -2322,7 +3018,6 @@ io.on('connection', function(socket){
             }
 
         }
-        /*
         // 測試，可偵測到Room被刪除，成功
         else if(msg["event_name"]=="test"){
             del = "delete from PlayRooms where room_id='"+msg["room_id"]+"'"
@@ -2344,9 +3039,319 @@ io.on('connection', function(socket){
                 usedb(let_user_logout,Object())
             }
         }
-        */
 
+        else if(msg["event_name"]=="requestAdminLogin"){
+            //console.log("C1")
+            // 防止sql injection，在帳密亂輸入奇怪東西
+            if(   (!checkEngNum(msg["admin"])) || (!checkEngNum(msg["password"]))   ){
+                obj = Object()
+                try{
+                    obj["result"] = "no";
+                    obj["event_name"]="serverResponseAdminLogin";
+                    obj["cause"] = "請勿輸入非英文或數字的字元"
+                    socket.emit("nonPlayingEvent",obj)
+                    return
+                }catch(e){
+                    // 應該就是網路出錯，就啥動作都不做
+                    return
+                }
+            }
+            //console.log("C2")
+            out = Object() 
+            // 加上限制，要取 有管理員 權限的
+            sqlstr="select * from Users where name = '"+String(msg["admin"])+"' and isAdmin = 1 ;"
+            //console.log("sqlstr : "+sqlstr)
+            usedb(sqlstr,out)
+            obj = Object()
+            // 此時 out["res"] 為陣列
+            if(out["res"].length==1){ // 確定此帳號已註冊過，往下檢查密碼
+                AdminLoginHashStr=getHashTypeStr("AdminLogin")
+                // 檢查密碼 ，是否正確
+                loginAdmin = out["res"][0]
+                vv = bcrypt.compareSync(msg["password"],loginAdmin["password"])
+                //console.log("C3")
+                // 密碼錯了，就會在這裡被檔，無法離開 if 往下走
+                if(!vv){
+                    try{
+                        obj["result"] = "no";
+                        obj["event_name"]="serverResponseAdminLogin";
+                        obj["cause"] = "密碼錯誤，請重新輸入"
+                        socket.emit("nonPlayingEvent",obj)
+                        return
+                    }catch(e){
+                        // 應該就是網路出錯，就啥動作都不做
+                        return
+                    }
+                    return
+                }
+
+                // !!!重點!! 檢查是否已經登入，已經登入就檔掉
+                if(loginAdmin["hasLogin"]){
+                    try{
+                        obj["result"] = "no";
+                        obj["event_name"]="serverResponseAdminLogin";
+                        obj["cause"] = "該管理者已經在其他分頁登入，不可再次登入"
+                        socket.emit("nonPlayingEvent",obj)
+                        return
+                    }catch(e){
+                        // 應該就是網路出錯，就啥動作都不做
+                        return
+                    }
+                    return
+                }
+
+                //console.log("繼續往下走")
+
+                // 來製造 loginHash 字串囉
+                
+                
+
+                da = new Date()
+                ds = da.getFullYear()+"-"+da.getMonth()+"-"+da.getDay()+" "+da.getHours()+":"+da.getMinutes()+":"+da.getSeconds()+":"+da.getMilliseconds()
+                
+                
+                ds = AdminLoginHashStr +"_"+msg["admin"]+"_" + ds
+                //console.log("CCCCC : "+getHashTypeStr("UserLogin"))
+                //update_sql = 'UPDATE Tests SET name="nn1",text="tt1" where id=2;';
+                
+                // 在 admin login hash 插入資料行
+                add_admin_loginHash_sql = "INSERT INTO AdminLoginHashs (admin,nonHash) VALUES ('"+msg["admin"]+"','"+ds+"');"
+                
+                usedb(add_admin_loginHash_sql,Object())
+                obj["adminLoginHash"]=bcrypt.hashSync(ds, 10)
+                obj["admin"] = msg["admin"]
+                obj["result"] = "ok";
+                obj["event_name"]="serverResponseAdminLogin";
+                socket.emit("nonPlayingEvent",obj)
+                //console.log("繼續往下走")
+                
+            }else{ // 此帳號未註冊過，無法登入
+                try{
+                    obj["result"] = "no";
+                    obj["event_name"]="serverResponseLogin";
+                    obj["cause"] = "此帳號未註冊，請先註冊"
+                    socket.emit("nonPlayingEvent",obj)
+                    return
+                }catch(e){
+                    // 應該就是網路出錯，就啥動作都不做
+                    return
+                }
+
+            }
+
+        }
+        // e
+        else if(msg["event_name"]=="requestAdminLogout"){
+            if(   (!checkEngNum(msg["admin"]))   ){
+                obj = Object()
+                try{
+                    obj["result"] = "no";
+                    obj["event_name"]="serverResponseAdminLogout";
+                    obj["cause"] = "請勿輸入非英文或數字的字元"
+                    socket.emit("nonPlayingEvent",obj)
+                    return
+                }catch(e){
+                    // 應該就是網路出錯，就啥動作都不做
+                    return
+                }
+            }
+            //console.log("C2")
+            out = Object() 
+            // 加上限制，要取 有管理員 權限的
+            sqlstr="select * from Users where name = '"+String(msg["admin"])+"' and isAdmin = 1 ;"
+            //console.log("sqlstr : "+sqlstr)
+            usedb(sqlstr,out)
+            obj = Object()
+            // 此時 out["res"] 為陣列
+            if(out["res"].length==1){ // 確定此帳號已註冊過，往下檢查密碼
+                AdminLogoutHashStr=getHashTypeStr("AdminLogout")
+                // 檢查密碼 ，是否正確
+                logoutAdmin = out["res"][0]
+                
+
+                // !!!重點!! 檢查是否已經登入，未登入就檔掉，未登入無法登出
+                if(!logoutAdmin["hasLogin"]){
+                    try{
+                        obj["result"] = "no";
+                        obj["event_name"]="serverResponseAdminLogout";
+                        obj["cause"] = "該管理者未登入，無法進行登出動作"
+                        socket.emit("nonPlayingEvent",obj)
+                        return
+                    }catch(e){
+                        // 應該就是網路出錯，就啥動作都不做
+                        return
+                    }
+                    return
+                }
+
+                //console.log("繼續往下走")
+
+                // 來製造 loginHash 字串囉
+                
+                
+
+                da = new Date()
+                ds = da.getFullYear()+"-"+da.getMonth()+"-"+da.getDay()+" "+da.getHours()+":"+da.getMinutes()+":"+da.getSeconds()+":"+da.getMilliseconds()
+                
+                
+                ds = AdminLogoutHashStr +"_"+msg["admin"]+"_" + ds
+                //console.log("CCCCC : "+getHashTypeStr("UserLogin"))
+                //update_sql = 'UPDATE Tests SET name="nn1",text="tt1" where id=2;';
+                
+                // 在 admin login hash 插入資料行
+                add_admin_logoutHash_sql = "INSERT INTO AdminLogoutHashs (admin,nonHash) VALUES ('"+msg["admin"]+"','"+ds+"');"
+                
+                usedb(add_admin_logoutHash_sql,Object())
+                obj["adminLogoutHash"]=bcrypt.hashSync(ds, 10)
+                obj["admin"] = msg["admin"]
+                obj["result"] = "ok";
+                obj["event_name"]="serverResponseAdminLogout";
+                socket.emit("nonPlayingEvent",obj)
+                //console.log("繼續往下走")
+                
+            }else{ // 此帳號未註冊過，無法登入
+                try{
+                    obj["result"] = "no";
+                    obj["event_name"]="serverResponseLogout";
+                    obj["cause"] = "此帳號未註冊，請先註冊"
+                    socket.emit("nonPlayingEvent",obj)
+                    return
+                }catch(e){
+                    // 應該就是網路出錯，就啥動作都不做
+                    return
+                }
+
+            }
+        }
+
+        else if(msg["event_name"]=="request_informAddRoom"){
+            room_id = msg["room_id"]
+            //console.log("A1 : "+JSON.stringify(msg))
+        
+
+
+            room_sql = "select * from PlayRooms where room_id='"+room_id+"' and playing_room_id IS NULL"
+            out2 = Object()
+            usedb(room_sql,out2)
+
+            if(out2["res"].length!=1){
+                     //console.log("A3 : "+JSON.stringify(out2["res"][0]))
+                    return
+                    
+            }
+            room = out2["res"][0]
+
+
+            if(!in_nonPlaying_room[room_id]){
+                // 如果這間房間不存在 或是在遊戲中，就直接跳掉，這是來亂的
+                 //console.log("A2")
+                
+                 //console.log("A344 : "+JSON.stringify(out2["res"][0]))
+                
+
+                
+                in_nonPlaying_room[room_id] = Object()
+            }
+             //console.log("A4")
+            if(!in_nonPlaying_room[room_id][msg["user"]]){
+                // 先檢查玩家是否存在 and 以登入 and 未在遊戲中
+                // console.log("A5")
+                user_sql = "select * from Users where name = '"+msg["user"]+"' "
+               // console.log("CCC : "+JSON.stringify(user))
+                out3 = Object()
+                usedb(user_sql,out3)
+                //console.log("CCC : "+JSON.stringify(out3["res"]))
+                if(out3["res"].length!=1){
+                    //console.log("A6")
+                    return
+                }
+                // 取得 User socket 物件，可對 User 發送訊息說要開始遊戲
+                in_nonPlaying_room[room_id][msg["user"]] = socket
+                //console.log("V6 : "+msg["user"])
+            }
+            //console.log("V7")
+        }
+
+        else if(msg["event_name"]=="model_ready"){
+
+            
+
+            user = msg["user"]
+            room_id = msg["user"]
+            
+
+            obj["room_id"] = room_id
+            obj["user"] = user
+
+            // {name:user , ready:false}
+             wait_model_all_ready[room_id][user]["ready"] = true
+
+             bb = true
+             for(user in wait_model_all_ready[room_id]){
+                 if(wait_model_all_ready[room_id][user]["ready"]==false){
+                     bb=false
+                     break
+                 }
+             }
+
+             if(bb){
+                delete wait_model_all_ready[room_id]
+                io.to(room_id).emit("playingEvent",{event_name:"client_start_game"})
+             }
+                         
+
+        }
     })
+
+    // 傳輸遊戲中的事件
+    socket.on("playingEvent",function(msg){{
+        if(msg["event_name"=="enemy_be_attacked"]){
+            obj = msg
+            obj["event_name"] = "enemy_get_damaged"
+            io.to(msg["room_id"]).emit("playingEvent",obj)
+        }else if(msg["event_name"=="castle_be_attacked"]){
+            obj = msg
+            obj["event_name"] = "castle_get_damaged"
+            io.to(msg["room_id"]).emit("playingEvent",obj)
+        }else if(msg["event_name"=="request_create_tower"]){
+            obj = msg
+            obj["event_name"] = "create_tower_success"
+            io.to(msg["room_id"]).emit("playingEvent",obj)
+        }else if(msg["event_name"=="tower_be_attacked"]){
+            obj = msg
+            obj["event_name"] = "tower_get_damaged"
+            io.to(msg["room_id"]).emit("playingEvent",obj)
+        }else if(msg["event_name"=="wave_spawner_request_spawn_enemy"]){
+            obj = msg
+            obj["enemy_id"] = getCreateEnemyId(obj["enemy_type"],obj["ws_faction"],msg["room_id"])
+            obj["event_name"] = "wave_spawner_create_enemy"
+            io.to(msg["room_id"]).emit("playingEvent",obj)
+        }
+
+        // 接收到，使用者遊戲中
+        else if(msg["event_name"]=="informPlayerOnline"){
+            if(!in_playing_room[msg["room_id"]]){
+                in_playing_room[msg["room_id"]]=Object()
+            }
+
+            if(!in_playing_room[msg["room_id"]][msg["user"]]){
+                in_playing_room[msg["room_id"]][msg["user"]] = socket
+                socket.join(msg["room_id"]) // 把 socket 加入房間
+
+                //fffff = 'UPDATE Users SET  login_hash = NULL , hasLogin = 1 , isPlaying = 1  , start_game_hash = "vojewjrbvoewjobjojrwebje" where name="'+msg["user"]+'";';
+                //console.log("WWWWW : "+fffff)
+                //usedb(fffff,Object())
+            }
+            //console.log("CCCC : "+Boolean(in_playing_room[msg["room_id"]][msg["user"]]))
+
+        }
+
+
+        // 接收到，單一客戶端，說要結束遊戲，傳給所有客戶端知道
+        else if(msg["event_name"]=="informEndGame"){
+            endGameBackLobby(msg["room_id"],msg["user"],socket)
+        }
+    }})
 }) 
 /*
 
@@ -2354,6 +3359,11 @@ io.on('connection', function(socket){
 */
 
 //============================這段寫，Server 伺服器啟動，開始監聽任何連線請求
-http.listen(port, function(){
-    console.log('listening on *:'+port);
+http.listen(PORT, function(){
+    console.log('http listening on *:'+PORT);
 });
+
+https.listen(SSLPORT, function(){
+    console.log('https listening on *:'+SSLPORT);
+});
+

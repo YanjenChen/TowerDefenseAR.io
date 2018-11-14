@@ -190,6 +190,10 @@ function getsocket(){
                 location.href="/login"
             }
         }
+        // Server 通知，可以開始遊戲了
+        else if(msg["event_name"]=="serverResponseCheckOnline"){
+
+        }
 
 	})
 }
@@ -268,7 +272,7 @@ function clickJoinRoom(){
 
 $(function(){
     setInterval(tickGetRooms,1000)
-
+    
     //登出按鈕
     $("#signout").click(function(){
         //alert("CCC")
@@ -325,12 +329,11 @@ $(function(){
 
     //設置 click 加入房間用的函示
     $(".iconth").click(clickJoinRoom)
-    /*
+
     // 測試，讓 user 被登出，會自動被偵測到
     $("#test2").click(function(){
         socket.emit("nonPlayingEvent",{event_name:"test2",user:$("#username").val()})  
     })
-    */
 })
 
 /*
