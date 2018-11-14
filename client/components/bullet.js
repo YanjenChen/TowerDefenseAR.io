@@ -69,7 +69,7 @@
                 });
                 */
                 this.el.sceneEl.emit('broadcast', {
-                    event_name: 'enemy-be-attacked',
+                    event_name: 'enemy_be_attacked',
                     id: this.data.target.getAttribute('id'),
                     damage: this.data.damagePoint
                 });

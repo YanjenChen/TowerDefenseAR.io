@@ -1,6 +1,10 @@
 (() => {
     AFRAME.registerComponent('wave-spawner', {
         schema: {
+            id: {
+                type: 'string',
+                default: ''
+            },
             amount: {
                 type: 'number',
                 default: 4
@@ -20,6 +24,7 @@
             }
         },
         init: function() {
+            this.el.setAttribute('id', this.data.id);
             this.timeCounter = 0;
             this.spawnCounter = 0;
             this.el.addState('activate');
@@ -38,7 +43,8 @@
                     });
                     */
                     this.el.sceneEl.emit('broadcast', {
-                        event_name: 'wave-spawner-request-spawn-enemy',
+                        event_name: 'wave_spawner_request_spawn_enemy',
+                        id: this.data.id,
                         ws_faction: this.data.faction,
                         type: 'default'
                     });

@@ -1,7 +1,9 @@
 (() => {
     // Connect to server.
     var SOCKET = undefined;
-    var ROOM_ID = undefined;
+    var ROOM_ID = jQuery("#room_id").val();
+    var USER = jQuery("#user").val();
+    var USER_FACTION = jQuery("#user_faction").val() == '1' ? 'A' : 'B';
 
     while (true) {
         try {
@@ -13,18 +15,23 @@
         init: function() {
             this.socket = SOCKET;
             this.room_id = ROOM_ID;
+            this.user = USER;
 
             this.el.addEventListener('loaded', this.onAssetsLoaded.bind(this));
-            this.socket.on('client-start-game', this.onStartGame.bind(this));
+            this.socket.on('client_start_game', this.onStartGame.bind(this));
 
             this.el.addEventListener('broadcast', this.onBroadcast.bind(this)); // Listen local event.
             this.socket.on('playingEvent', this.onExecute.bind(this)); // Listen server broadcast.
         },
         onAssetsLoaded: function() {
-            this.socket.emit('model-ready');
+            this.socket.emit('model-ready', {
+                room_id: this.room_id,
+                user: this.user
+            });
         },
         onStartGame: function() {
-            var sceneEl = document.querySelector('a-scene');
+            //var sceneEl = document.querySelector('a-scene
+            var sceneEl = this.el;
             jQuery.getJSON('renderer/maps/demo.json', (map) => {
                 /* CURVE LOADER */
                 map.factions.forEach(faction => {
@@ -91,6 +98,7 @@
                 sceneEl.appendChild(testTower2);
 
                 var testWavespawner1 = document.createElement('a-entity');
+                testWavespawner1.setAttribute('id', 'faction-A-wave-spawner');
                 testWavespawner1.setAttribute('wave-spawner', {
                     amount: 5,
                     duration: 5000,
@@ -100,6 +108,7 @@
                 sceneEl.appendChild(testWavespawner1);
 
                 var testWavespawner2 = document.createElement('a-entity');
+                testWavespawner2.setAttribute('id', 'faction-B-wave-spawner');
                 testWavespawner2.setAttribute('wave-spawner', {
                     amount: 5,
                     duration: 6000,
@@ -112,26 +121,27 @@
         },
         onBroadcast: function(content) {
             content.room_id = this.room_id;
+            content.user = this.user;
             this.socket.emit('playingEvent', content);
         },
         onExecute: function(content) {
             switch (content['event_name']) {
-                case 'enemy-get-damaged':
+                case 'enemy_get_damaged':
                     this.el.querySelector('#' + content['id']).emit('be-attacked', {
                         damage: content['damage']
                     });
                     break;
-                case 'castle-get-damaged':
+                case 'castle_get_damaged':
 
                     break;
-                case 'create-tower-success':
+                case 'create_tower_success':
 
                     break;
-                case 'tower-get-damaged':
+                case 'tower_get_damaged':
 
                     break;
-                case 'wave-spawner-create-enemy':
-                    this.el.querySelector('[wave-spawner]').emit('spawn_enemy', {
+                case 'wave_spawner_create_enemy':
+                    this.el.querySelector('#' + content['id']).emit('spawn_enemy', {
                         id: content['enemy_id'],
                         faction: content['ws_faction'],
                         healthPoint: 6,
