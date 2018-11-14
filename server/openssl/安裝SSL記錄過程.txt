@@ -1,0 +1,7 @@
+1 先安裝 openssl ，先去網路上下載以下檔案 : openssl-1.0.2j-fips-x86_64.zip
+    我把裡面檔案解壓縮到 D:\OpenSSL\
+2 之後開始用 openssl 產生憑證檔案，用 "管理員權限" 開終端機
+3 接下來的指令動作，都照這個網站的教學 : https://medium.com/@savemuse/node-js-%E5%BB%BA%E7%AB%8Bhttps%E4%BC%BA%E6%9C%8D%E5%99%A8-46442e9cd433
+    注意。裡面有講到 "openssl.cnf" 都改成 "D:\OpenSSL\bin\openssl.cnf" ，就是在 openssl-1.0.2j-fips-x86_64.zip 解壓縮到的目錄
+
+

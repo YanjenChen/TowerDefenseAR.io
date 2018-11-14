@@ -175,6 +175,16 @@ function getsocket(){
 	        }
         }
 
+        else if(msg["event_name"]=="serverInformStartGame"){
+            console.log("出現了 : "+JSON.stringify(msg))
+            $("#startGameUser").val(msg["user"])
+            $("#startGameRoom").val(msg["room_id"])
+            $("#startGameHash").val(msg["start_game_hash"])
+            $("#startGameForm").submit()
+    
+
+        }
+
 	})
 }
 getsocket()
@@ -205,9 +215,21 @@ function renew_room_user_list(){
 }
 
 
+function informAddRoom(){
+    obj2 = Object()
+    obj2["event_name"] = "request_informAddRoom"
+    obj2["user"] = $("#username").val()
+    obj2["room_id"] = $("#room_id").val()
+    socket.emit("nonPlayingEvent",obj2)
+    console.log("發射~")
+}
+
+
 $(function(){
     setInterval(checkOnline,1000)
     setInterval(renew_room_user_list,1000)
+    informAddRoom() // 發動一次就好了
+    //setInterval(informAddRoom_checkCanStart,1000)
     //登出按鈕
     $("#signout").click(function(){
         //alert("CCC")
@@ -240,17 +262,16 @@ $(function(){
         }  
     })
 
-    /*
     // (成功) 測試，讓 room 消失，會自動被偵測到
     $("#test").click(function(){
         socket.emit("nonPlayingEvent",{event_name:"test",room_id:$("#room_id").val()})  
     })
-    
+
     // 測試，讓 user 被登出，會自動被偵測到
     $("#test2").click(function(){
         socket.emit("nonPlayingEvent",{event_name:"test2",user:$("#username").val()})  
     })
-    */
+
      $(".block").css({"visibility":"hidden"})
 
     //變換 team 
@@ -277,7 +298,7 @@ $(function(){
         $(this).click(function(){
             if(index == out_ready_id){
             // 代表狀態一樣，不用丟封包
-                //alert("CCCC")
+                alert("CCCC")
                 return
             }
             console.log("VVVVVVV")

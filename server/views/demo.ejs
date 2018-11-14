@@ -1,0 +1,81 @@
+<!DOCTYPE HTML>
+<html>
+
+<head>
+    <title>Tower Defense AR</title>
+    <!--
+    LIBRARY EXPLAINATION
+        aframe.min.js: main renderer library.
+        aframe-extras.min.js: 3d module animation, loader and other supporting functions.
+        aframe-ar.js: marker-based AR library for aframe.
+    -->
+    <script src="https://aframe.io/releases/0.8.0/aframe.min.js"></script>
+    <script src="https://cdn.rawgit.com/donmccurdy/aframe-extras/v4.2.0/dist/aframe-extras.min.js"></script>
+    <!-- DISABLE AR.js WHEN USING AFRAME TEST -->
+    <!--script src="https://cdn.rawgit.com/jeromeetienne/AR.js/1.5.0/aframe/build/aframe-ar.js"></script-->
+    <!-- ONLY USED IN DEMO.JS -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+
+    <!--
+    LOAD COMPONENTS
+    -->
+    <!--script src="https://unpkg.com/aframe-curve-component/dist/aframe-curve-component.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@ripter/aframe-alongpath-component@1.1.4/index.js"></script-->
+    <script src="lib/glow.js"></script>
+    <script src="lib/path.js"></script>
+    <script src="lib/trace.js"></script>
+    <script src="components/enemy.js"></script>
+    <script src="components/wave_spawner.js"></script>
+    <script src="components/bullet.js"></script>
+    <script src="components/tower.js"></script>
+    
+    <!-- 載入 socket.io 的 js 檔，從後端抓的 --> 
+    <script src="/socket.io/socket.io.js"></script> 
+    
+    <script src="demo.js"></script>
+
+    
+</head>
+
+<body>
+    <!-- record player name -->
+    <input id="username" value="<%=inobj["user"]%>" type="hidden">
+    <!-- record player faction id -->
+    <input id="user_team_id" value="<%=inobj["user_team_id"]%>" type="hidden">
+    <!-- record room_id -->
+    <input id="room_id" value="<%=inobj["room_id"]%>" type="hidden">
+
+    <!-- back to game lobby -->
+    <form id="endGameBackForm" method="post" action="/">
+        <input id="endGameBackUser" name="endGameBackUser" type="hidden" />
+        <input id="endGameBackUser" name="endGameBackRoom" type="hidden" />
+        <input id="endGameBackHash" name="endGameBackHash" type="hidden" />
+    </form>
+
+
+    <!--
+    ENABLE THE FOLLOWING SECTION TO RUN AFRAME TEST
+        This part demos how you can test the scense you created without AR.
+        Aframe is VR library, we use it as the 3d renderer.
+        For more information, google "aframe" and read it's tutorial.
+    -->
+    <a-scene stats background="color: grey">
+        <a-camera position="0 10 0" rotation="-90 0 0" look-controls-enabled="false">
+    </a-scene>
+
+    <!--
+    ENABLE THE FOLLOWING SECTION TO RUN AR TEST
+        This part demos how to intergrate AR.js with aframe.
+        The only thing we need to do is adding a <a-marker> wrapper to the scense,
+        and remove all the light source in the scense, AR.js SEEMS will add the light source
+        by itself.
+        For more information, google "AR.js" and read it's github.
+    -->
+    <!--a-scene stats artoolkit>
+        <a-marker-camera preset='hiro'></a-marker-camera>
+    </a-scene-->
+
+    <script src="renderer/demo.js"></script>
+</body>
+
+</html>
