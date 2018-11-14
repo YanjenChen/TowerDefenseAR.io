@@ -23,20 +23,26 @@
             this.timeCounter = 0;
             this.spawnCounter = 0;
             this.el.addState('activate');
+            this.addEventListener('spawn_enemy', this._spawnEnemy.bind(this));
         },
         tick: function(time, timeDelta) {
             if (this.el.is('activate')) {
                 if (this.timeCounter > this.data.timeOffSet) {
                     this.spawnCounter++;
+                    /* following is local method */
+                    /*
                     this._spawnEnemy({
                         faction: this.data.faction,
                         healthPoint: 6,
                         speed: 4
                     });
-                    if (this.spawnCounter >= this.data.amount) {
-                        this.spawnCounter = 0;
-                        this.el.removeState('activate');
-                    }
+                    */
+                    this.el.sceneEl.emit('broadcast', {
+                        event_name: 'wave-spawner-request-spawn-enemy',
+                        ws_faction: this.data.faction,
+                        type: 'default'
+                    });
+
                     this.timeCounter = 0
                 } else
                     this.timeCounter += timeDelta;
@@ -55,6 +61,11 @@
             var enemyEl = document.createElement('a-entity');
             enemyEl.setAttribute('enemy', schema);
             this.el.sceneEl.appendChild(enemyEl);
+
+            if (this.spawnCounter >= this.data.amount) {
+                this.spawnCounter = 0;
+                this.el.removeState('activate');
+            }
         }
     });
 })();

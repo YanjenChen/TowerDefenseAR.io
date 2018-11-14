@@ -28,6 +28,7 @@
     <script src="components/wave_spawner.js"></script>
     <script src="components/bullet.js"></script>
     <script src="components/tower.js"></script>
+    <script src="renderer/game.js"></script>
 </head>
 
 <body>
@@ -37,7 +38,10 @@
         Aframe is VR library, we use it as the 3d renderer.
         For more information, google "aframe" and read it's tutorial.
     -->
-    <a-scene stats background="color: grey">
+    <a-scene stats background="color: grey" tdar-game>
+        <a-assets>
+            <a-asset-item src="renderer/assets/tower.ply"></a-asset-item>
+        </a-assets>
         <a-camera position="0 10 0" rotation="-90 0 0" look-controls-enabled="false">
     </a-scene>
 
@@ -53,7 +57,7 @@
         <a-marker-camera preset='hiro'></a-marker-camera>
     </a-scene-->
 
-    <script src="renderer/demo.js"></script>
+    <!--script src="renderer/demo.js"></script-->
 </body>
 
 </html>

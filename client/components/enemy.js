@@ -9,11 +9,11 @@
             };
             this.faction.A.enemies = [];
             this.faction.B.enemies = [];
-            this._idCounter = 0;
+            //this._idCounter = 0;
         },
         registerEnemy: function(el) {
             var fac = el.components.enemy.data.faction;
-            el.setAttribute('id', 'enemy-' + (this._idCounter++).toString());
+            //el.setAttribute('id', 'enemy-' + (this._idCounter++).toString());
             this.faction[fac].enemies.push(el);
             document.querySelector('a-scene').systems['tower'].updateEnemies(fac);
         },
@@ -29,6 +29,10 @@
 
     AFRAME.registerComponent('enemy', {
         schema: {
+            id: {
+                type: 'string',
+                default: ''
+            },
             faction: {
                 type: 'string',
                 default: 'A',
@@ -50,6 +54,7 @@
         init: function() {
             //console.log('Initial enemy.');
             this.currentHP = this.data.healthPoint;
+            this.el.setAttribute('id', this.data.id);
             this.el.setAttribute('geometry', {
                 primitive: 'sphere',
                 radius: 0.4,
