@@ -296,6 +296,10 @@ var in_nonPlaying_room = Object()
 var in_playing_room = Object()
 var wait_model_all_ready = Object()
 var game_enemy = Object() // 記錄各隊伍的 enemy counter
+
+
+
+/// 使用者斷線，相關動作
 function check_offline(user){
     // 先確定，若這使用者有加入任何ROOM，就把那個ROOM內的使用者名單刪掉
     sql = "select * from Users where name ='"+String(user)+"'"
@@ -364,7 +368,14 @@ function check_offline(user){
                 if(in_playing_room[room][obj["res"][0]["name"]]){
                     delete in_playing_room[room][obj["res"][0]["name"]]
                 }
-            }                
+            }      
+
+            //刪掉 wait_model_all_ready 內的
+            if(wait_model_all_ready[room]){
+                if(wait_model_all_ready[room][obj["res"][0]["name"]]){
+                    delete wait_model_all_ready[room][obj["res"][0]["name"]]
+                }
+            }          
         }
 
 
@@ -1882,10 +1893,10 @@ app.post("/game",function(req,res){
      join_room_user = JSON.parse(room["join_room_user_str"])
      obj6["user"] = req.body["startGameUser"]
      user = obj6["user"]
-     obj6["user_fraction"] = join_room_user[user]["team_id"]
+     obj6["user_faction"] = join_room_user[user]["team_id"]
      
      obj6["user_team_id"] = join_room_user[req.body["startGameUser"]]["team_id"] // 1 或 2
-     res.render("demo.ejs",{inobj:obj6})
+     
 
      // 刪掉 in_nonPlaying_room 這間 Room 的，若有，通常只會刪掉一次
      if(in_nonPlaying_room[req.body["startGameRoom"]]){
@@ -1899,23 +1910,33 @@ app.post("/game",function(req,res){
         // room["join_room_user_str"]
         room_user = JSON.parse(room["join_room_user_str"])
         for (user in room_user){
-            obj8[user] = {name:user , ready:false}
+            obj8[user] = {name:user , model_ready:false,socket_join_ready:false}
         }
-
+        /*
+        
+        TypeError: Cannot read property 'undefined' of undefined
+            at Socket.<anonymous> (D:\Programing_Projects\#學校網頁課1\TDAR_1114_Test\server.js:3290:44)
+        */
         wait_model_all_ready[room_id] = obj8
-
+        // {"Room11":{"syn55698":{"name":"syn55698","model_ready":false,"socket_join_ready":false},"fhrol55698":{"name":"fhrol55698","model_ready":false,"socket_join_ready":false}}}
+        console.log("\nWWWWWWWWWW : \n"+JSON.stringify(wait_model_all_ready)+"\n\n")
+        
+        // 這邊確定有跑到
+        // POST wait_model_all_ready[room_id] : {"syn55698":{"name":"syn55698","ready":false},"fhrol55698":{"name":"fhrol55698","ready":false}}
+        //console.log("POST wait_model_all_ready[room_id] : "+JSON.stringify(wait_model_all_ready[room_id]))
         game_enemy[room_id] = Object()
         
         game_enemy[room_id]["counter"] = 0
 
     }
      
-     
+     /*
      setTimeout(function(){
          console.log("啟動~~~~")
          endGameBackLobby(obj6["room_id"])
      },10000)
-     
+     */
+     res.render("demo.ejs",{inobj:obj6})
 
      
 })
@@ -2012,6 +2033,8 @@ function checkAllRoom(){
                 usedb(set_room_playing_id,cc)
                 */
                 // 對每個客戶端發送消息
+
+                //  wait_model_all_ready[room_id][user]["ready"] = true
                 for(user in in_nonPlaying_room[room["room_id"]]){
                     //console.log("user : "+user)
                     user_socket = in_nonPlaying_room[room["room_id"]][user]
@@ -2029,6 +2052,49 @@ function checkAllRoom(){
     }
 }
 setInterval(checkAllRoom,1500)
+
+
+// 持續跑，等某間 Room 的所有使用者的 model_ready , socket_join_ready 都是 true，就發送 client_start_game 給這 Room 所有使用者，並刪掉 wait_model_all_ready 這間 Room 的 key
+function checkRoomAllUser_ModelSocketReady(){
+
+
+    for(room_id in wait_model_all_ready){
+        for(user in wait_model_all_ready[room_id]){
+            
+            bb = true
+            if(  (wait_model_all_ready[room_id][user]["model_ready"]) && (wait_model_all_ready[room_id][user]["socket_join_ready"])  ){
+                     
+            }else{
+                     // 確認，要全部使用者，model 載好 + 寫過 join 後，才可發送 io.emit 
+                     // 不要有的還沒 join 就發射
+                     bb=false
+                     break
+            }
+        }
+
+        if(bb){
+               
+
+                // 'client_start_game'
+                //io.to(room_id).emit('client_start_game',{event_name:"client_start_game"})
+                
+                io.to(room_id).emit("CCC",{result:"測試"})
+                
+                // 這句不加，CCC 才能收到
+                io.to(room_id).emit("DDD",{result:"測試"})
+                console.log("\n\nGGGGGGGGGGGGG : "+JSON.stringify(wait_model_all_ready)+"\n\n")
+                 delete wait_model_all_ready[room_id]
+                 io.to(room_id).emit("client_start_game",{event_name:"client_start_game"})
+        }
+
+
+    }
+}
+setInterval(checkRoomAllUser_ModelSocketReady,100)
+
+
+
+
 var util = require("util")
 
 // 確認一間 Room 的使用者退乾淨後，刪掉這間 room
@@ -2272,6 +2338,8 @@ io.on('connection', function(socket){
                 socket.emit("nonPlayingEvent",obj3)
 
             }
+
+            console.log("checkOnline.......")
         }
         // 處理 登出 請求
         else if(msg["event_name"]=="requestLogout"){
@@ -3277,27 +3345,57 @@ io.on('connection', function(socket){
             
 
             user = msg["user"]
-            room_id = msg["user"]
+            room_id = msg["room_id"]
             
 
             obj["room_id"] = room_id
             obj["user"] = user
 
             // {name:user , ready:false}
-             wait_model_all_ready[room_id][user]["ready"] = true
+            if(!wait_model_all_ready[room_id]){
+                // 代表已經model readt + socket join ready，wait_model_all_ready[room_id] 已經被刪掉了，所以不用再檢查了
+                console.log("\nmodel_ready圓滿落幕囉~~ : "+JSON.stringify(msg)+"\n")
+                return
+            }
+           
+             wait_model_all_ready[room_id][user]["model_ready"] = true
+             //console.log("這邊~~~~")
 
+             //console.log("\nmodel ready : \n"+JSON.stringify(msg)+"\n")
+              //console.log("room id : "+room_id+" , user : "+user)
+            //console.log("\n3290  wait_model_all_ready[room_id] : "+JSON.stringify( wait_model_all_ready[room_id])+"\n")
+
+
+            // 以下這段，移到 checkRoomAllUser_ModelSocketReady 函式，定時會檢查
+            /*
              bb = true
              for(user in wait_model_all_ready[room_id]){
-                 if(wait_model_all_ready[room_id][user]["ready"]==false){
+                 if(  (wait_model_all_ready[room_id][user]["model_ready"]) && (wait_model_all_ready[room_id][user]["socket_join_ready"])  ){
+                     
+                 }else{
+                     // 確認，要全部使用者，model 載好 + 寫過 join 後，才可發送 io.emit 
+                     // 不要有的還沒 join 就發射
                      bb=false
                      break
                  }
              }
 
              if(bb){
-                delete wait_model_all_ready[room_id]
-                io.to(room_id).emit("playingEvent",{event_name:"client_start_game"})
+               
+
+                // 'client_start_game'
+                //io.to(room_id).emit('client_start_game',{event_name:"client_start_game"})
+                
+                io.to(room_id).emit("CCC",{result:"測試"})
+                
+                // 這句不加，CCC 才能收到
+                io.to(room_id).emit("DDD",{result:"測試"})
+                console.log("\n\nGGGGGGGGGGGGG : "+JSON.stringify(wait_model_all_ready)+"\n\n")
+                 delete wait_model_all_ready[room_id]
+                 io.to(room_id).emit("client_start_game",{event_name:"client_start_game"})
              }
+
+             */
                          
 
         }
@@ -3329,6 +3427,8 @@ io.on('connection', function(socket){
         }
 
         // 接收到，使用者遊戲中
+
+        // 寫 socket.join 的
         else if(msg["event_name"]=="informPlayerOnline"){
             if(!in_playing_room[msg["room_id"]]){
                 in_playing_room[msg["room_id"]]=Object()
@@ -3336,12 +3436,28 @@ io.on('connection', function(socket){
 
             if(!in_playing_room[msg["room_id"]][msg["user"]]){
                 in_playing_room[msg["room_id"]][msg["user"]] = socket
-                socket.join(msg["room_id"]) // 把 socket 加入房間
 
+
+                // 確定有了，修好了
+                socket.join(msg["room_id"]) // 把 socket 加入房間
+                console.log("SSSS : "+JSON.stringify(wait_model_all_ready)+"\n : "+JSON.stringify(msg)+"\n\n")
+                
+
+                if(wait_model_all_ready[msg["room_id"]]){
+                    wait_model_all_ready[msg["room_id"]][msg["user"]]["socket_join_ready"] = true
+                
+                    console.log("\n"+msg["user"]+".....socket.join room : "+msg["room_id"]+"\n")
+                    console.log("CCC : "+JSON.stringify(wait_model_all_ready)+"\n\n")
+                }
+                
+                
+                
                 //fffff = 'UPDATE Users SET  login_hash = NULL , hasLogin = 1 , isPlaying = 1  , start_game_hash = "vojewjrbvoewjobjojrwebje" where name="'+msg["user"]+'";';
                 //console.log("WWWWW : "+fffff)
                 //usedb(fffff,Object())
             }
+
+            //console.log("informPlayerOnline PPPP")
             //console.log("CCCC : "+Boolean(in_playing_room[msg["room_id"]][msg["user"]]))
 
         }

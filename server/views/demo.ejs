@@ -16,6 +16,17 @@
     <!-- ONLY USED IN DEMO.JS -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 
+
+    <!-- 載入 socket.io 的 js 檔，從後端抓的 --> 
+    <script src="/socket.io/socket.io.js"></script> 
+    <script src="demo.js"></script>
+
+
+    <input id='room_id' value="<%=inobj['room_id']%>" type='hidden'>
+    <input id='user' value="<%=inobj['user']%>" type='hidden'>
+    <input id='user_faction' value="<%=inobj['user_faction']%>" type='hidden'>
+
+    
     <!--
     LOAD COMPONENTS
     -->
@@ -29,37 +40,27 @@
     <script src="components/bullet.js"></script>
     <script src="components/tower.js"></script>
     
-    <!-- 載入 socket.io 的 js 檔，從後端抓的 --> 
-    <script src="/socket.io/socket.io.js"></script> 
-    
-    <script src="demo.js"></script>
 
     
+    <script src="renderer/game.js"></script>
 </head>
 
 <body>
-    <!-- record player name -->
-    <input id="username" value="<%=inobj["user"]%>" type="hidden">
-    <!-- record player faction id -->
-    <input id="user_team_id" value="<%=inobj["user_team_id"]%>" type="hidden">
-    <!-- record room_id -->
-    <input id="room_id" value="<%=inobj["room_id"]%>" type="hidden">
-
-    <!-- back to game lobby -->
-    <form id="endGameBackForm" method="post" action="/">
-        <input id="endGameBackUser" name="endGameBackUser" type="hidden" />
-        <input id="endGameBackUser" name="endGameBackRoom" type="hidden" />
-        <input id="endGameBackHash" name="endGameBackHash" type="hidden" />
-    </form>
-
-
+    
     <!--
     ENABLE THE FOLLOWING SECTION TO RUN AFRAME TEST
         This part demos how you can test the scense you created without AR.
         Aframe is VR library, we use it as the 3d renderer.
         For more information, google "aframe" and read it's tutorial.
     -->
-    <a-scene stats background="color: grey">
+    <a-scene stats background="color: grey" tdar-game>
+
+
+        <!--
+        <a-assets>
+            <a-asset-item src="renderer/assets/tower.ply"></a-asset-item>
+        </a-assets>
+        -->
         <a-camera position="0 10 0" rotation="-90 0 0" look-controls-enabled="false">
     </a-scene>
 
@@ -75,7 +76,9 @@
         <a-marker-camera preset='hiro'></a-marker-camera>
     </a-scene-->
 
-    <script src="renderer/demo.js"></script>
+    <!--script src="renderer/demo.js"></script-->
+
+    
 </body>
 
 </html>
