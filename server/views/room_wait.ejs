@@ -1,0 +1,162 @@
+<html>
+    <head>
+            <title>Web TDAR Game - <%=room_id%></title>
+
+            <script type="text/javascript" src="https://cdn.bootcss.com/jquery/2.1.1/jquery.min.js"></script> 
+            <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/themes/smoothness/jquery-ui.css"> 
+
+            <!-- 新 Bootstrap 核心 CSS 文件 --> 
+            <link href="https://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet"> 
+            <!-- 最新的 Bootstrap 核心 JavaScript 文件 --> 
+            <script src="https://cdn.bootcss.com/bootstrap/3.3.7/js/bootstrap.min.js"></script> 
+
+            <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.2.9/semantic.min.css"/>
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.2.9/semantic.min.js"></script>
+
+            <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+            <!-- 載入 socket.io 的 js 檔，從後端抓的 --> 
+            <script src="/socket.io/socket.io.js"></script> 
+    
+
+            <script src="room_wait.js"></script>
+
+    </head>
+
+    <body>
+        <input id="username" value="<%=user%>" type='hidden'/>
+        <input id="room_id" value="<%=room_id%>" type='hidden'/>
+
+        <form id="logoutForm" method="post" action="/logout">
+            <input id="logoutName" name="logoutName" type="hidden" />
+            <input id="logoutHash" name="logoutHash" type="hidden" />
+        </form>
+
+        <form id="backLobbyForm" method="post" action="/">
+            <input id="backLobbyUser" name="backLobbyUser" type="hidden" />
+            <input id="backLobbyRoom" name="backLobbyRoom" type="hidden" />
+        </form>
+
+        <form id="leaveRoomForm" method="post" action="/">
+            <input id="leaveRoomUser" name="leaveRoomUser" type="hidden" />
+            <input id="leaveRoomId" name="leaveRoomId" type="hidden" />
+            <input id="leaveRoomHash" name="leaveRoomHash" type="hidden" />
+        </form>
+
+
+		<form id="startGameForm" method="post" action="/game">
+            <input id="startGameUser" name="startGameUser" type="hidden" />
+            <input id="startGameRoom" name="startGameRoom" type="hidden" />
+			<input id="startGameHash" name="startGameHash" type="hidden" />
+        </form>
+
+        <br>
+        <div class="ui inverted top fixed menu" style="position:fixed;top:20px;width:100%;height:100px;font-size:25px;">
+            
+            <a id="test2" class="right aligned item" style="width:300px;height:100%;"><%=user%></a>
+            <a id="test" class="right aligned item" style="width:300px;height:100%;"><%=room_id%></a>
+            <a id="leave_room" class="right aligned item" style="width:300px;height:100%;">leave_room</a>
+            <a id="signout" class="right aligned item" style="width:300px;height:100%;">sign out</a>
+        </div>
+
+
+
+
+         
+          <!--
+          <div class="ui grid segment container">
+              <div class="ui four wide column segment container">
+              <h1>測試</h1>
+              </div>
+
+    
+
+
+              <div class="ui twelve wide column segment container">
+                  <h1>測試</h1>
+              </div>
+          </div>
+          -->
+          <br><br><br>
+		  <div class="ui grid segment" >
+				<div class="four wide column ui segment container" style="top:10px;min-height:450px"> 
+					<div style="height:500px" class="">
+						<br><br><br>
+						<div class="ui large buttons">
+							<button class="ui blue button ready_button" style="width:40%;height:100px;font-size:45px;padding:0px;margin:5px;">取消準備</button>
+							<button class="ui red button ready_button" style="width:40%;height:100px;font-size:45px;padding:0px;margin:5px;">準備完成</button>
+						</div>
+					</div>
+					<div class="ui large buttons">
+						<button class="ui red button team_button" style="width:60%;height:100px;font-size:50px;padding:0px;margin:5px;">Team1</button>
+						
+						<button class="ui blue button team_button" style="width:60%;height:100px;font-size:50px;padding:0px;margin:5px;">Team2</button>
+					</div>
+				</div>
+
+				<div class="eleven wide column ui segment container" style="position:relative;bottom:5px;min-height:450px">
+
+					<div class="ui grid" style="height:375px;">
+							<div class="block ui five wide column segment container" style="top:15px;max-height:345px;padding:5px">
+								<div style="background-color: blue;text-align: center;color:white;height:170px;position:relative;top:5px">
+									<h1 class="player" style="position:relative;top:50px;font-size:50px;">Syn</h1>
+								</div>
+								<br>
+								<div style="background-color:darkcyan;text-align: center;color:aquamarine;height:120px;position:relative;top:5px">
+									<h1 class= "status" style="position:relative;top:20px;font-size:60px;">準備完成</h1>
+								</div>
+							</div>
+							<div class="block ui five wide column segment container" style="position:relative;">
+								<div style="background-color: blue;text-align: center;color:white;height:170px;position:relative;bottom:15px">
+									<h1 class="player" style="position:relative;top:50px;font-size:50px;">Syn</h1>
+								</div>
+								<br>
+								<div style="background-color:darkcyan;text-align: center;color:aquamarine;height:120px;position:relative;bottom:15px">
+									<h1 class= "status" style="position:relative;top:20px;font-size:60px;">準備完成</h1>
+								</div>
+							</div>
+							<div class="block ui five wide column segment container" style="position:relative;top:0px;max-height: 350px">
+								<div style="background-color: blue;text-align: center;color:white;height:170px;position:relative;bottom:15px">
+									<h1 class="player" style="position:relative;top:50px;font-size:50px;">Syn</h1>
+								</div>
+								<br>
+								<div style="background-color:darkcyan;text-align: center;color:aquamarine;height:120px;position:relative;bottom:15px">
+									<h1 class= "status" style="position:relative;top:20px;font-size:60px;">準備完成</h1>
+								</div>
+							</div>
+					</div>
+
+					<div class="ui grid" style="height:375px;">
+							<div class="block ui five wide column segment container" style="top:15px;max-height:345px;padding:5px;">
+								<div style="background-color: blue;text-align: center;color:white;height:170px;position:relative;top:5px">
+									<h1 class="player" style="position:relative;top:50px;font-size:50px;">Syn</h1>
+								</div>
+								<br>
+								<div style="background-color:darkcyan;text-align: center;color:aquamarine;height:120px;position:relative;top:5px">
+									<h1 class= "status" style="position:relative;top:20px;font-size:60px;">準備完成</h1>
+								</div>
+							</div>
+							<div class="block ui five wide column segment container" style="position:relative;">
+								<div style="background-color: blue;text-align: center;color:white;height:170px;position:relative;bottom:15px">
+									<h1 class="player" style="position:relative;top:50px;font-size:50px;">Syn</h1>
+								</div>
+								<br>
+								<div style="background-color:darkcyan;text-align: center;color:aquamarine;height:120px;position:relative;bottom:15px">
+									<h1 class= "status" style="position:relative;top:20px;font-size:60px;">準備完成</h1>
+								</div>
+							</div>
+							<div class="block ui five wide column segment container" style="position:relative;top:0px;max-height: 350px">
+								<div style="background-color: blue;text-align: center;color:white;height:170px;position:relative;bottom:15px">
+									<h1 class="player" style="position:relative;top:50px;font-size:50px;">Syn</h1>
+								</div>
+								<br>
+								<div style="background-color:darkcyan;text-align: center;color:aquamarine;height:120px;position:relative;bottom:15px">
+									<h1 class= "status" style="position:relative;top:20px;font-size:60px;">準備完成</h1>
+								</div>
+							</div>
+					</div>
+				</div>
+         </div>
+        
+
+    </body>
+</html>
