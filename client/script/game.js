@@ -1,16 +1,11 @@
+/*** DEPEDENCY: Need to execute network.js first. ***/
 (() => {
-    // Connect to server.
-    var SOCKET = undefined;
     var ROOM_ID = jQuery("#room_id").val();
     var USER = jQuery("#user").val();
     var USER_FACTION = jQuery("#user_faction").val() == '1' ? 'A' : 'B';
+    //console.log("gamejs : ROOM_ID : " + ROOM_ID + " , USER : " + USER)
+    //console.log("gamejs : " + socket)
 
-    while (true) {
-        try {
-            SOCKET = io();
-            break;
-        } catch (e) {}
-    }
     AFRAME.registerSystem('tdar-game', {
         init: function() {
             this.socket = SOCKET;
@@ -18,21 +13,25 @@
             this.user = USER;
 
             this.el.addEventListener('loaded', this.onAssetsLoaded.bind(this));
-            this.socket.on('client_start_game', this.onStartGame.bind(this));
+            this.socket.on('client_start_game', this.onStartGame);
+            //console.warn("AFRAME Init");
 
             this.el.addEventListener('broadcast', this.onBroadcast.bind(this)); // Listen local event.
-            this.socket.on('playingEvent', this.onExecute.bind(this)); // Listen server broadcast.
+            this.socket.on('playingEvent', this.onExecute); // Listen server broadcast.
         },
         onAssetsLoaded: function() {
-            this.socket.emit('model-ready', {
+            //console.warn('Assets successful loaded.');
+            this.socket.emit("nonPlayingEvent", {
                 room_id: this.room_id,
+                event_name: 'model_ready',
                 user: this.user
             });
         },
         onStartGame: function() {
-            //var sceneEl = document.querySelector('a-scene
-            var sceneEl = this.el;
-            jQuery.getJSON('renderer/maps/demo.json', (map) => {
+            //console.warn('Client start game.')
+            var sceneEl = document.querySelector('a-scene');
+            //var sceneEl = this.el;
+            jQuery.getJSON('./renderer/maps/demo.json', (map) => {
                 /* CURVE LOADER */
                 map.factions.forEach(faction => {
                     faction.enemyPath.forEach(path => {
@@ -98,8 +97,8 @@
                 sceneEl.appendChild(testTower2);
 
                 var testWavespawner1 = document.createElement('a-entity');
-                testWavespawner1.setAttribute('id', 'faction-A-wave-spawner');
                 testWavespawner1.setAttribute('wave-spawner', {
+                    id: 'faction-A-wave-spawner',
                     amount: 5,
                     duration: 5000,
                     faction: 'A',
@@ -108,8 +107,8 @@
                 sceneEl.appendChild(testWavespawner1);
 
                 var testWavespawner2 = document.createElement('a-entity');
-                testWavespawner2.setAttribute('id', 'faction-B-wave-spawner');
                 testWavespawner2.setAttribute('wave-spawner', {
+                    id: 'faction-B-wave-spawner',
                     amount: 5,
                     duration: 6000,
                     faction: 'B',
@@ -119,15 +118,18 @@
 
             });
         },
-        onBroadcast: function(content) {
+        onBroadcast: function(evt) {
+            var content = evt.detail;
             content.room_id = this.room_id;
             content.user = this.user;
             this.socket.emit('playingEvent', content);
+            //console.warn('Emit event to server, name: ' + content['event_name']);
         },
         onExecute: function(content) {
+            //console.warn('Receive event from server, name: ' + content['event_name']);
             switch (content['event_name']) {
                 case 'enemy_get_damaged':
-                    this.el.querySelector('#' + content['id']).emit('be-attacked', {
+                    document.querySelector('#' + content['id']).emit('be-attacked', {
                         damage: content['damage']
                     });
                     break;
@@ -141,7 +143,7 @@
 
                     break;
                 case 'wave_spawner_create_enemy':
-                    this.el.querySelector('#' + content['id']).emit('spawn_enemy', {
+                    document.querySelector('#' + content['id']).emit('spawn_enemy', {
                         id: content['enemy_id'],
                         faction: content['ws_faction'],
                         healthPoint: 6,

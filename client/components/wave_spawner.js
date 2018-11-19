@@ -28,7 +28,7 @@
             this.timeCounter = 0;
             this.spawnCounter = 0;
             this.el.addState('activate');
-            this.addEventListener('spawn_enemy', this._spawnEnemy.bind(this));
+            this.el.addEventListener('spawn_enemy', this._spawnEnemy.bind(this));
         },
         tick: function(time, timeDelta) {
             if (this.el.is('activate')) {
@@ -48,6 +48,7 @@
                         ws_faction: this.data.faction,
                         type: 'default'
                     });
+                    //console.warn('WSID: ' + this.data.id);
 
                     this.timeCounter = 0
                 } else
@@ -63,9 +64,9 @@
             delete this.timeCounter;
             delete this.spawnCounter;
         },
-        _spawnEnemy: function(schema) {
+        _spawnEnemy: function(evt) {
             var enemyEl = document.createElement('a-entity');
-            enemyEl.setAttribute('enemy', schema);
+            enemyEl.setAttribute('enemy', evt.detail);
             this.el.sceneEl.appendChild(enemyEl);
 
             if (this.spawnCounter >= this.data.amount) {
