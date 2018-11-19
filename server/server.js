@@ -57,7 +57,7 @@ function checkEngNumHash(str) {
 //============================這段，使用 express 基本的伺服器設定
 var express = require('express');
 var app = express();
-var port = 8081;
+var port = 11235;
 app.use(express.static('../client/'));
 app.set('views', __dirname + '/views');
 app.set('view engine', 'ejs');
@@ -1989,8 +1989,8 @@ app.post("/game", function(req, res) {
 
 
 //============================這邊寫 WebScoket 基本設定+監聽訊息
-var PORT = 8081;
-var SSLPORT = 8085;
+var PORT = 11235;
+var SSLPORT = 11237;
 
 var options = {
     key: fs.readFileSync('openssl/server-key.pem'),
