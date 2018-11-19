@@ -1,168 +1,173 @@
 <html>
-    <head>
-            <title>Web TDAR Game Lobby</title>
 
-            <script type="text/javascript" src="https://cdn.bootcss.com/jquery/2.1.1/jquery.min.js"></script> 
-            <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/themes/smoothness/jquery-ui.css"> 
+<head>
+    <title>Web TDAR Game Lobby</title>
 
-            <!-- 新 Bootstrap 核心 CSS 文件 --> 
-            <link href="https://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet"> 
-            <!-- 最新的 Bootstrap 核心 JavaScript 文件 --> 
-            <script src="https://cdn.bootcss.com/bootstrap/3.3.7/js/bootstrap.min.js"></script> 
+    <script type="text/javascript" src="https://cdn.bootcss.com/jquery/2.1.1/jquery.min.js"></script>
+    <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/themes/smoothness/jquery-ui.css">
 
-            <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.2.9/semantic.min.css"/>
-            <script src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.2.9/semantic.min.js"></script>
+    <!-- 新 Bootstrap 核心 CSS 文件 -->
+    <link href="https://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
+    <!-- 最新的 Bootstrap 核心 JavaScript 文件 -->
+    <script src="https://cdn.bootcss.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 
-            <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-            <!-- 載入 socket.io 的 js 檔，從後端抓的 --> 
-            <script src="/socket.io/socket.io.js"></script> 
-    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.2.9/semantic.min.css" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.2.9/semantic.min.js"></script>
 
-            <script src="room_lobby.js"></script>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <!-- 載入 socket.io 的 js 檔，從後端抓的 -->
+    <script src="/socket.io/socket.io.js"></script>
 
 
-    </head>
-    <body>
+    <script src="src/room_lobby.js"></script>
+
+
+</head>
+
+<body>
+    <br>
+    <input id="username" value="<%=username%>" type='hidden' />
+    <input id="disconnect" value="<%=username%>" type='hidden' />
+    <form id="logoutForm" method="post" action="/logout">
+        <input id="logoutName" name="logoutName" type="hidden" />
+        <input id="logoutHash" name="logoutHash" type="hidden" />
+    </form>
+    <form id="createRoomForm" method="post" action="/createRoom">
+        <input id="createRoomName" name="createRoomName" type="hidden" />
+        <input id="createRoomHash" name="createRoomHash" type="hidden" />
+    </form>
+    <form id="joinRoomForm" method="post" action="/joinRoom">
+        <input id="joinRoomName" name="joinRoomName" type="hidden" />
+        <input id="joinRoomId" name="joinRoomId" type="hidden" />
+        <input id="joinRoomHash" name="joinRoomHash" type="hidden" />
+    </form>
+
+    <br><br><br>
+    <div class="ui inverted top fixed menu" style="position:fixed;top:20px;width:100%;height:100px;font-size:25px;">
+        <div class="item">Welcome TowerDefenseAR , just enjoy it</div>
+        <a id="test2" class="right aligned item" style="width:300px;height:100%;">
+            <%=username%>
+        </a>
+        <a id="create_new_room" class="right aligned item" style="width:300px;height:100%;">Create New Room</a>
+        <a id="signout" class="right aligned item" style="width:300px;height:100%;">sign out</a>
+    </div>
+
+    <br>
+    <div class="ui segment center aligned container" style="width:70%;">
+
+        <input id="nowPage" value='1' type='hidden' />
         <br>
-        <input id="username" value="<%=username%>" type='hidden'/>
-        <input id="disconnect" value="<%=username%>" type='hidden'/>
-        <form id="logoutForm" method="post" action="/logout">
-            <input id="logoutName" name="logoutName" type="hidden" />
-            <input id="logoutHash" name="logoutHash" type="hidden" />
-        </form>
-        <form id="createRoomForm" method="post" action="/createRoom">
-            <input id="createRoomName" name="createRoomName" type="hidden" />
-            <input id="createRoomHash" name="createRoomHash" type="hidden" />
-        </form>
-        <form id="joinRoomForm" method="post" action="/joinRoom">
-            <input id="joinRoomName" name="joinRoomName" type="hidden" />
-            <input id="joinRoomId" name="joinRoomId" type="hidden" />
-            <input id="joinRoomHash" name="joinRoomHash" type="hidden" />
-        </form>
 
-        <br><br><br>
-        <div class="ui inverted top fixed menu" style="position:fixed;top:20px;width:100%;height:100px;font-size:25px;">
-            <div class="item">Welcome TowerDefenseAR , just enjoy it</div>
-            <a id="test2" class="right aligned item" style="width:300px;height:100%;"><%=username%></a>
-            <a id="create_new_room" class="right aligned item" style="width:300px;height:100%;">Create New Room</a>
-            <a id="signout" class="right aligned item" style="width:300px;height:100%;">sign out</a>
-        </div>
-        
-        <br>
-        <div class="ui segment center aligned container" style="width:70%;">
-            
-            <input id="nowPage" value='1' type='hidden' />
-            <br>
-            
 
-            <button id="lastPage" class="huge ui left labeled icon button" style="display:none;">
+        <button id="lastPage" class="huge ui left labeled icon button" style="display:none;">
                 <i class="left arrow icon"></i>
                 Last
             </button>
-            
-            <button id="page" class="huge ui blue button"  >1</button>
 
-            <button id="nextPage" class="huge ui right labeled icon button" style="display:none;">
+        <button id="page" class="huge ui blue button">1</button>
+
+        <button id="nextPage" class="huge ui right labeled icon button" style="display:none;">
                 <i class="right arrow icon"></i>
                 Next
             </button>
-            
-            <hr>
-            <br>
 
-            <div id="room_list" class="ui grid segments container" style="min-height:603px;">
-                
-                <div style="display:none;" class="room four wide column">
-                    <div class="inroom ui segment container">
-                        <h1 class="room_name"></h1>
-                        
-                        <h2 class="ui icon header">
+        <hr>
+        <br>
+
+        <div id="room_list" class="ui grid segments container" style="min-height:603px;">
+
+            <div style="display:none;" class="room four wide column">
+                <div class="inroom ui segment container">
+                    <h1 class="room_name"></h1>
+
+                    <h2 class="ui icon header">
                             <i class="iconth red arrow circle right link icon"></i>
                             <h2>Join Room</h2>
-                        </h2>
-                    </div>
+                    </h2>
                 </div>
-
-                <div style="display:none;" class="room four wide column">
-                    <div class="inroom ui segment container">
-                        <h1 class="room_name"></h1>
-                        
-                        <h2 class="ui icon header">
-                            <i class="iconth red arrow circle right link icon"></i>
-                            <h2>Join Room</h2>
-                        </h2>
-                    </div>
-                </div>
-
-                <div style="display:none;" class="room four wide column">
-                    <div class="inroom ui segment container">
-                        <h1 class="room_name"></h1>
-                        
-                        <h2 class="ui icon header">
-                            <i class="iconth red arrow circle right link icon"></i>
-                            <h2>Join Room</h2>
-                        </h2>
-                    </div>
-                </div>
-
-                <div style="display:none;" class="room four wide column">
-                    <div class="inroom ui segment container">
-                        <h1 class="room_name"></h1>
-                        
-                        <h2 class="ui icon header">
-                            <i class="iconth red arrow circle right link icon"></i>
-                            <h2>Join Room</h2>
-                        </h2>
-                    </div>
-                </div>
-
-                <div style="display:none;" class="room four wide column">
-                    <div class="inroom ui segment container">
-                        <h1 class="room_name"></h1>
-                        
-                        <h2 class="ui icon header">
-                            <i class="iconth red arrow circle right link icon"></i>
-                            <h2>Join Room</h2>
-                        </h2>
-                    </div>
-                </div>
-
-                <div style="display:none;" class="room four wide column">
-                    <div class="inroom ui segment container">
-                        <h1 class="room_name"></h1>
-                        
-                        <h2 class="ui icon header">
-                            <i class="iconth red arrow circle right link icon"></i>
-                            <h2>Join Room</h2>
-                        </h2>
-                    </div>
-                </div>
-
-                <div style="display:none;" class="room four wide column">
-                    <div class="inroom ui segment container">
-                        <h1 class="room_name"></h1>
-                        
-                        <h2 class="ui icon header">
-                            <i class="iconth red arrow circle right link icon"></i>
-                            <h2>Join Room</h2>
-                        </h2>
-                    </div>
-                </div>
-
-                <div style="display:none;" class="room four wide column">
-                    <div class="inroom ui segment container">
-                        <h1 class="room_name"></h1>
-                        
-                        <h2 class="ui icon header">
-                            <i class="iconth red arrow circle right link icon"></i>
-                            <h2>Join Room</h2>
-                        </h2>
-                    </div>
-                </div>
-
-
-
             </div>
+
+            <div style="display:none;" class="room four wide column">
+                <div class="inroom ui segment container">
+                    <h1 class="room_name"></h1>
+
+                    <h2 class="ui icon header">
+                            <i class="iconth red arrow circle right link icon"></i>
+                            <h2>Join Room</h2>
+                    </h2>
+                </div>
+            </div>
+
+            <div style="display:none;" class="room four wide column">
+                <div class="inroom ui segment container">
+                    <h1 class="room_name"></h1>
+
+                    <h2 class="ui icon header">
+                            <i class="iconth red arrow circle right link icon"></i>
+                            <h2>Join Room</h2>
+                    </h2>
+                </div>
+            </div>
+
+            <div style="display:none;" class="room four wide column">
+                <div class="inroom ui segment container">
+                    <h1 class="room_name"></h1>
+
+                    <h2 class="ui icon header">
+                            <i class="iconth red arrow circle right link icon"></i>
+                            <h2>Join Room</h2>
+                    </h2>
+                </div>
+            </div>
+
+            <div style="display:none;" class="room four wide column">
+                <div class="inroom ui segment container">
+                    <h1 class="room_name"></h1>
+
+                    <h2 class="ui icon header">
+                            <i class="iconth red arrow circle right link icon"></i>
+                            <h2>Join Room</h2>
+                    </h2>
+                </div>
+            </div>
+
+            <div style="display:none;" class="room four wide column">
+                <div class="inroom ui segment container">
+                    <h1 class="room_name"></h1>
+
+                    <h2 class="ui icon header">
+                            <i class="iconth red arrow circle right link icon"></i>
+                            <h2>Join Room</h2>
+                    </h2>
+                </div>
+            </div>
+
+            <div style="display:none;" class="room four wide column">
+                <div class="inroom ui segment container">
+                    <h1 class="room_name"></h1>
+
+                    <h2 class="ui icon header">
+                            <i class="iconth red arrow circle right link icon"></i>
+                            <h2>Join Room</h2>
+                    </h2>
+                </div>
+            </div>
+
+            <div style="display:none;" class="room four wide column">
+                <div class="inroom ui segment container">
+                    <h1 class="room_name"></h1>
+
+                    <h2 class="ui icon header">
+                            <i class="iconth red arrow circle right link icon"></i>
+                            <h2>Join Room</h2>
+                    </h2>
+                </div>
+            </div>
+
+
+
         </div>
-    </body>
+    </div>
+</body>
+
 </html>

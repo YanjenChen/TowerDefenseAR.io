@@ -1,34 +1,36 @@
 <html>
-    <head>
-            <title>Web TDAR Register</title>
 
-            <script type="text/javascript" src="https://cdn.bootcss.com/jquery/2.1.1/jquery.min.js"></script> 
-            <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/themes/smoothness/jquery-ui.css"> 
+<head>
+    <title>Web TDAR Register</title>
 
-            <!-- 新 Bootstrap 核心 CSS 文件 --> 
-            <link href="https://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet"> 
-            <!-- 最新的 Bootstrap 核心 JavaScript 文件 --> 
-            <script src="https://cdn.bootcss.com/bootstrap/3.3.7/js/bootstrap.min.js"></script> 
+    <script type="text/javascript" src="https://cdn.bootcss.com/jquery/2.1.1/jquery.min.js"></script>
+    <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/themes/smoothness/jquery-ui.css">
 
-            <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.2.9/semantic.min.css"/>
-            <script src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.2.9/semantic.min.js"></script>
+    <!-- 新 Bootstrap 核心 CSS 文件 -->
+    <link href="https://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
+    <!-- 最新的 Bootstrap 核心 JavaScript 文件 -->
+    <script src="https://cdn.bootcss.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 
-            <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-            <!-- 載入 socket.io 的 js 檔，從後端抓的 --> 
-            <script src="/socket.io/socket.io.js"></script> 
-    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.2.9/semantic.min.css" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.2.9/semantic.min.js"></script>
 
-            <script src="registerForm.js"></script>
-    </head>
-    <body>
-        <br><br>
-        <div class="ui segment center aligned container" style="width:70%;">
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <!-- 載入 socket.io 的 js 檔，從後端抓的 -->
+    <script src="/socket.io/socket.io.js"></script>
+
+
+    <script src="src/registerForm.js"></script>
+</head>
+
+<body>
+    <br><br>
+    <div class="ui segment center aligned container" style="width:70%;">
         <h1 style="font-size:50px;">註冊頁面</h1>
         <div class="ui left aligned container" style="width:70%;">
 
 
-            
-            
+
+
             <form id="registerForm" action="/register" method="post">
                 <input id="registerName" name="registerName" type="hidden" />
                 <input id="registerPass" name="registerPass" type="hidden" />
@@ -38,23 +40,24 @@
             <br><br>
             <div style="position:relative;left:15%;">
                 <div class="ui input" style="font-size:30px;text-align:left center;">
-                    <span style="position:relative;top:10px">帳號 : </span>&nbsp;&nbsp;&nbsp;<input id="registerNameInput" name="registerNameInput" type="text" placeholder="輸入帳號..." style="height:50px;"/>
+                    <span style="position:relative;top:10px">帳號 : </span>&nbsp;&nbsp;&nbsp;<input id="registerNameInput" name="registerNameInput" type="text" placeholder="輸入帳號..." style="height:50px;" />
                 </div>
                 <br><br>
                 <div class="ui input" style="font-size:30px;">
-                    <span style="position:relative;top:10px">密碼 : </span>&nbsp;&nbsp;&nbsp;<input id="registerPassInput" name="registerPassInput" type="text" placeholder="輸入密碼..." style="height:50px;"/>
+                    <span style="position:relative;top:10px">密碼 : </span>&nbsp;&nbsp;&nbsp;<input id="registerPassInput" name="registerPassInput" type="text" placeholder="輸入密碼..." style="height:50px;" />
                 </div>
                 <br><br>
                 <div class="ui input" style="font-size:30px;">
-                    <span style="position:relative;top:10px">密碼確認 : </span>&nbsp;<input id="registerPassCheckInput" name="registerPassCheckInput" type="text" placeholder="再次輸入密碼..." style="height:50px;"/>
+                    <span style="position:relative;top:10px">密碼確認 : </span>&nbsp;<input id="registerPassCheckInput" name="registerPassCheckInput" type="text" placeholder="再次輸入密碼..." style="height:50px;" />
                 </div>
             </div>
 
             <br>
-            
-        
+
+
         </div>
         <button id="register" class="ui basic teal button" style="width:200px;font-size:20px;">進行註冊</button>
-        </div>
-    </body>
+    </div>
+</body>
+
 </html>

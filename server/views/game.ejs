@@ -17,16 +17,15 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 
 
-    <!-- 載入 socket.io 的 js 檔，從後端抓的 --> 
-    <script src="/socket.io/socket.io.js"></script> 
-    <script src="demo.js"></script>
+    <!-- 載入 socket.io 的 js 檔，從後端抓的 -->
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="script/network.js"></script>
 
-
+    <!-- Receive params from server -->
     <input id='room_id' value="<%=inobj['room_id']%>" type='hidden'>
     <input id='user' value="<%=inobj['user']%>" type='hidden'>
     <input id='user_faction' value="<%=inobj['user_faction']%>" type='hidden'>
 
-    
     <!--
     LOAD COMPONENTS
     -->
@@ -39,14 +38,12 @@
     <script src="components/wave_spawner.js"></script>
     <script src="components/bullet.js"></script>
     <script src="components/tower.js"></script>
-    
 
-    
-    <script src="renderer/game.js"></script>
+    <script src="script/game.js"></script>
 </head>
 
 <body>
-    
+
     <!--
     ENABLE THE FOLLOWING SECTION TO RUN AFRAME TEST
         This part demos how you can test the scense you created without AR.
@@ -54,8 +51,6 @@
         For more information, google "aframe" and read it's tutorial.
     -->
     <a-scene stats background="color: grey" tdar-game>
-
-
         <!--
         <a-assets>
             <a-asset-item src="renderer/assets/tower.ply"></a-asset-item>
@@ -76,9 +71,6 @@
         <a-marker-camera preset='hiro'></a-marker-camera>
     </a-scene-->
 
-    <!--script src="renderer/demo.js"></script-->
-
-    
 </body>
 
 </html>
