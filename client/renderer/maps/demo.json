@@ -37,12 +37,7 @@
     "settings": {
         "towers": {
             "default": {
-                "model": {
-                    "primitive": "box",
-                    "width": 0.5,
-                    "height": 0.5,
-                    "depth": 2
-                }
+                "geometry": "primitive: box; width: 0.5; height: 0.5; depth: 2"
             }
         },
         "towerBase": {

@@ -11,7 +11,7 @@
 		init: function() {
 			switch (this.data.mode) {
 				case 'single-player':
-                    this.ENEMY_COUNTER = -1;
+					this.ENEMY_COUNTER = -1;
 
 					this.el.addEventListener('loaded', this.onAssetsLoaded.bind(this));
 					this.el.addEventListener('start_game', this.onStartGame.bind(this));
@@ -87,8 +87,9 @@
 					faction.towerBases.forEach(base => {
 						baseEl = document.createElement('a-entity');
 						baseEl.setAttribute('geometry', map.settings.towerBase.geometry);
-                        baseEl.setAttribute('material', map.settings.towerBase.material);
+						baseEl.setAttribute('material', map.settings.towerBase.material);
 						baseEl.setAttribute('position', base.position);
+						baseEl.setAttribute('tower-base', { faction: faction.name });
 						sceneEl.appendChild(baseEl);
 					});
 
@@ -98,6 +99,13 @@
 					waveSpawnerEl.setAttribute('position', faction.waveSpawner.position);
 					sceneEl.appendChild(waveSpawnerEl);
 				});
+
+                // load tower template to mixin.
+                defaultTowerMixIn = document.createElement('a-mixin');
+                defaultTowerMixIn.setAttribute('geometry', map.settings.towers.default.geometry);
+                console.log(map.settings.towers.default.model);
+                defaultTowerMixIn.setAttribute('id', 'tower-default-mixin');
+                sceneEl.querySelector('a-assets').appendChild(defaultTowerMixIn);
 			});
 		},
 		onBroadcast: function(evt) {
@@ -125,8 +133,8 @@
 							break;
 						case 'wave_spawner_request_spawn_enemy':
 							content.event_name = 'wave_spawner_create_enemy';
-                            content.enemy_id = 'enemy-' + this.ENEMY_COUNTER.toString();
-                            this.ENEMY_COUNTER++;
+							content.enemy_id = 'enemy-' + this.ENEMY_COUNTER.toString();
+							this.ENEMY_COUNTER++;
 							this.el.emit('executeRequest', content);
 							break;
 					}
@@ -143,8 +151,8 @@
 			}
 		},
 		onExecute: function(content) {
-            if(this.data.mode == 'single-player')
-                content = content.detail;
+			if (this.data.mode == 'single-player')
+				content = content.detail;
 			//console.warn('Receive event from server, name: ' + content['event_name']);
 
 			switch (content['event_name']) {

@@ -43,9 +43,9 @@
         tick: function(time, timeDelta) {
             if (this.el.is('activate')) {
                 if (this._checkTargetDistance()) {
-                    this.el.object3D.lookAt(this.targetEl.object3D.getWorldPosition());
+                    this.el.object3D.lookAt(this.el.parentNode.object3D.worldToLocal(this.targetEl.object3D.getWorldPosition()));
+                    //this.el.object3D.lookAt(this.targetEl.object3D.getWorldPosition());
 
-                    // TESTING PART
                     this.timeCounter += timeDelta;
                     if (this.timeCounter >= this.duration) {
                         this.el.emit('fire');
@@ -75,6 +75,12 @@
             }
         },
         remove: function() {
+            // ONLY USE IN DEVELOPER TESTING
+            this.targetEl.setAttribute('glow', {
+                enabled: false
+            });
+            ////////////////////////////////
+
             delete this.targetEl;
             delete this.targetFac;
             delete this.duration;
@@ -104,7 +110,7 @@
         _onFire: function() {
             if (this.el.sceneEl.querySelector('#' + this.targetEl.id)) {
                 var bulletEl = document.createElement('a-entity');
-                bulletEl.setAttribute('position', this.el.object3D.position);
+                bulletEl.setAttribute('position', this.el.object3D.getWorldPosition());
                 bulletEl.setAttribute('bullet', {
                     damagePoint: 1,
                     maxRange: this.data.range,
