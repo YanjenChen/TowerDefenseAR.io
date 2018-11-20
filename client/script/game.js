@@ -86,7 +86,8 @@
 					// load tower bases.
 					faction.towerBases.forEach(base => {
 						baseEl = document.createElement('a-entity');
-						baseEl.setAttribute('geometry', map.settings.towerBase.model);
+						baseEl.setAttribute('geometry', map.settings.towerBase.geometry);
+                        baseEl.setAttribute('material', map.settings.towerBase.material);
 						baseEl.setAttribute('position', base.position);
 						sceneEl.appendChild(baseEl);
 					});
@@ -142,7 +143,10 @@
 			}
 		},
 		onExecute: function(content) {
+            if(this.data.mode == 'single-player')
+                content = content.detail;
 			//console.warn('Receive event from server, name: ' + content['event_name']);
+
 			switch (content['event_name']) {
 				case 'enemy_get_damaged':
 					document.querySelector('#' + content['id']).emit('be-attacked', {

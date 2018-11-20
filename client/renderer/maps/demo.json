@@ -46,11 +46,15 @@
             }
         },
         "towerBase": {
-            "model": {
+            "geometry": {
                 "primitive": "box",
+                "color": "grey",
                 "width": 1,
                 "height": 0.2,
                 "depth": 1
+            },
+            "material": {
+                "color": "#5A6266"
             }
         }
     }
