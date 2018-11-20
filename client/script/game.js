@@ -1,156 +1,172 @@
 /*** DEPEDENCY: Need to execute network.js first. ***/
 (() => {
-    var ROOM_ID = jQuery("#room_id").val();
-    var USER = jQuery("#user").val();
-    var USER_FACTION = jQuery("#user_faction").val() == '1' ? 'A' : 'B';
-    //console.log("gamejs : ROOM_ID : " + ROOM_ID + " , USER : " + USER)
-    //console.log("gamejs : " + socket)
+	AFRAME.registerSystem('tdar-game', {
+		schema: {
+			mode: {
+				type: 'string',
+				default: 'multi-player',
+				oneOf: ['single-player', 'multi-player']
+			}
+		},
+		init: function() {
+			switch (this.data.mode) {
+				case 'single-player':
+                    this.ENEMY_COUNTER = -1;
 
-    AFRAME.registerSystem('tdar-game', {
-        init: function() {
-            this.socket = SOCKET;
-            this.room_id = ROOM_ID;
-            this.user = USER;
+					this.el.addEventListener('loaded', this.onAssetsLoaded.bind(this));
+					this.el.addEventListener('start_game', this.onStartGame.bind(this));
+					//console.warn("AFRAME Init");
 
-            this.el.addEventListener('loaded', this.onAssetsLoaded.bind(this));
-            this.socket.on('client_start_game', this.onStartGame);
-            //console.warn("AFRAME Init");
+					this.el.addEventListener('broadcast', this.onBroadcast.bind(this)); // Listen local event.
+					this.el.addEventListener('executeRequest', this.onExecute.bind(this)); // Listen server broadcast.
+					break;
+				case 'multi-player':
+					this.socket = SOCKET;
+					this.room_id = jQuery("#room_id").val();
+					this.user = jQuery("#user").val();
+					this.user_faction = jQuery("#user_faction").val() == '1' ? 'A' : 'B';
+					//console.log("game.js initialized. ROOM_ID: " + ROOM_ID + ", USER: " + USER);
 
-            this.el.addEventListener('broadcast', this.onBroadcast.bind(this)); // Listen local event.
-            this.socket.on('playingEvent', this.onExecute); // Listen server broadcast.
-        },
-        onAssetsLoaded: function() {
-            //console.warn('Assets successful loaded.');
-            this.socket.emit("nonPlayingEvent", {
-                room_id: this.room_id,
-                event_name: 'model_ready',
-                user: this.user
-            });
-        },
-        onStartGame: function() {
-            //console.warn('Client start game.')
-            var sceneEl = document.querySelector('a-scene');
-            //var sceneEl = this.el;
-            jQuery.getJSON('./renderer/maps/demo.json', (map) => {
-                /* CURVE LOADER */
-                map.factions.forEach(faction => {
-                    faction.enemyPath.forEach(path => {
-                        var curveEl = document.createElement('a-entity');
-                        curveEl.setAttribute('path', {});
-                        curveEl.setAttribute('id', faction.name + 'faction' + path.type + 'path');
-                        path.points.forEach((point) => {
-                            var pointEl = document.createElement('a-entity');
-                            pointEl.setAttribute('path-point', {});
-                            pointEl.setAttribute('position', point);
-                            curveEl.appendChild(pointEl);
-                        });
+					this.el.addEventListener('loaded', this.onAssetsLoaded.bind(this));
+					this.socket.on('client_start_game', this.onStartGame.bind(this));
+					//console.warn("AFRAME Init");
 
-                        // ONLY USE IN DEVELOPER TESTING
-                        curveEl.setAttribute('draw-path', {
-                            path: '#' + faction.name + 'faction' + path.type + 'path'
-                        });
-                        ////////////////////////////////
+					this.el.addEventListener('broadcast', this.onBroadcast.bind(this)); // Listen local event.
+					this.socket.on('playingEvent', this.onExecute.bind(this)); // Listen server broadcast.
+					break;
+				default:
+					console.warn('GAME MODE ERROR.');
+			}
+		},
+		onAssetsLoaded: function() {
+			//console.warn('Assets successful loaded.');
+			switch (this.data.mode) {
+				case 'single-player':
+					this.el.emit('start_game');
+					break;
+				case 'multi-player':
+					this.socket.emit("nonPlayingEvent", {
+						room_id: this.room_id,
+						event_name: 'model_ready',
+						user: this.user
+					});
+					break;
+				default:
+					console.warn('GAME MODE ERROR.');
+			}
+		},
+		onStartGame: function() {
+			//console.warn('Client start game.')
+			var sceneEl = document.querySelector('a-scene');
+			//var sceneEl = this.el;
+			jQuery.getJSON('./renderer/maps/demo.json', (map) => {
+				/* SCENE LOADER */
+				map.factions.forEach(faction => {
+					// load enemy path.
+					faction.enemyPath.forEach(path => {
+						var curveEl = document.createElement('a-entity');
+						curveEl.setAttribute('path', {});
+						curveEl.setAttribute('id', faction.name + 'faction' + path.type + 'path');
+						path.points.forEach((point) => {
+							var pointEl = document.createElement('a-entity');
+							pointEl.setAttribute('path-point', {});
+							pointEl.setAttribute('position', point);
+							curveEl.appendChild(pointEl);
+						});
 
-                        sceneEl.appendChild(curveEl);
-                    });
-                });
+						// ONLY USE IN DEVELOPER TESTING
+						curveEl.setAttribute('draw-path', {
+							path: '#' + faction.name + 'faction' + path.type + 'path'
+						});
+						////////////////////////////////
 
-                /*
-                var testCastle = document.createElement('a-entity');
-                testCastle.setAttribute('ply-model', {
-                    src: 'url(renderer/assets/tower.ply)'
-                });
-                testCastle.setAttribute('position', '-6 1.6 -6');
-                testCastle.setAttribute('scale', '0.025 0.025 0.025');
-                testCastle.setAttribute('rotation', '-90 0 0');
-                sceneEl.appendChild(testCastle);
-        		*/
+						sceneEl.appendChild(curveEl);
+					});
 
-                var testTower1 = document.createElement('a-entity');
-                testTower1.setAttribute('geometry', {
-                    primitive: 'box',
-                    width: 0.5,
-                    height: 0.5,
-                    depth: 2
-                });
-                testTower1.setAttribute('position', '-3 0 0');
-                testTower1.setAttribute('tower', {
-                    dps: 10,
-                    faction: 'B',
-                    range: 10
-                });
-                sceneEl.appendChild(testTower1);
+					// load tower bases.
+					faction.towerBases.forEach(base => {
+						baseEl = document.createElement('a-entity');
+						baseEl.setAttribute('geometry', map.settings.towerBase.model);
+						baseEl.setAttribute('position', base.position);
+						sceneEl.appendChild(baseEl);
+					});
 
-                var testTower2 = document.createElement('a-entity');
-                testTower2.setAttribute('geometry', {
-                    primitive: 'box',
-                    width: 0.5,
-                    height: 0.5,
-                    depth: 2
-                });
-                testTower2.setAttribute('position', '9 0 0');
-                testTower2.setAttribute('tower', {
-                    dps: 20,
-                    faction: 'A',
-                    range: 5
-                });
-                sceneEl.appendChild(testTower2);
+					// load wave spawner.
+					waveSpawnerEl = document.createElement('a-entity');
+					waveSpawnerEl.setAttribute('wave-spawner', faction.waveSpawner.schema);
+					waveSpawnerEl.setAttribute('position', faction.waveSpawner.position);
+					sceneEl.appendChild(waveSpawnerEl);
+				});
+			});
+		},
+		onBroadcast: function(evt) {
+			switch (this.data.mode) {
+				case 'single-player':
+					// Client simulate multi player server behavior.
+					var content = evt.detail;
 
-                var testWavespawner1 = document.createElement('a-entity');
-                testWavespawner1.setAttribute('wave-spawner', {
-                    id: 'faction-A-wave-spawner',
-                    amount: 5,
-                    duration: 5000,
-                    faction: 'A',
-                    timeOffSet: 300
-                });
-                sceneEl.appendChild(testWavespawner1);
+					switch (evt.detail.event_name) {
+						case 'enemy_be_attacked':
+							content.event_name = 'enemy_get_damaged';
+							this.el.emit('executeRequest', content);
+							break;
+						case 'castle_be_attacked':
+							content.event_name = 'castle_get_damaged';
+							this.el.emit('executeRequest', content);
+							break;
+						case 'request_create_tower':
+							content.event_name = 'create_tower_success';
+							this.el.emit('executeRequest', content);
+							break;
+						case 'tower_be_attacked':
+							content.event_name = 'tower_get_damaged';
+							this.el.emit('executeRequest', content);
+							break;
+						case 'wave_spawner_request_spawn_enemy':
+							content.event_name = 'wave_spawner_create_enemy';
+                            content.enemy_id = 'enemy-' + this.ENEMY_COUNTER.toString();
+                            this.ENEMY_COUNTER++;
+							this.el.emit('executeRequest', content);
+							break;
+					}
+					break;
+				case 'multi-player':
+					var content = evt.detail;
+					content.room_id = this.room_id;
+					content.user = this.user;
+					this.socket.emit('playingEvent', content);
+					//console.warn('Emit event to server, name: ' + content['event_name']);
+					break;
+				default:
+					console.warn('GAME MODE ERROR.');
+			}
+		},
+		onExecute: function(content) {
+			//console.warn('Receive event from server, name: ' + content['event_name']);
+			switch (content['event_name']) {
+				case 'enemy_get_damaged':
+					document.querySelector('#' + content['id']).emit('be-attacked', {
+						damage: content['damage']
+					});
+					break;
+				case 'castle_get_damaged':
 
-                var testWavespawner2 = document.createElement('a-entity');
-                testWavespawner2.setAttribute('wave-spawner', {
-                    id: 'faction-B-wave-spawner',
-                    amount: 5,
-                    duration: 6000,
-                    faction: 'B',
-                    timeOffSet: 300
-                });
-                sceneEl.appendChild(testWavespawner2);
+					break;
+				case 'create_tower_success':
 
-            });
-        },
-        onBroadcast: function(evt) {
-            var content = evt.detail;
-            content.room_id = this.room_id;
-            content.user = this.user;
-            this.socket.emit('playingEvent', content);
-            //console.warn('Emit event to server, name: ' + content['event_name']);
-        },
-        onExecute: function(content) {
-            //console.warn('Receive event from server, name: ' + content['event_name']);
-            switch (content['event_name']) {
-                case 'enemy_get_damaged':
-                    document.querySelector('#' + content['id']).emit('be-attacked', {
-                        damage: content['damage']
-                    });
-                    break;
-                case 'castle_get_damaged':
+					break;
+				case 'tower_get_damaged':
 
-                    break;
-                case 'create_tower_success':
-
-                    break;
-                case 'tower_get_damaged':
-
-                    break;
-                case 'wave_spawner_create_enemy':
-                    document.querySelector('#' + content['id']).emit('spawn_enemy', {
-                        id: content['enemy_id'],
-                        faction: content['ws_faction'],
-                        healthPoint: 6,
-                        speed: 4
-                    });
-                    break;
-            }
-        }
-    });
+					break;
+				case 'wave_spawner_create_enemy':
+					document.querySelector('#' + content['id']).emit('spawn_enemy', {
+						id: content['enemy_id'],
+						faction: content['ws_faction'],
+						healthPoint: 6,
+						speed: 4
+					});
+					break;
+			}
+		}
+	});
 })();

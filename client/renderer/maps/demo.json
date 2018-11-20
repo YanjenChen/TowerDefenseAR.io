@@ -1,22 +1,57 @@
 {
-    "factions": [
-        {
+    "factions": [{
             "name": "A",
-            "enemyPath": [
-                {
-                    "type": "default",
-                    "points": ["-3 0 -3", "-3 0 -4", "5 0 -4", "5 0 6", "-7 0 6", "-7 0 -7"]
-                }
-            ]
+            "enemyPath": [{
+                "type": "default",
+                "points": ["-3 0 -3", "-3 0 -4", "5 0 -4", "5 0 6", "-7 0 6", "-7 0 -7"]
+            }],
+            "towerBases": [{
+                "position": "-3 0 0"
+            }],
+            "waveSpawner": {
+                "position": "-3 0 -3",
+                "schema": {
+					"id": "faction-A-wave-spawner",
+					"faction": "A"
+				}
+            }
         },
         {
             "name": "B",
-            "enemyPath": [
-                {
-                    "type": "default",
-                    "points": ["3 0 3", "3 0 4", "-5 0 4", "-5 0 -6", "7 0 -6", "7 0 7"]
-                }
-            ]
+            "enemyPath": [{
+                "type": "default",
+                "points": ["3 0 3", "3 0 4", "-5 0 4", "-5 0 -6", "7 0 -6", "7 0 7"]
+            }],
+            "towerBases": [{
+                "position": "9 0 0"
+            }],
+            "waveSpawner": {
+                "position": "3 0 3",
+                "schema": {
+					"id": "faction-B-wave-spawner",
+					"faction": "B"
+				}
+            }
         }
-    ]
+    ],
+    "settings": {
+        "towers": {
+            "default": {
+                "model": {
+                    "primitive": "box",
+                    "width": 0.5,
+                    "height": 0.5,
+                    "depth": 2
+                }
+            }
+        },
+        "towerBase": {
+            "model": {
+                "primitive": "box",
+                "width": 1,
+                "height": 0.2,
+                "depth": 1
+            }
+        }
+    }
 }

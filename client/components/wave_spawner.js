@@ -7,11 +7,11 @@
             },
             amount: {
                 type: 'number',
-                default: 4
+                default: 5
             },
             duration: {
                 type: 'number',
-                default: 3000
+                default: 5000
             },
             faction: {
                 type: 'string',
