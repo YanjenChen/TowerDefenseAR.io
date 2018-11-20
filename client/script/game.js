@@ -100,12 +100,12 @@
 					sceneEl.appendChild(waveSpawnerEl);
 				});
 
-                // load tower template to mixin.
-                defaultTowerMixIn = document.createElement('a-mixin');
-                defaultTowerMixIn.setAttribute('geometry', map.settings.towers.default.geometry);
-                console.log(map.settings.towers.default.model);
-                defaultTowerMixIn.setAttribute('id', 'tower-default-mixin');
-                sceneEl.querySelector('a-assets').appendChild(defaultTowerMixIn);
+				// load tower template to mixin.
+				defaultTowerMixIn = document.createElement('a-mixin');
+				defaultTowerMixIn.setAttribute('geometry', map.settings.towers.default.geometry);
+				console.log(map.settings.towers.default.model);
+				defaultTowerMixIn.setAttribute('id', 'tower-default-mixin');
+				sceneEl.querySelector('a-assets').appendChild(defaultTowerMixIn);
 			});
 		},
 		onBroadcast: function(evt) {
@@ -157,9 +157,10 @@
 
 			switch (content['event_name']) {
 				case 'enemy_get_damaged':
-					document.querySelector('#' + content['id']).emit('be-attacked', {
-						damage: content['damage']
-					});
+					if (document.querySelector('#' + content['id']) != null)
+						document.querySelector('#' + content['id']).emit('be-attacked', {
+							damage: content['damage']
+						});
 					break;
 				case 'castle_get_damaged':
 
@@ -171,12 +172,13 @@
 
 					break;
 				case 'wave_spawner_create_enemy':
-					document.querySelector('#' + content['id']).emit('spawn_enemy', {
-						id: content['enemy_id'],
-						faction: content['ws_faction'],
-						healthPoint: 6,
-						speed: 4
-					});
+					if (document.querySelector('#' + content['id']) != null)
+						document.querySelector('#' + content['id']).emit('spawn_enemy', {
+							id: content['enemy_id'],
+							faction: content['ws_faction'],
+							healthPoint: 6,
+							speed: 4
+						});
 					break;
 			}
 		}
