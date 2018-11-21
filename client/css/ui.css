@@ -1,0 +1,18 @@
+.tdar-ui-button {
+    position: fixed;
+    width: 60px;
+    height: 60px;
+    overflow: hidden;
+    bottom: 60px;
+    right: 20px;
+    z-index: 10000;
+    margin: 1px;
+    padding: 20px;
+    border: black solid;
+    border-radius: 60px;
+    background-color: black;
+}
+
+.tdar-ui-button img {
+    width: 100%;
+}
