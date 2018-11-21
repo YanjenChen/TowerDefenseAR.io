@@ -60,8 +60,9 @@
         },
         _onAttack: function() {
             if (this._isTargetExist()) {
+                //console.log('bullet attack ' + this.data.target.id);
 
-                this.data.target.emit('be-attacked', {//向data.target發送be-attacked
+                this.data.target.emit('be-attacked', {
                     damage: this.data.damagePoint
                 });
             }

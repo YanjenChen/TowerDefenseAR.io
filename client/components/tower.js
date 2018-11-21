@@ -56,6 +56,7 @@
                     this.targetEl.setAttribute('glow', {
                         enabled: false
                     });
+                    ////////////////////////////////
 
                     this.targetEl = null;
                     this.el.removeState('activate');
@@ -66,6 +67,8 @@
                     this.targetEl.setAttribute('glow', {
                         enabled: true
                     });
+                    ////////////////////////////////
+
                     this.el.addState('activate');
                     this.el.object3D.lookAt(this.targetEl.object3D.getWorldPosition());
                 }

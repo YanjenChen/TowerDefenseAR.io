@@ -1,2 +1,0 @@
-ttt abc
-rrr 12345
