@@ -7,11 +7,11 @@
             },
             amount: {
                 type: 'number',
-                default: 5
+                default: 3
             },
             duration: {
                 type: 'number',
-                default: 5000
+                default: 7000
             },
             faction: {
                 type: 'string',
@@ -20,7 +20,7 @@
             },
             timeOffSet: {
                 type: 'number',
-                default: 300
+                default: 1000
             }
         },
         init: function() {

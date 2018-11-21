@@ -72,6 +72,8 @@
             this.currentLine = 0;
             this.timeCounter = 0;
             this.completeDist = 0;
+
+            this._lookAtDirection();
         },
         remove: function() {
             delete this.lines;
@@ -87,6 +89,7 @@
                 if (this.timeCounter * this.data.speed - this.completeDist >= this.linesLength[this.currentLine]) {
                     this.completeDist += this.linesLength[this.currentLine];
                     this.currentLine++;
+                    this._lookAtDirection();
                 }
                 if (this.currentLine >= this.lines.length) {
                     this.el.addState('endofpath');
@@ -96,6 +99,16 @@
                     p = this.data.path.parentNode.object3D.localToWorld(p);
                     this.el.setAttribute('position', this.el.parentNode.object3D.worldToLocal(p));
                 }
+            }
+        },
+        _lookAtDirection: function() {
+            // Look at moving direction.
+            if (this.currentLine < this.lines.length) {
+                p1 = this.lines[this.currentLine].v1.clone();
+                p2 = this.lines[this.currentLine].v2.clone();
+                d = p2.sub(p1).normalize();
+                d = this.data.path.parentNode.object3D.localToWorld(d);
+                this.el.object3D.lookAt(this.el.parentNode.object3D.worldToLocal(d));
             }
         }
     });
