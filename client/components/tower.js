@@ -44,7 +44,6 @@
 			if (this.el.is('activate')) {
 				if (this._checkTargetDistance()) {
 					this.el.object3D.lookAt(this.el.parentNode.object3D.worldToLocal(this.targetEl.object3D.getWorldPosition()));
-					//this.el.object3D.lookAt(this.targetEl.object3D.getWorldPosition());
 
 					this.timeCounter += timeDelta;
 					if (this.timeCounter >= this.duration) {
@@ -70,7 +69,6 @@
 					////////////////////////////////
 
 					this.el.addState('activate');
-					this.el.object3D.lookAt(this.targetEl.object3D.getWorldPosition());
 				}
 			}
 		},
@@ -92,7 +90,7 @@
 			if (this.system.faction[this.targetFac].enemies.indexOf(this.targetEl) < 0) // Prevent target doesn't exist cause null error.
 				return false;
 
-			return (this.targetEl.object3D.getWorldPosition().distanceTo(this.el.object3D.getWorldPosition()) < this.data.range);
+			return (this.el.parentNode.object3D.worldToLocal(this.targetEl.object3D.getWorldPosition()).distanceTo(this.el.object3D.position) < this.data.range);
 		},
 		_getNearestEnemy: function() {
 			if (this.system.faction[this.targetFac].enemies.length <= 0) // Prevent empty array cause error.
@@ -100,7 +98,7 @@
 
 			var minDistance = Infinity;
 			this.system.faction[this.targetFac].enemies.forEach((enemyEl) => {
-				var distance = enemyEl.object3D.getWorldPosition().distanceTo(this.el.object3D.getWorldPosition());
+				var distance = this.el.parentNode.object3D.worldToLocal(enemyEl.object3D.getWorldPosition()).distanceTo(this.el.object3D.position);
 				if (distance < minDistance) {
 					minDistance = distance;
 					this.targetEl = enemyEl;
@@ -111,7 +109,7 @@
 		_onFire: function() {
 			if (this.el.sceneEl.querySelector('#' + this.targetEl.id)) {
 				var bulletEl = document.createElement('a-entity');
-				bulletEl.setAttribute('position', this.el.object3D.getWorldPosition());
+				bulletEl.setAttribute('position', this.el.sceneEl.systems['tdar-game'].sceneEntity.object3D.worldToLocal(this.el.object3D.getWorldPosition()));
 				bulletEl.setAttribute('bullet', {
 					damagePoint: 1,
 					maxRange: this.data.range,

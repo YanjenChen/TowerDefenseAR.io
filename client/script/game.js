@@ -42,7 +42,7 @@
 					console.warn('GAME MODE ERROR.');
 			}
 
-			this.sceneEntity = this.data.ar ? document.querySelector('a-marker') : document.querySelector('a-scene');
+			this.sceneEntity = this.data.ar ? document.querySelector('#ar-mode-sceneEntity') : document.querySelector('a-scene');
 		},
 		onAssetsLoaded: function() {
 			//console.warn('Assets successful loaded.');

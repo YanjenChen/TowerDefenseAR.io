@@ -36,7 +36,8 @@
                     if (point.x !== undefined && point.y !== undefined && point.z !== undefined)
                         return point;
                     */
-                    return this.el.parentNode.object3D.worldToLocal(point.object3D.getWorldPosition());
+                    return point.object3D.getWorldPosition();
+                    //return this.el.parentNode.object3D.worldToLocal(point.object3D.getWorldPosition());
                 });
 
                 this.lines = [];
