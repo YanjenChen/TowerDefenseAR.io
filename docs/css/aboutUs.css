@@ -1,0 +1,47 @@
+.loading {
+  overflow: hidden; }
+
+.bar {
+  background-color: transparent;
+  position: fixed;
+  transition: 0.4s;
+  width: 100%;
+  z-index: 1; }
+  .bar .ui.massive.menu {
+    background-color: transparent;
+    border: none;
+    box-shadow: none; }
+  .bar.desktop {
+    padding: 1.5em; }
+    @media only screen and (max-width: 768px) {
+      .bar.desktop {
+        display: none; } }
+    .bar.desktop.following {
+      background-color: #6435c9;
+      padding: 0.5em; }
+  .bar.mobile {
+    padding: 0.5em; }
+    @media only screen and (min-width: 768px) {
+      .bar.mobile {
+        display: none; } }
+    .bar.mobile.following {
+      background-color: #6435c9; }
+
+.masthead {
+  background-image: url("../assets/header.jpg");
+  background-position: center bottom;
+  background-size: cover;
+  background-repeat: no-repeat;
+  padding: 6em 0 2em 0; }
+
+.stripe {
+  padding: 3em 0; }
+  .stripe.alternate {
+    background-color: #f2f3f5; }
+  .stripe.inverted {
+    background-color: #6435c9;
+    color: white; }
+    .stripe.inverted a {
+      color: white; }
+  .stripe.thin {
+    padding: 1em 0; }

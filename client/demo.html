@@ -8,13 +8,26 @@
         aframe.min.js: main renderer library.
         aframe-extras.min.js: 3d module animation, loader and other supporting functions.
         aframe-ar.js: marker-based AR library for aframe.
-        jquery: just need the selector... i'm lazy.
     -->
     <script src="https://aframe.io/releases/0.8.0/aframe.min.js"></script>
     <script src="https://cdn.rawgit.com/donmccurdy/aframe-extras/v4.2.0/dist/aframe-extras.min.js"></script>
     <!-- DISABLE AR.js WHEN USING AFRAME TEST -->
     <!--script src="https://cdn.rawgit.com/jeromeetienne/AR.js/1.5.0/aframe/build/aframe-ar.js"></script-->
+    <!-- ONLY USED IN DEMO.JS -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+
+    <!--
+    LOAD COMPONENTS
+    -->
+    <!--script src="https://unpkg.com/aframe-curve-component/dist/aframe-curve-component.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@ripter/aframe-alongpath-component@1.1.4/index.js"></script-->
+    <script src="lib/glow.js"></script>
+    <script src="lib/path.js"></script>
+    <script src="lib/trace.js"></script>
+    <script src="components/enemy.js"></script>
+    <script src="components/wave_spawner.js"></script>
+    <script src="components/bullet.js"></script>
+    <script src="components/tower.js"></script>
 </head>
 
 <body>
@@ -25,23 +38,7 @@
         For more information, google "aframe" and read it's tutorial.
     -->
     <a-scene stats background="color: grey">
-        <a-assets>
-            <a-asset-item id="tree" src="renderer\assets\tree_7_ao\scene.gltf"></a-asset-item>
-            <a-asset-item id="mimikyu" src="renderer\assets\mimikyu\scene.gltf"></a-asset-item>
-        </a-assets>
-
-        <a-entity id="enviroment" position="0 0 0" scale="0.3 0.3 0.3">
-            <a-plane color="#BDB76B" rotation="-90 0 0" height="7" width="7"></a-plane>
-            <a-gltf-model src="#tree"></a-gltf-model>
-            <a-entity>
-                <a-entity position="3 0 0">
-                    <a-gltf-model src="#mimikyu" animation-mixer scale="0.2 0.2 0.2"></a-gltf-model>
-                </a-entity>
-                <a-animation attribute="rotation" to="0 -360 0" dur="10000" easing="linear" repeat="indefinite"></a-animation>
-            </a-entity>
-        </a-entity>
-
-        <a-entity camera="active: true" position="0 1 2" rotation="-30 0 0"></a-entity>
+        <a-camera position="0 10 0" rotation="-90 0 0" look-controls-enabled="false">
     </a-scene>
 
     <!--
@@ -52,21 +49,11 @@
         by itself.
         For more information, google "AR.js" and read it's github.
     -->
-    <!--a-scene stats embedded arjs>
-        <a-assets>
-            <a-asset-item id="viking_room" src="renderer\assets\viking_room\scene.gltf"></a-asset-item>
-        </a-assets>
-
-        <a-marker preset="hiro">
-            <a-entity id="enviroment" position="0 0 0" scale="0.1 0.1 0.1">
-                <a-gltf-model src="#viking_room" position="0 0 0"></a-gltf-model>
-            </a-entity>
-        </a-marker>
-
-        <a-entity camera></a-entity>
+    <!--a-scene stats artoolkit>
+        <a-marker-camera preset='hiro'></a-marker-camera>
     </a-scene-->
 
-    <!--script src="renderer\demo.js"></script-->
+    <script src="renderer/demo.js"></script>
 </body>
 
 </html>
