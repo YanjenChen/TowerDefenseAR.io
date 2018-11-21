@@ -32,9 +32,11 @@
                 console.warn("At least 2 curve-points needed to draw a path");
             } else {
                 this.pathPoints = this.points.map((point) => {
+                    /*
                     if (point.x !== undefined && point.y !== undefined && point.z !== undefined)
                         return point;
-                    return point.object3D.getWorldPosition();
+                    */
+                    return this.el.parentNode.object3D.worldToLocal(point.object3D.getWorldPosition());
                 });
 
                 this.lines = [];
@@ -90,7 +92,8 @@
                     this.el.emit('movingended');
                 } else {
                     var p = this.lines[this.currentLine].getPoint((this.data.speed * this.timeCounter - this.completeDist) / this.lines[this.currentLine].getLength());
-                    this.el.setAttribute('position', p);
+                    p = this.data.path.parentNode.object3D.localToWorld(p);
+                    this.el.setAttribute('position', this.el.parentNode.object3D.worldToLocal(p));
                 }
             }
         }

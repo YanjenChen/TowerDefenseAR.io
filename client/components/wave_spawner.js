@@ -67,7 +67,7 @@
         _spawnEnemy: function(evt) {
             var enemyEl = document.createElement('a-entity');
             enemyEl.setAttribute('enemy', evt.detail);
-            this.el.sceneEl.appendChild(enemyEl);
+            this.el.sceneEl.systems['tdar-game'].sceneEntity.appendChild(enemyEl);
 
             if (this.spawnCounter >= this.data.amount) {
                 this.spawnCounter = 0;

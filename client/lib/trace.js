@@ -33,8 +33,8 @@
             if (this._isTargetExist()) {
                 this.timeCounter += (timeDelta * this.data.timeRatio);
                 if (this.timeCounter * this.data.speed <= this.data.maxRange) {
-                    p1 = this.el.object3D.getWorldPosition();
-                    p2 = this.data.target.object3D.getWorldPosition();
+                    p1 = this.el.parentNode.object3D.worldToLocal(this.el.object3D.getWorldPosition());
+                    p2 = this.el.parentNode.object3D.worldToLocal(this.data.target.object3D.getWorldPosition());
                     rDelta = p1.distanceTo(p2);
 
                     if (rDelta < this.data.triggerRange) {

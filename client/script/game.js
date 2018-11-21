@@ -6,6 +6,10 @@
 				type: 'string',
 				default: 'multi-player',
 				oneOf: ['single-player', 'multi-player']
+			},
+			ar: {
+				type: 'boolean',
+				default: false,
 			}
 		},
 		init: function() {
@@ -37,6 +41,8 @@
 				default:
 					console.warn('GAME MODE ERROR.');
 			}
+
+			this.sceneEntity = this.data.ar ? document.querySelector('a-marker') : document.querySelector('a-scene');
 		},
 		onAssetsLoaded: function() {
 			//console.warn('Assets successful loaded.');
@@ -57,8 +63,6 @@
 		},
 		onStartGame: function() {
 			//console.warn('Client start game.')
-			var sceneEl = document.querySelector('a-scene');
-			//var sceneEl = this.el;
 			jQuery.getJSON('./renderer/maps/demo.json', (map) => {
 				/* SCENE LOADER */
 				map.factions.forEach(faction => {
@@ -80,7 +84,7 @@
 						});
 						////////////////////////////////
 
-						sceneEl.appendChild(curveEl);
+						this.sceneEntity.appendChild(curveEl);
 					});
 
 					// load tower bases.
@@ -90,14 +94,14 @@
 						baseEl.setAttribute('material', map.settings.towerBase.material);
 						baseEl.setAttribute('position', base.position);
 						baseEl.setAttribute('tower-base', { faction: faction.name });
-						sceneEl.appendChild(baseEl);
+						this.sceneEntity.appendChild(baseEl);
 					});
 
 					// load wave spawner.
 					waveSpawnerEl = document.createElement('a-entity');
 					waveSpawnerEl.setAttribute('wave-spawner', faction.waveSpawner.schema);
 					waveSpawnerEl.setAttribute('position', faction.waveSpawner.position);
-					sceneEl.appendChild(waveSpawnerEl);
+					this.sceneEntity.appendChild(waveSpawnerEl);
 				});
 
 				// load tower template to mixin.
@@ -105,7 +109,7 @@
 				defaultTowerMixIn.setAttribute('geometry', map.settings.towers.default.geometry);
 				console.log(map.settings.towers.default.model);
 				defaultTowerMixIn.setAttribute('id', 'tower-default-mixin');
-				sceneEl.querySelector('a-assets').appendChild(defaultTowerMixIn);
+				this.el.sceneEl.querySelector('a-assets').appendChild(defaultTowerMixIn);
 			});
 		},
 		onBroadcast: function(evt) {

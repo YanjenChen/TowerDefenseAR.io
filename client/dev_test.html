@@ -12,7 +12,9 @@
     <script src="https://aframe.io/releases/0.8.0/aframe.min.js"></script>
     <script src="https://cdn.rawgit.com/donmccurdy/aframe-extras/v4.2.0/dist/aframe-extras.min.js"></script>
     <!-- DISABLE AR.js WHEN USING AFRAME TEST -->
-    <!--script src="https://cdn.rawgit.com/jeromeetienne/AR.js/1.5.0/aframe/build/aframe-ar.js"></script-->
+
+    <script src="https://cdn.rawgit.com/jeromeetienne/AR.js/1.5.0/aframe/build/aframe-ar.js"></script>
+
     <!-- ONLY USED IN DEMO.JS -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 
@@ -41,16 +43,17 @@
         Aframe is VR library, we use it as the 3d renderer.
         For more information, google "aframe" and read it's tutorial.
     -->
+    <!--
     <a-scene stats background="color: grey" tdar-game="mode: single-player">
         <a-assets>
         </a-assets>
 
-        <a-entity position="0 10 0" rotation="-90 0 0" camera wasd-controls>
+        <a-entity position="0 10 0" rotation="-90 0 0" camera wasd-controls="acceleration: 250">
             <a-entity cursor="fuse: false;" position="0 0 -1" geometry="primitive: ring; radiusInner: 0.02; radiusOuter: 0.03" material="color: black; shader: flat">
             </a-entity>
         </a-entity>
     </a-scene>
-
+-->
     <!--
     ENABLE THE FOLLOWING SECTION TO RUN AR TEST
         This part demos how to intergrate AR.js with aframe.
@@ -59,11 +62,20 @@
         by itself.
         For more information, google "AR.js" and read it's github.
     -->
-    <!--
-    <a-scene stats artoolkit tdar-game="mode: single-player">
-        <a-marker-camera preset='hiro'></a-marker-camera>
+
+    <a-scene stats arjs artoolkit tdar-game="mode: single-player; ar: true">
+        <a-assets>
+        </a-assets>
+
+        <a-marker preset="hiro">
+        </a-marker>
+
+        <a-entity camera position="0 0 15">
+            <a-entity cursor="fuse: false;" position="0 0 -1" geometry="primitive: ring; radiusInner: 0.02; radiusOuter: 0.03" material="color: black; shader: flat">
+            </a-entity>
+        </a-entity>
     </a-scene>
-    -->
+
 </body>
 
 </html>
