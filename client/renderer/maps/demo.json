@@ -11,9 +11,17 @@
             "waveSpawner": {
                 "position": "-3 0 -3",
                 "schema": {
-					"id": "faction-A-wave-spawner",
-					"faction": "A"
-				}
+                    "id": "faction-A-wave-spawner",
+                    "faction": "A"
+                }
+            },
+            "castle": {
+                "position": "-7 0 -7",
+                "schema": {
+                    "id": "faction-A-castle",
+                    "faction": "A",
+                    "healthPoint": 10
+                }
             }
         },
         {
@@ -28,9 +36,17 @@
             "waveSpawner": {
                 "position": "3 0 3",
                 "schema": {
-					"id": "faction-B-wave-spawner",
-					"faction": "B"
-				}
+                    "id": "faction-B-wave-spawner",
+                    "faction": "B"
+                }
+            },
+            "castle": {
+                "position": "7 0 7",
+                "schema": {
+                    "id": "faction-B-castle",
+                    "faction": "B",
+                    "healthPoint": 10
+                }
             }
         }
     ],
@@ -50,6 +66,15 @@
             },
             "material": {
                 "color": "#5A6266"
+            }
+        },
+        "castle": {
+            "geometry": {
+                "primitive": "box",
+                "color": "grey",
+                "width": 0.5,
+                "height": 2,
+                "depth": 0.5
             }
         }
     }

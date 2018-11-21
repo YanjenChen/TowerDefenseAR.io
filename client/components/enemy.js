@@ -50,19 +50,20 @@
                 type: 'string',
                 default: 'default'
             },
-            damage:{
-                type:'number',
-                default:1
+            damage: {
+                type: 'number',
+                default: 1
             },
-            target:{
-              type:'selector',
-              default:null
+            targetCastle: {
+                type: 'selector',
+                default: null
             }
         },
         init: function() {
             //console.log('Initial enemy.');
             this.currentHP = this.data.healthPoint;
             this.el.setAttribute('id', this.data.id);
+
             /*
             this.el.setAttribute('geometry', {
                 primitive: 'sphere',
@@ -89,18 +90,15 @@
             this.el.removeEventListener('movingended', this._onArrived.bind(this));
         },
         _onArrived: function() {
-            this.targetFac = (this.data.faction == 'A') ? 'B' : 'A';
-            var scene =document.querySelector('a-scene');
-            this.target_castle =scene.querySelector("#CastleB");
-            console.log(this.target_castle);
-            this.target_castle.emit('castle-be-attacked', {
-              damage: this.data.damage
+            this.data.targetCastle.emit('castle-be-attacked', {
+                damage: this.data.damage
             });
             this.el.parentNode.removeChild(this.el);
         },
         _onBeAttacked: function(evt) {
             //console.log(this.el.id + ' be attacked.');
-            this.currentHP -= evt.detail.damage;//detail為bullet.js的_onAttack中emit中傳送的內容
+
+            this.currentHP -= evt.detail.damage;
             if (this.currentHP <= 0) {
                 this.el.parentNode.removeChild(this.el);
             }
