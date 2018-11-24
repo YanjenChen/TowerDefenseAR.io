@@ -59,7 +59,6 @@
         "towerBase": {
             "geometry": {
                 "primitive": "box",
-                "color": "grey",
                 "width": 1,
                 "height": 0.2,
                 "depth": 1
@@ -71,7 +70,6 @@
         "castle": {
             "geometry": {
                 "primitive": "box",
-                "color": "grey",
                 "width": 0.5,
                 "height": 2,
                 "depth": 0.5

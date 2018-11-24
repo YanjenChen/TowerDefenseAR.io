@@ -2,63 +2,67 @@
 <html>
 
 <head>
-    <title>Tower Defense AR</title>
-    <!--
+  <title>Tower Defense AR</title>
+  <!--
     LIBRARY EXPLAINATION
         aframe.min.js: main renderer library.
         aframe-extras.min.js: 3d module animation, loader and other supporting functions.
         aframe-ar.js: marker-based AR library for aframe.
     -->
-    <script src="https://aframe.io/releases/0.8.0/aframe.min.js"></script>
-    <script src="https://cdn.rawgit.com/donmccurdy/aframe-extras/v4.2.0/dist/aframe-extras.min.js"></script>
-    <!-- DISABLE AR.js WHEN USING AFRAME TEST -->
-    <!--
+  <meta name="aframe-enable-ar-scene">
+
+  <script src="lib/aframe.js"></script>
+
+  <script src="https://cdn.rawgit.com/donmccurdy/aframe-extras/v5.0.0/dist/aframe-extras.min.js"></script>
+
+  <!-- DISABLE AR.js WHEN USING AFRAME TEST -->
+  <!--
     <script src="https://cdn.rawgit.com/jeromeetienne/AR.js/1.5.0/aframe/build/aframe-ar.js"></script>
 -->
-    <!-- ONLY USED IN DEMO.JS -->
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <!-- ONLY USED IN DEMO.JS -->
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 
-    <!--
+  <!--
     LOAD COMPONENTS
     -->
-    <!--script src="https://unpkg.com/aframe-curve-component/dist/aframe-curve-component.min.js"></script>
+  <!--script src="https://unpkg.com/aframe-curve-component/dist/aframe-curve-component.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@ripter/aframe-alongpath-component@1.1.4/index.js"></script-->
-    <script src="lib/glow.js"></script>
-    <script src="lib/path.js"></script>
-    <script src="lib/trace.js"></script>
-    <script src="components/enemy.js"></script>
-    <script src="components/wave_spawner.js"></script>
-    <script src="components/bullet.js"></script>
-    <script src="components/tower.js"></script>
-    <script src="components/tower_base.js"></script>
-    <script src="components/castle.js"></script>
+  <script src="components/core/glow.js"></script>
+  <script src="components/core/path.js"></script>
+  <script src="components/core/trace.js"></script>
+  <script src="components/enemy.js"></script>
+  <script src="components/wave_spawner.js"></script>
+  <script src="components/bullet.js"></script>
+  <script src="components/tower.js"></script>
+  <script src="components/tower_base.js"></script>
+  <script src="components/castle.js"></script>
 
-    <script src="script/game.js"></script>
+  <script src="script/game.js"></script>
 </head>
 
 <body>
 
-    <!--
+  <!--
     ENABLE THE FOLLOWING SECTION TO RUN AFRAME TEST
         This part demos how you can test the scense you created without AR.
         Aframe is VR library, we use it as the 3d renderer.
         For more information, google "aframe" and read it's tutorial.
     -->
 
-    <a-scene stats background="color: grey" tdar-game="mode: single-player">
-        <a-assets>
-            <img id="bubbling-beam" src="renderer/assets/ui/bubbling-beam.svg">
-            <img id="hammer-nails" src="renderer/assets/ui/hammer-nails.svg">
-            <a-asset-item id="knight" src="renderer/assets/knight.gltf"></a-asset-item>
-        </a-assets>
+  <a-scene stats background="color: grey" tdar-game="mode: single-player">
+    <a-assets>
+      <img id="bubbling-beam" src="renderer/assets/ui/bubbling-beam.svg">
+      <img id="hammer-nails" src="renderer/assets/ui/hammer-nails.svg">
+      <a-asset-item id="knight" src="renderer/assets/knight.gltf"></a-asset-item>
+    </a-assets>
 
-        <a-entity position="0 10 0" rotation="-90 0 0" camera wasd-controls="acceleration: 250">
-            <a-entity cursor="fuse: false;" position="0 0 -1" geometry="primitive: ring; radiusInner: 0.02; radiusOuter: 0.03" material="color: black; shader: flat">
-            </a-entity>
-        </a-entity>
-    </a-scene>
+    <a-entity position="0 10 0" rotation="-90 0 0" camera wasd-controls="acceleration: 250">
+      <a-entity cursor="fuse: false;" position="0 0 -1" geometry="primitive: ring; radiusInner: 0.02; radiusOuter: 0.03" material="color: black; shader: flat" raycaster="objects: [data-raycastable]">
+      </a-entity>
+    </a-entity>
+  </a-scene>
 
-    <!--
+  <!--
     ENABLE THE FOLLOWING SECTION TO RUN AR TEST
         This part demos how to intergrate AR.js with aframe.
         The only thing we need to do is adding a <a-marker> wrapper to the scense,
@@ -66,7 +70,7 @@
         by itself.
         For more information, google "AR.js" and read it's github.
     -->
-    <!--
+  <!--
     <a-scene stats arjs artoolkit tdar-game="mode: single-player; ar: true">
         <a-assets>
         </a-assets>

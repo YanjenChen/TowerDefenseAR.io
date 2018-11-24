@@ -93,6 +93,7 @@
                         baseEl.setAttribute('geometry', map.settings.towerBase.geometry);
                         baseEl.setAttribute('material', map.settings.towerBase.material);
                         baseEl.setAttribute('position', base.position);
+                        baseEl.setAttribute('data-raycastable', '');
                         baseEl.setAttribute('tower-base', {
                             faction: faction.name
                         });
@@ -116,7 +117,6 @@
                 // load tower template to mixin.
                 defaultTowerMixIn = document.createElement('a-mixin');
                 defaultTowerMixIn.setAttribute('geometry', map.settings.towers.default.geometry);
-                console.log(map.settings.towers.default.model);
                 defaultTowerMixIn.setAttribute('id', 'tower-default-mixin');
                 this.el.sceneEl.querySelector('a-assets').appendChild(defaultTowerMixIn);
             });

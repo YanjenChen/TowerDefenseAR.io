@@ -43,7 +43,9 @@
         tick: function(time, timeDelta) {
             if (this.el.is('activate')) {
                 if (this._checkTargetDistance()) {
-                    this.el.object3D.lookAt(this.el.parentNode.object3D.worldToLocal(this.targetEl.object3D.getWorldPosition()));
+                    let p = new THREE.Vector3();
+                    this.targetEl.object3D.getWorldPosition(p);
+                    this.el.object3D.lookAt(p);
 
                     this.timeCounter += timeDelta;
                     if (this.timeCounter >= this.duration) {
@@ -95,8 +97,9 @@
         _checkTargetDistance: function() {
             if (this.system.faction[this.targetFac].enemies.indexOf(this.targetEl) < 0) // Prevent target doesn't exist cause null error.
                 return false;
-
-            return (this.el.parentNode.object3D.worldToLocal(this.targetEl.object3D.getWorldPosition()).distanceTo(this.el.object3D.position) < this.data.range);
+            let p = new THREE.Vector3();
+            this.targetEl.object3D.getWorldPosition(p);
+            return (this.el.parentNode.object3D.worldToLocal(p).distanceTo(this.el.object3D.position) < this.data.range);
         },
         _getNearestEnemy: function() {
             if (this.system.faction[this.targetFac].enemies.length <= 0) // Prevent empty array cause error.
@@ -104,7 +107,9 @@
 
             var minDistance = Infinity;
             this.system.faction[this.targetFac].enemies.forEach((enemyEl) => {
-                var distance = this.el.parentNode.object3D.worldToLocal(enemyEl.object3D.getWorldPosition()).distanceTo(this.el.object3D.position);
+                let p = new THREE.Vector3();
+                enemyEl.object3D.getWorldPosition(p);
+                var distance = this.el.parentNode.object3D.worldToLocal(p).distanceTo(this.el.object3D.position);
                 if (distance < minDistance) {
                     minDistance = distance;
                     this.targetEl = enemyEl;
@@ -115,7 +120,9 @@
         _onFire: function() {
             if (this.el.sceneEl.querySelector('#' + this.targetEl.id)) {
                 var bulletEl = document.createElement('a-entity');
-                bulletEl.setAttribute('position', this.el.sceneEl.systems['tdar-game'].sceneEntity.object3D.worldToLocal(this.el.object3D.getWorldPosition()));
+                let p = new THREE.Vector3();
+                this.el.object3D.getWorldPosition(p);
+                bulletEl.setAttribute('position', this.el.sceneEl.systems['tdar-game'].sceneEntity.object3D.worldToLocal(p));
                 bulletEl.setAttribute('bullet', {
                     damagePoint: 1,
                     maxRange: this.data.range,
