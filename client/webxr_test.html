@@ -1,4 +1,4 @@
-<!DOCTYPE HTML>
+<!doctype html>
 <html>
 
 <head>
@@ -9,13 +9,9 @@
         aframe-extras.min.js: 3d module animation, loader and other supporting functions.
         aframe-ar.js: marker-based AR library for aframe.
     -->
-  <!--
   <meta name="aframe-enable-ar-scene">
-  -->
 
   <script src="lib/aframe.js"></script>
-
-  <script src="https://cdn.rawgit.com/donmccurdy/aframe-extras/v5.0.0/dist/aframe-extras.min.js"></script>
 
   <!-- DISABLE AR.js WHEN USING AFRAME TEST -->
   <!--
@@ -29,17 +25,6 @@
     -->
   <!--script src="https://unpkg.com/aframe-curve-component/dist/aframe-curve-component.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@ripter/aframe-alongpath-component@1.1.4/index.js"></script-->
-  <script src="components/core/glow.js"></script>
-  <script src="components/core/path.js"></script>
-  <script src="components/core/trace.js"></script>
-  <script src="components/enemy.js"></script>
-  <script src="components/wave_spawner.js"></script>
-  <script src="components/bullet.js"></script>
-  <script src="components/tower.js"></script>
-  <script src="components/tower_base.js"></script>
-  <script src="components/castle.js"></script>
-
-  <script src="script/game.js"></script>
 </head>
 
 <body>
@@ -51,19 +36,29 @@
         For more information, google "aframe" and read it's tutorial.
     -->
 
-  <a-scene stats background="color: grey" tdar-game="mode: single-player">
-    <a-assets>
-      <img id="bubbling-beam" src="renderer/assets/ui/bubbling-beam.svg">
-      <img id="hammer-nails" src="renderer/assets/ui/hammer-nails.svg">
-      <a-asset-item id="knight" src="renderer/assets/knight.gltf"></a-asset-item>
-    </a-assets>
+  <a-scene stats>
+    <a-box depth="0.2" height="0.2" width="0.2" position="1 1 1"></a-box>
+    <a-box depth="0.2" height="0.2" width="0.2" position="-1 1 1"></a-box>
+    <a-box depth="0.2" height="0.2" width="0.2" position="1 -1 1"></a-box>
+    <a-box depth="0.2" height="0.2" width="0.2" position="1 1 -1"></a-box>
+    <a-box depth="0.2" height="0.2" width="0.2" position="1 -1 -1"></a-box>
+    <a-box depth="0.2" height="0.2" width="0.2" position="-1 1 -1"></a-box>
+    <a-box depth="0.2" height="0.2" width="0.2" position="-1 -1 1"></a-box>
+    <a-box depth="0.2" height="0.2" width="0.2" position="-1 -1 -1"></a-box>
 
-    <a-entity position="0 10 0" rotation="-90 0 0" camera wasd-controls="acceleration: 250">
-      <a-entity cursor="fuse: false;" position="0 0 -1" geometry="primitive: ring; radiusInner: 0.02; radiusOuter: 0.03" material="color: black; shader: flat" raycaster="objects: [data-raycastable]">
-      </a-entity>
-    </a-entity>
+    <a-box depth="0.2" height="0.2" width="0.2" position="2 2 2"></a-box>
+    <a-box depth="0.2" height="0.2" width="0.2" position="-2 2 2"></a-box>
+    <a-box depth="0.2" height="0.2" width="0.2" position="2 -2 2"></a-box>
+    <a-box depth="0.2" height="0.2" width="0.2" position="2 2 -2"></a-box>
+    <a-box depth="0.2" height="0.2" width="0.2" position="2 -2 -2"></a-box>
+    <a-box depth="0.2" height="0.2" width="0.2" position="-2 2 -2"></a-box>
+    <a-box depth="0.2" height="0.2" width="0.2" position="-2 -2 2"></a-box>
+    <a-box depth="0.2" height="0.2" width="0.2" position="-2 -2 -2"></a-box>
+
+    <a-entity camera></a-entity>
   </a-scene>
 
+  <a id="enter-ar" style="position: fixed; bottom: 5%; left: 5%;">Start augmented reality</a>
   <!--
     ENABLE THE FOLLOWING SECTION TO RUN AR TEST
         This part demos how to intergrate AR.js with aframe.
