@@ -1,0 +1,12 @@
+#stabilization {
+  background-image: url(../renderer/assets/stabilization.gif);
+  background-size: contain;
+  background-repeat: no-repeat;
+  width: 400px;
+  height: 400px;
+  position: fixed;
+  left: 50%;
+  top: 0;
+  transform: translate(-50%, 0);
+  z-index: 10;
+}

@@ -2,64 +2,95 @@
 <html>
 
 <head>
-  <title>Tower Defense AR</title>
-  <!--
+    <title>Tower Defense AR</title>
+    <!--
     LIBRARY EXPLAINATION
         aframe.min.js: main renderer library.
         aframe-extras.min.js: 3d module animation, loader and other supporting functions.
         aframe-ar.js: marker-based AR library for aframe.
     -->
-  <meta name="aframe-enable-ar-scene">
+    <meta name="aframe-enable-ar-scene">
 
-  <script src="lib/aframe.js"></script>
+    <link type="text/css" rel="stylesheet" href="css/reticle.css">
+    <script src="lib/aframe.js"></script>
 
-  <!-- DISABLE AR.js WHEN USING AFRAME TEST -->
-  <!--
+    <!-- DISABLE AR.js WHEN USING AFRAME TEST -->
+    <!--
     <script src="https://cdn.rawgit.com/jeromeetienne/AR.js/1.5.0/aframe/build/aframe-ar.js"></script>
 -->
-  <!-- ONLY USED IN DEMO.JS -->
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <!-- ONLY USED IN DEMO.JS -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 
-  <!--
+
+    <script src="components/core/reticle.js"></script>
+    <!--
     LOAD COMPONENTS
     -->
-  <!--script src="https://unpkg.com/aframe-curve-component/dist/aframe-curve-component.min.js"></script>
+    <!--script src="https://unpkg.com/aframe-curve-component/dist/aframe-curve-component.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@ripter/aframe-alongpath-component@1.1.4/index.js"></script-->
 </head>
 
 <body>
 
-  <!--
+    <!--
     ENABLE THE FOLLOWING SECTION TO RUN AFRAME TEST
         This part demos how you can test the scense you created without AR.
         Aframe is VR library, we use it as the 3d renderer.
         For more information, google "aframe" and read it's tutorial.
     -->
+    <script>
+        (() => {
+            AFRAME.registerComponent('cube-scene', {
+                schema: {},
+                init: function() {
+                    const materials = [
+                        new THREE.MeshBasicMaterial({
+                            color: 0xff0000
+                        }),
+                        new THREE.MeshBasicMaterial({
+                            color: 0x0000ff
+                        }),
+                        new THREE.MeshBasicMaterial({
+                            color: 0x00ff00
+                        }),
+                        new THREE.MeshBasicMaterial({
+                            color: 0xff00ff
+                        }),
+                        new THREE.MeshBasicMaterial({
+                            color: 0x00ffff
+                        }),
+                        new THREE.MeshBasicMaterial({
+                            color: 0xffff00
+                        })
+                    ];
 
-  <a-scene stats>
-    <a-box depth="0.2" height="0.2" width="0.2" position="1 1 1"></a-box>
-    <a-box depth="0.2" height="0.2" width="0.2" position="-1 1 1"></a-box>
-    <a-box depth="0.2" height="0.2" width="0.2" position="1 -1 1"></a-box>
-    <a-box depth="0.2" height="0.2" width="0.2" position="1 1 -1"></a-box>
-    <a-box depth="0.2" height="0.2" width="0.2" position="1 -1 -1"></a-box>
-    <a-box depth="0.2" height="0.2" width="0.2" position="-1 1 -1"></a-box>
-    <a-box depth="0.2" height="0.2" width="0.2" position="-1 -1 1"></a-box>
-    <a-box depth="0.2" height="0.2" width="0.2" position="-1 -1 -1"></a-box>
+                    const ROW_COUNT = 4;
+                    const SPREAD = 1;
+                    const HALF = ROW_COUNT / 2;
+                    for (let i = 0; i < ROW_COUNT; i++) {
+                        for (let j = 0; j < ROW_COUNT; j++) {
+                            for (let k = 0; k < ROW_COUNT; k++) {
+                                const box = new THREE.Mesh(new THREE.BoxBufferGeometry(0.2, 0.2, 0.2), materials);
+                                box.position.set(i - HALF, j - HALF, k - HALF);
+                                box.position.multiplyScalar(SPREAD);
+                                this.el.sceneEl.object3D.add(box);
+                            }
+                        }
+                    }
+                }
+            });
+        })();
+    </script>
 
-    <a-box depth="0.2" height="0.2" width="0.2" position="2 2 2"></a-box>
-    <a-box depth="0.2" height="0.2" width="0.2" position="-2 2 2"></a-box>
-    <a-box depth="0.2" height="0.2" width="0.2" position="2 -2 2"></a-box>
-    <a-box depth="0.2" height="0.2" width="0.2" position="2 2 -2"></a-box>
-    <a-box depth="0.2" height="0.2" width="0.2" position="2 -2 -2"></a-box>
-    <a-box depth="0.2" height="0.2" width="0.2" position="-2 2 -2"></a-box>
-    <a-box depth="0.2" height="0.2" width="0.2" position="-2 -2 2"></a-box>
-    <a-box depth="0.2" height="0.2" width="0.2" position="-2 -2 -2"></a-box>
+    <a-scene stats cube-scene>
+        <a-entity camera>
+            <a-entity cursor="fuse: false;" position="0 0 -1" geometry="primitive: ring; radiusInner: 0.02; radiusOuter: 0.03" material="color: black; shader: flat" raycaster="objects: [data-raycastable]">
+            </a-entity>
+        </a-entity>
+        <a-entity reticle></a-entity>
+    </a-scene>
 
-    <a-entity camera></a-entity>
-  </a-scene>
-
-  <a id="enter-ar" style="position: fixed; bottom: 5%; left: 5%;">Start augmented reality</a>
-  <!--
+    <!--
     ENABLE THE FOLLOWING SECTION TO RUN AR TEST
         This part demos how to intergrate AR.js with aframe.
         The only thing we need to do is adding a <a-marker> wrapper to the scense,
@@ -67,7 +98,7 @@
         by itself.
         For more information, google "AR.js" and read it's github.
     -->
-  <!--
+    <!--
     <a-scene stats arjs artoolkit tdar-game="mode: single-player; ar: true">
         <a-assets>
         </a-assets>
