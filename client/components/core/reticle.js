@@ -1,7 +1,18 @@
 (() => {
     AFRAME.registerComponent('reticle', {
-        schema: {},
+        schema: {
+            targetEl: {
+                type: 'selector',
+                default: null
+            },
+            scaleFactor: {
+                type: 'number',
+                default: 0.1
+            }
+        },
         init: function() {
+            this.targetEl = this.data.targetEl;
+
             let indicatorEl = this.el.sceneEl.querySelector('#stabilization');
             if (!indicatorEl) {
                 //
@@ -54,17 +65,11 @@
 
             // Initialize after scene enter ar mode.
             this.el.sceneEl.addEventListener('enter-ar', this.onEnterAR.bind(this));
-        },
-        update: function(oldData) {
-            /*
-            if (this.el.sceneEl.is('ar-mode') && !this.session) {
-                onEnterAR();
-            }
-            */
+            this.placeObject = this.placeObject.bind(this);
         },
         tick: function(time, timeDelta) {
             var self = this
-            if (!this.session)
+            if (!this.session || self.el.is('complete'))
                 return;
 
             let camera = this.arManager.getCamera(this.el.sceneEl.camera);
@@ -84,13 +89,7 @@
                     let hitMatrix = new THREE.Matrix4().fromArray(hit.hitMatrix);
 
                     // Now apply the position from the hitMatrix onto our model
-                    //let world_position = new THREE.Vector3().setFromMatrixPosition(hitMatrix);
-                    //self.el.setAttribute('position', self.el.parentNode.object3D.worldToLocal(world_position));
                     self.el.object3D.position.setFromMatrixPosition(hitMatrix);
-                    //console.log('reticle position: ', self.el.object3D.position);
-                    //console.log('camera position', camera.position);
-                    //console.log('camera projectionMatrix', camera.projectionMatrix);
-                    //console.log('camera matrix', camera.matrix);
 
                     let targetPos = new THREE.Vector3().setFromMatrixPosition(camera.matrixWorld);
                     targetPos = self.el.parentNode.object3D.worldToLocal(targetPos);
@@ -102,9 +101,20 @@
                         self.el.object3D.visible = true;
                         self.el.addState('stabilized');
                         self.el.sceneEl.querySelector('#stabilization').classList.add('a-hidden');
+
+                        // Place targetEl if specified.
+                        if (self.targetEl !== null) {
+                            self.el.sceneEl.systems['tdar-game-ui'].displayUIs([{
+                                callback: self.placeObject,
+                                icon: 'hammer'
+                            }]);
+                        }
                     }
                 }
             });
+        },
+        tock: function(time, timeDelta) {
+            this.el.sceneEl.renderer.shadowMap.needsUpdate = false;
         },
         remove: function() {
             delete this.session;
@@ -117,6 +127,48 @@
             this.session = this.el.sceneEl.xrSession;
             this.frameOfReference = this.el.sceneEl.frameOfReference;
             this.el.sceneEl.querySelector('#stabilization').classList.remove('a-hidden');
+        },
+        // Testing function, should be delete.
+        placeObject: function() {
+            var self = this;
+            if (!this.session)
+                return;
+
+            let camera = self.arManager.getCamera(self.el.sceneEl.camera);
+
+            let raycaster = new THREE.Raycaster();
+            raycaster.setFromCamera({
+                x: 0,
+                y: 0
+            }, camera);
+            let ray = raycaster.ray;
+
+            let origin = new Float32Array(ray.origin.toArray());
+            let direction = new Float32Array(ray.direction.toArray());
+            self.session.requestHitTest(origin, direction, self.frameOfReference).then(function(hits) {
+                if (hits.length) {
+                    let hit = hits[0];
+                    let hitMatrix = new THREE.Matrix4().fromArray(hit.hitMatrix);
+
+                    self.targetEl.object3D.position.setFromMatrixPosition(hitMatrix);
+
+                    let targetPos = new THREE.Vector3().setFromMatrixPosition(camera.matrixWorld);
+                    targetPos = self.targetEl.parentNode.object3D.worldToLocal(targetPos);
+                    let angle = Math.atan2(targetPos.x - self.targetEl.object3D.position.x, targetPos.z - self.targetEl.object3D.position.z);
+                    self.targetEl.object3D.rotation.set(0, angle, 0);
+
+                    let arShadowMesh = self.el.sceneEl.object3D.children.find(c => c.name === 'arShadowMesh');
+                    arShadowMesh.position.y = self.targetEl.object3D.position.y;
+
+                    self.targetEl.object3D.scale.set(self.data.scaleFactor, self.data.scaleFactor, self.data.scaleFactor);
+                    self.targetEl.object3D.visible = true;
+                    self.el.sceneEl.renderer.shadowMap.needsUpdate = true;
+                    self.el.sceneEl.emit('placed_target_to_ar');
+
+                    self.el.object3D.visible = false;
+                    self.el.addState('complete');
+                }
+            });
         }
     });
 })();

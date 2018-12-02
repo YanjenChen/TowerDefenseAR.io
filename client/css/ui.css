@@ -1,18 +1,47 @@
-.tdar-ui-button {
+.tdar-ui-buttons-container {
     position: fixed;
-    width: 60px;
-    height: 60px;
-    overflow: hidden;
-    bottom: 60px;
+    display: flex;
+    bottom: 30px;
     right: 20px;
-    z-index: 10000;
     margin: 1px;
-    padding: 20px;
+    padding: 1px;
+    max-width: 120px;
+    flex-direction: column-reverse;
+    justify-content: flex-end;
+}
+
+.tdar-ui-button-wrapper {
+    width: 40px;
+    height: 40px;
+    margin: 10px auto;
+    padding: 10px;
+    overflow: hidden;
     border: black solid;
     border-radius: 60px;
     background-color: black;
 }
 
-.tdar-ui-button img {
+.tdar-ui-button-wrapper.primary {
+    width: 60px;
+    height: 60px;
+    margin: 10px auto;
+    padding: 20px;
+}
+
+.tdar-ui-button-wrapper.empty {
+    background-color: transparent;
+    border-style: dashed;
+    border-width: 2px;
+}
+
+.tdar-ui-button {
     width: 100%;
+    height: 100%;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    background-position: center;
+}
+
+.tdar-ui-button-wrapper.hammer .tdar-ui-button {
+    background-image: url(../renderer/assets/ui/hammer-nails.svg);
 }

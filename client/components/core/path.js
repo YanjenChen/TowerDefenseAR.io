@@ -65,7 +65,7 @@
             },
             speed: {
                 type: 'number',
-                default: 5
+                default: 1
             }
         },
         init: function() {
@@ -75,6 +75,7 @@
             this.timeCounter = 0;
             this.completeDist = 0;
 
+            this.el.object3D.position.copy(this.lines[this.currentLine].v1);
             this._lookAtDirection();
         },
         remove: function() {
@@ -97,20 +98,18 @@
                     this.el.addState('endofpath');
                     this.el.emit('movingended');
                 } else {
-                    var p = this.lines[this.currentLine].getPoint((this.data.speed * this.timeCounter - this.completeDist) / this.lines[this.currentLine].getLength());
+                    let p = this.lines[this.currentLine].getPoint((this.data.speed * this.timeCounter - this.completeDist) / this.lines[this.currentLine].getLength());
                     p = this.data.path.parentNode.object3D.localToWorld(p);
-                    this.el.setAttribute('position', this.el.parentNode.object3D.worldToLocal(p));
+                    this.el.object3D.position.copy(this.el.parentNode.object3D.worldToLocal(p));
                 }
             }
         },
         _lookAtDirection: function() {
             // Look at moving direction.
             if (this.currentLine < this.lines.length) {
-                p1 = this.lines[this.currentLine].v1.clone();
                 p2 = this.lines[this.currentLine].v2.clone();
-                d = p2.sub(p1).normalize();
-                d = this.data.path.parentNode.object3D.localToWorld(d);
-                this.el.object3D.lookAt(this.el.parentNode.object3D.worldToLocal(d));
+                d = this.data.path.parentNode.object3D.localToWorld(p2);
+                this.el.object3D.lookAt(d);
             }
         }
     });
@@ -126,8 +125,7 @@
             this.data.path.addEventListener('path-updated', this.update.bind(this));
         },
         update: function() {
-            let lineMaterial = new THREE.LineBasicMaterial({
-            });
+            let lineMaterial = new THREE.LineBasicMaterial({});
 
             var lineGeometry = new THREE.Geometry();
             lineGeometry.vertices = [];

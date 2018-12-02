@@ -44,7 +44,7 @@
             },
             speed: {
                 type: 'number',
-                default: 6
+                default: 0.5
             },
             type: {
                 type: 'string',
@@ -73,8 +73,8 @@
             });
             */
             this.el.setAttribute('gltf-model', '#knight');
-            this.el.setAttribute('animation-mixer', 'timeScale: 2.7');
-            this.el.setAttribute('scale', '0.5 0.5 0.5')
+            this.el.setAttribute('animation-mixer', 'timeScale: 1.4');
+            this.el.setAttribute('scale', '0.3 0.3 0.3');
             this.system.registerEnemy(this.el);
             this.el.setAttribute('moveonpath', {
                 path: '#' + this.data.faction + 'faction' + this.data.type + 'path',

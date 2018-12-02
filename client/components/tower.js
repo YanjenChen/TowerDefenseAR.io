@@ -34,6 +34,9 @@
             }
         },
         init: function() {
+            this.el.setAttribute('gltf-model', '#fort');
+            this.el.setAttribute('scale', '0.15 0.15 0.15');
+
             this.targetEl = null;
             this.targetFac = (this.data.faction == 'A') ? 'B' : 'A';
             this.duration = 1000 / this.data.dps; // Unit is (ms).
@@ -122,7 +125,7 @@
                 var bulletEl = document.createElement('a-entity');
                 let p = new THREE.Vector3();
                 this.el.object3D.getWorldPosition(p);
-                bulletEl.setAttribute('position', this.el.sceneEl.systems['tdar-game'].sceneEntity.object3D.worldToLocal(p));
+                bulletEl.object3D.position.copy(this.el.sceneEl.systems['tdar-game'].sceneEntity.object3D.worldToLocal(p));
                 bulletEl.setAttribute('bullet', {
                     damagePoint: 1,
                     maxRange: this.data.range,

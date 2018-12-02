@@ -44,7 +44,7 @@
                     } else {
                         direction = p2.sub(p1).normalize();
                         p = p1.add(direction.multiplyScalar(timeDelta * this.data.timeRatio * this.data.speed));
-                        this.el.setAttribute('position', p);
+                        this.el.object3D.position.copy(p);
                     }
                 } else {
                     //console.log('Element out of range.');

@@ -43,9 +43,9 @@
             } else {
                 this.el.setAttribute('geometry', {
                     primitive: 'sphere',
-                    radius: 0.1,
-                    segmentsHeight: 4,
-                    segmentsWidth: 4
+                    radius: 0.05,
+                    segmentsHeight: 2,
+                    segmentsWidth: 2
                 });
                 this.el.setAttribute('moveontrace', {
                     maxRange: this.data.maxRange,
