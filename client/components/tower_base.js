@@ -8,6 +8,7 @@
             }
         },
         init: function() {
+            this.fortBase = undefined;
             this.towerEl = undefined;
 
             this.el.addState('empty');

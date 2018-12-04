@@ -34,22 +34,48 @@
             }
         },
         init: function() {
-            this.el.setAttribute('gltf-model', '#fort');
+            // load fort base.
+            this.fortBase = document.createElement('a-entity');
+            this.fortBase.setAttribute('gltf-model', '#fort-base');
+            this.el.appendChild(this.fortBase);
+            // load fort rotation part.
+            this.rotationPart = document.createElement('a-entity');
+            this.rotationPart.setAttribute('gltf-model', '#fort');
+            this.rotationPart.setAttribute('animation-mixer', {
+                timeScale: 0.8,
+                loop: 'once'
+            });
+            // set fire point.
+            this.firePoint = document.createElement('a-entity');
+            this.firePoint.setAttribute('position', '0 4.831 3.5');
+            this.rotationPart.appendChild(this.firePoint);
+            //this.rotationPart.setAttribute('position', '0 2.51 0');
+            this.el.appendChild(this.rotationPart);
+
             this.el.setAttribute('scale', '0.15 0.15 0.15');
-            this.el.object3D.position.set(0, 0, 0);
 
             this.targetEl = null;
             this.targetFac = (this.data.faction == 'A') ? 'B' : 'A';
             this.duration = 1000 / this.data.dps; // Unit is (ms).
             this.timeCounter = 0;
             this.el.addEventListener('fire', this._onFire.bind(this));
+
+            let self = this;
+            this.el.addState('initializing');
+            this.rotationPart.addEventListener('animation-finished', function() {
+                self.el.removeState('initializing');
+                self.rotationPart.removeEventListener('animation-finished', this);
+            });
         },
         tick: function(time, timeDelta) {
+            if (this.el.is('initializing'))
+                return;
+
             if (this.el.is('activate')) {
                 if (this._checkTargetDistance()) {
                     let p = new THREE.Vector3();
                     this.targetEl.object3D.getWorldPosition(p);
-                    this.el.object3D.lookAt(p);
+                    this.rotationPart.object3D.lookAt(p);
 
                     this.timeCounter += timeDelta;
                     if (this.timeCounter >= this.duration) {
@@ -91,7 +117,9 @@
                 });
 			*/
             ////////////////////////////////
-
+            delete this.fortBase;
+            delete this.rotationPart;
+            delete this.firePoint;
             delete this.targetEl;
             delete this.targetFac;
             delete this.duration;
@@ -125,7 +153,7 @@
             if (this.el.sceneEl.querySelector('#' + this.targetEl.id)) {
                 var bulletEl = document.createElement('a-entity');
                 let p = new THREE.Vector3();
-                this.el.object3D.getWorldPosition(p);
+                this.firePoint.object3D.getWorldPosition(p);
                 bulletEl.object3D.position.copy(this.el.sceneEl.systems['tdar-game'].sceneEntity.object3D.worldToLocal(p));
                 bulletEl.setAttribute('bullet', {
                     damagePoint: 1,
