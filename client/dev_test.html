@@ -52,7 +52,7 @@
     -->
 
     <!--a-scene stats background="color: grey" tdar-game="mode: single-player"-->
-    <a-scene stats background="color: grey">
+    <a-scene stats background="color: grey" tdar-game-ui tdar-game="mode: single-player; ar: false">
         <a-assets>
             <a-asset-item id="knight" src="renderer/assets/knight.gltf"></a-asset-item>
             <a-asset-item id="fort" src="renderer/assets/fort.gltf"></a-asset-item>
@@ -64,11 +64,11 @@
             <a-asset-item id="grass" src="renderer/assets/grass/model.gltf"></a-asset-item>
         </a-assets>
 
-        <a-entity gltf-model="renderer/assets/table/model.gltf" position="" scale="0.5 0.5 0.5">
+        <a-entity gltf-model="renderer/assets/table/model.gltf" position="0 -7.5 0">
                     <a-entity gltf-model="renderer/assets/mill/model.gltf" position="-4.233 9.5 -7.462" scale="2 2 2" rotation="0 29.999999999999996 0"></a-entity><a-entity gltf-model="renderer/assets/mill/model.gltf" position="3.747 9.5 7.481" scale="2 2 2" rotation="0 210.00000000000003 0"></a-entity><a-entity gltf-model="renderer/assets/tree01/model.gltf" position="-1.16 7.443 -8.049" scale="0.008 0.008 0.008" rotation=""></a-entity><a-entity gltf-model="renderer/assets/tree01/model.gltf" position="0.682 7.443 -7.144" scale="0.008 0.008 0.008" rotation="0 80 0"></a-entity><a-entity gltf-model="renderer/assets/tree01/model.gltf" position="2.736 7.443 -8.005" scale="0.008 0.008 0.008" rotation="0 210.00000000000003 0"></a-entity><a-entity gltf-model="renderer/assets/tree01/model.gltf" position="4.492 7.443 -8.254" scale="0.008 0.008 0.008" rotation="0 140 0"></a-entity><a-entity gltf-model="renderer/assets/tree01/model.gltf" position="3.838 7.443 -5.63" scale="0.008 0.008 0.008" rotation="0 10 0"></a-entity><a-entity gltf-model="renderer/assets/tree01/model.gltf" position="4.679 7.443 -3.913" scale="0.008 0.008 0.008" rotation="0 95 0"></a-entity><a-entity gltf-model="renderer/assets/tree01/model.gltf" position="0.039 7.443 8.086" scale="0.008 0.008 0.008" rotation="0 210.00000000000003 0"></a-entity><a-entity gltf-model="renderer/assets/tree01/model.gltf" position="-1.942 7.443 7.219" scale="0.008 0.008 0.008" rotation="0 170 0"></a-entity><a-entity gltf-model="renderer/assets/tree01/model.gltf" position="-3.773 7.443 8.075" scale="0.008 0.008 0.008" rotation="0 270 0"></a-entity><a-entity gltf-model="renderer/assets/tree01/model.gltf" position="-4.689 7.443 6.142" scale="0.008 0.008 0.008" rotation=""></a-entity><a-entity gltf-model="renderer/assets/corn_field/model.gltf" position="-3.995 7.443 0.834" scale="0.15 0.15 0.15" rotation=""></a-entity><a-entity gltf-model="renderer/assets/corn_field/model.gltf" position="-2.302 7.443 -1.035" scale="0.15 0.15 0.15" rotation=""></a-entity><a-entity gltf-model="renderer/assets/corn_field/model.gltf" position="1.959 7.443 1.891" scale="0.15 0.15 0.15" rotation=""></a-entity><a-entity gltf-model="renderer/assets/corn_field/model.gltf" position="4.069 7.443 1.891" scale="0.15 0.15 0.15" rotation=""></a-entity><a-entity gltf-model="renderer/assets/stone/model.gltf" position="-3.888 7.443 4.785" scale="" rotation=""></a-entity><a-entity gltf-model="renderer/assets/stone/model.gltf" position="-3.036 7.443 3.242" scale="" rotation="0 38 0"></a-entity><a-entity gltf-model="renderer/assets/stone/model.gltf" position="2.151 7.443 -1.341" scale="" rotation="0 59.99999999999999 0"></a-entity><a-entity gltf-model="renderer/assets/stone/model.gltf" position="4.142 7.443 -1.341" scale="" rotation="0 210.00000000000003 0"></a-entity>
                 </a-entity>
 
-        <a-entity position="0 10 0" rotation="-90 0 0" camera wasd-controls="acceleration: 250">
+        <a-entity position="0 10 0" rotation="-90 0 0" camera wasd-controls="acceleration: 150">
             <a-entity cursor="fuse: false;" position="0 0 -1" geometry="primitive: ring; radiusInner: 0.02; radiusOuter: 0.03" material="color: black; shader: flat" raycaster="objects: [data-raycastable]">
             </a-entity>
         </a-entity>

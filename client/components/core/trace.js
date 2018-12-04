@@ -39,7 +39,7 @@
                     p2 = this.el.parentNode.object3D.worldToLocal(p2);
                     rDelta = p1.distanceTo(p2);
 
-                    if (rDelta < this.data.triggerRange) {
+                    if (rDelta < this.data.triggerRange || ((timeDelta * this.data.timeRatio) * this.data.speed - rDelta) >= 0) {
                         this.el.emit('reached-target');
                     } else {
                         direction = p2.sub(p1).normalize();

@@ -17,8 +17,12 @@
                 case 'single-player':
                     this.ENEMY_COUNTER = -1;
 
-                    this.el.addEventListener('loaded', this.onAssetsLoaded.bind(this));
-                    this.el.addEventListener('placed_target_to_ar', this.onStabilized.bind(this));
+                    if (this.data.ar) {
+                        this.el.addEventListener('loaded', this.onAssetsLoaded.bind(this));
+                        this.el.addEventListener('placed_target_to_ar', this.onStabilized.bind(this));
+                    } else {
+                        this.el.addEventListener('loaded', this.onStabilized.bind(this));
+                    }
                     this.el.addEventListener('start_game', this.onStartGame.bind(this));
                     //console.warn("AFRAME Init");
 
@@ -143,7 +147,9 @@
                     // load enemy path.
                     faction.enemyPath.forEach(path => {
                         var curveEl = document.createElement('a-entity');
-                        curveEl.setAttribute('path', {});
+                        curveEl.setAttribute('path', {
+                            lineType: path.lineType
+                        });
                         curveEl.setAttribute('id', faction.name + 'faction' + path.type + 'path');
                         path.points.forEach((point) => {
                             var pointEl = document.createElement('a-entity');
@@ -262,7 +268,7 @@
                             id: content['enemy_id'],
                             faction: content['ws_faction'],
                             healthPoint: 6,
-                            speed: 0.6,
+                            speed: 0.03,
                             targetCastle: content['ws_faction'] == 'A' ? '#faction-B-castle' : '#faction-A-castle'
                         });
                     }

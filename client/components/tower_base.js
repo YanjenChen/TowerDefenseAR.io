@@ -32,19 +32,36 @@
             this.el.removeEventListener('click', this.onClick.bind(this));
         },
         onClick: function(evt) {
+            // Prevent double emit click event bug on mouse.
+            if (this.el.is('processing'))
+                return;
+
+            let self = this;
             if (this.el.is('empty')) {
                 this.towerEl = document.createElement('a-entity');
                 this.towerEl.setAttribute('tower', {
-                    dps: 10,
+                    dps: 4,
                     faction: this.data.faction,
                     range: 10
                 });
                 this.el.appendChild(this.towerEl);
-                this.el.removeState('empty')
+
+                // Prevent double emit click event bug on mouse.
+                this.el.addState('processing');
+                setTimeout(function() {
+                    self.el.removeState('empty');
+                    self.el.removeState('processing');
+                }, 500);
             } else {
                 this.towerEl.parentNode.removeChild(this.towerEl);
                 this.towerEl = undefined;
-                this.el.addState('empty');
+
+                // Prevent double emit click event bug on mouse.
+                this.el.addState('processing');
+                setTimeout(function() {
+                    self.el.addState('empty');
+                    self.el.removeState('processing');
+                }, 500);
             }
         }
     });

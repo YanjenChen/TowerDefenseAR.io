@@ -47,6 +47,9 @@
                     segmentsHeight: 2,
                     segmentsWidth: 2
                 });
+                this.el.setAttribute('material', {
+                    color: 'white'
+                });
                 this.el.setAttribute('moveontrace', {
                     maxRange: this.data.maxRange,
                     speed: this.data.speed,

@@ -45,3 +45,15 @@
 .tdar-ui-button-wrapper.hammer .tdar-ui-button {
     background-image: url(../renderer/assets/ui/hammer-nails.svg);
 }
+
+.tdar-ui-button-wrapper.beam .tdar-ui-button {
+    background-image: url(../renderer/assets/ui/bubbling-beam.svg);
+}
+
+.tdar-ui-button-wrapper.bullets .tdar-ui-button {
+    background-image: url(../renderer/assets/ui/bullets.svg);
+}
+
+.tdar-ui-button-wrapper.rocket .tdar-ui-button {
+    background-image: url(../renderer/assets/ui/rocket.svg);
+}

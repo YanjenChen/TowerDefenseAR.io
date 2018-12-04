@@ -15,15 +15,27 @@
     });
 
     AFRAME.registerComponent('path', {
-        schema: {},
+        schema: {
+            lineType: {
+                type: 'string',
+                default: 'Line',
+                oneOf: ['CatmullRom', 'Line']
+            }
+        },
         init: function() {
             this.pathPoints = null;
-            this.lines = [];
+            if (this.data.lineType == 'Line')
+                this.lines = [];
+            else
+                this.line = null;
             this.el.addEventListener('path-point-change', this.update.bind(this));
         },
         remove: function() {
             delete this.pathPoints;
-            delete this.lines;
+            if (this.data.lineType == 'Line')
+                delete this.lines;
+            else
+                delete this.line;
             this.el.removeEventListener('path-point-change', this.update.bind(this));
         },
         update: function(oldData) {
@@ -41,10 +53,15 @@
                     return p;
                     //return this.el.parentNode.object3D.worldToLocal(point.object3D.getWorldPosition());
                 });
-
-                this.lines = [];
-                for (i = 0; i < this.pathPoints.length - 1; i++) {
-                    this.lines.push(new THREE['LineCurve3'](this.pathPoints[i], this.pathPoints[i + 1]));
+                if (this.data.lineType == 'Line') {
+                    delete this.lines;
+                    this.lines = [];
+                    for (i = 0; i < this.pathPoints.length - 1; i++) {
+                        this.lines.push(new THREE['LineCurve3'](this.pathPoints[i], this.pathPoints[i + 1]));
+                    }
+                } else {
+                    delete this.line;
+                    this.line = new THREE['CatmullRomCurve3'](this.pathPoints);
                 }
             }
 
@@ -69,42 +86,79 @@
             }
         },
         init: function() {
-            this.lines = this.data.path.components['path'].lines;
-            this.linesLength = this.lines.map(line => line.getLength());
-            this.currentLine = 0;
+            this.lineType = this.data.path.components['path'].data.lineType;
+            if (this.lineType == 'Line') {
+                this.lines = this.data.path.components['path'].lines;
+                this.linesLength = this.lines.map(line => line.getLength());
+                this.currentLine = 0;
+
+                this.el.object3D.position.copy(this.lines[this.currentLine].v1);
+                this._lookAtDirectionLine();
+            } else {
+                // For CatmullRomCurve3
+                this.line = this.data.path.components['path'].line;
+                this.lineLength = this.line.getLength();
+                // Change speed to arc speed.
+                this.el.setAttribute('moveonpath', {
+                    speed: this.data.speed / (2 * Math.PI)
+                });
+            }
             this.timeCounter = 0;
             this.completeDist = 0;
-
-            this.el.object3D.position.copy(this.lines[this.currentLine].v1);
-            this._lookAtDirection();
         },
         remove: function() {
-            delete this.lines;
-            delete this.linesLength;
-            delete this.currentLine;
+            if (this.lineType == 'Line') {
+                delete this.lines;
+                delete this.linesLength;
+                delete this.currentLine;
+            } else {
+                delete this.line;
+                delete this.lineLength;
+            }
             delete this.timeCounter;
             delete this.completeDist;
+            delete this.lineType;
         },
         tick: function(time, timeDelta) {
-            if (!this.el.is('endofpath')) {
-                this.timeCounter += (timeDelta * this.data.timeRatio);
+            if (this.lineType == 'Line') {
+                // For Line curve.
+                if (!this.el.is('endofpath')) {
+                    this.timeCounter += (timeDelta * this.data.timeRatio);
 
-                if (this.timeCounter * this.data.speed - this.completeDist >= this.linesLength[this.currentLine]) {
-                    this.completeDist += this.linesLength[this.currentLine];
-                    this.currentLine++;
-                    this._lookAtDirection();
+                    if (this.timeCounter * this.data.speed - this.completeDist >= this.linesLength[this.currentLine]) {
+                        this.completeDist += this.linesLength[this.currentLine];
+                        this.currentLine++;
+                        this._lookAtDirectionLine();
+                    }
+                    if (this.currentLine >= this.lines.length) {
+                        this.el.addState('endofpath');
+                        this.el.emit('movingended');
+                    } else {
+                        let p = this.lines[this.currentLine].getPoint((this.data.speed * this.timeCounter - this.completeDist) / this.lines[this.currentLine].getLength());
+                        p = this.data.path.parentNode.object3D.localToWorld(p);
+                        this.el.object3D.position.copy(this.el.parentNode.object3D.worldToLocal(p));
+                    }
                 }
-                if (this.currentLine >= this.lines.length) {
-                    this.el.addState('endofpath');
-                    this.el.emit('movingended');
-                } else {
-                    let p = this.lines[this.currentLine].getPoint((this.data.speed * this.timeCounter - this.completeDist) / this.lines[this.currentLine].getLength());
-                    p = this.data.path.parentNode.object3D.localToWorld(p);
-                    this.el.object3D.position.copy(this.el.parentNode.object3D.worldToLocal(p));
+            } else {
+                // For CatmullRomCurve3 curve.
+                if (!this.el.is('endofpath')) {
+                    this.timeCounter += (timeDelta * this.data.timeRatio);
+                    this.completeDist += this.data.speed * this.timeCounter;
+
+                    if (this.completeDist >= this.lineLength) {
+                        this.el.addState('endofpath');
+                        this.el.emit('movingended');
+                    } else {
+                        let p = this.line.getUtoTmapping(0, this.completeDist);
+                        p = this.line.getPoint(p);
+                        p = this.data.path.parentNode.object3D.localToWorld(p);
+                        this.el.object3D.lookAt(p);
+                        this.el.object3D.position.copy(this.el.parentNode.object3D.worldToLocal(p));
+                    }
                 }
             }
         },
-        _lookAtDirection: function() {
+        _lookAtDirectionLine: function() {
             // Look at moving direction.
             if (this.currentLine < this.lines.length) {
                 p2 = this.lines[this.currentLine].v2.clone();

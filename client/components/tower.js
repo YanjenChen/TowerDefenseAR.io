@@ -36,6 +36,7 @@
         init: function() {
             this.el.setAttribute('gltf-model', '#fort');
             this.el.setAttribute('scale', '0.15 0.15 0.15');
+            this.el.object3D.position.set(0, 0, 0);
 
             this.targetEl = null;
             this.targetFac = (this.data.faction == 'A') ? 'B' : 'A';
