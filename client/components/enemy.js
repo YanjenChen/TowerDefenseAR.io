@@ -61,15 +61,20 @@
         },
         init: function() {
             //console.log('Initial enemy.');
-            let setting = this.el.sceneEl.systems['tdar-game'].settings.enemy;
-
             this.currentHP = this.data.healthPoint;
             this.el.setAttribute('id', this.data.id);
-            this.el.setAttribute('gltf-model', setting.model);
-            this.el.setAttribute('animation-mixer', {
-                timeScale: setting.animation_timeScale
+
+            /*
+            this.el.setAttribute('geometry', {
+                primitive: 'sphere',
+                radius: 0.4,
+                segmentsWidth: 4,
+                segmentsHeight: 4
             });
-            this.el.setAttribute('scale', setting.scale);
+            */
+            this.el.setAttribute('gltf-model', '#knight');
+            this.el.setAttribute('animation-mixer', 'timeScale: 1.4');
+            this.el.setAttribute('scale', '0.3 0.3 0.3');
             this.system.registerEnemy(this.el);
             this.el.setAttribute('moveonpath', {
                 path: '#' + this.data.faction + 'faction' + this.data.type + 'path',

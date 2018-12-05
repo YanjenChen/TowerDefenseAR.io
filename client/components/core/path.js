@@ -151,11 +151,9 @@
                     } else {
                         let p = this.line.getUtoTmapping(0, this.completeDist);
                         p = this.line.getPoint(p);
-                        //p = this.data.path.parentNode.object3D.localToWorld(p);
+                        p = this.data.path.parentNode.object3D.localToWorld(p);
                         this.el.object3D.lookAt(p);
                         this.el.object3D.position.copy(this.el.parentNode.object3D.worldToLocal(p));
-                        //this.el.object3D.position.copy(p);
-                        //console.log(this.el.object3D.position);
                     }
                 }
             }

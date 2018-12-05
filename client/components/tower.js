@@ -35,26 +35,24 @@
         },
         init: function() {
             // load fort base.
-            let setting = this.el.sceneEl.systems['tdar-game'].settings.towers;
-
             this.fortBase = document.createElement('a-entity');
-            this.fortBase.setAttribute('gltf-model', setting.fortBase);
+            this.fortBase.setAttribute('gltf-model', '#fort-base');
             this.el.appendChild(this.fortBase);
             // load fort rotation part.
             this.rotationPart = document.createElement('a-entity');
-            this.rotationPart.setAttribute('gltf-model', setting.fort);
+            this.rotationPart.setAttribute('gltf-model', '#fort');
             this.rotationPart.setAttribute('animation-mixer', {
-                timeScale: setting.animation_timeScale,
+                timeScale: 0.8,
                 loop: 'once'
             });
             // set fire point.
             this.firePoint = document.createElement('a-entity');
-            this.firePoint.setAttribute('position', setting.firePointOffset);
+            this.firePoint.setAttribute('position', '0 4.831 3.5');
             this.rotationPart.appendChild(this.firePoint);
             //this.rotationPart.setAttribute('position', '0 2.51 0');
             this.el.appendChild(this.rotationPart);
 
-            this.el.setAttribute('scale', setting.scale);
+            this.el.setAttribute('scale', '0.15 0.15 0.15');
 
             this.targetEl = null;
             this.targetFac = (this.data.faction == 'A') ? 'B' : 'A';
