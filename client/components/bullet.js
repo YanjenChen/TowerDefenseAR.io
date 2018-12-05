@@ -41,15 +41,10 @@
                 //console.warn('Target does not exist.');
                 this.system.addToErrList(this.el);
             } else {
-                this.el.setAttribute('geometry', {
-                    primitive: 'sphere',
-                    radius: 0.05,
-                    segmentsHeight: 2,
-                    segmentsWidth: 2
-                });
-                this.el.setAttribute('material', {
-                    color: 'white'
-                });
+                let setting = this.el.sceneEl.systems['tdar-game'].settings.bullet;
+
+                this.el.setAttribute('geometry', setting.geometry);
+                this.el.setAttribute('material', setting.material);
                 this.el.setAttribute('moveontrace', {
                     maxRange: this.data.maxRange,
                     speed: this.data.speed,

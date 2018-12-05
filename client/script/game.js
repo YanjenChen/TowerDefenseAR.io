@@ -13,106 +13,58 @@
             }
         },
         init: function() {
-            switch (this.data.mode) {
-                case 'single-player':
-                    this.ENEMY_COUNTER = -1;
+            let self = this;
+            this.gameLoader = new GameLoader(this.el);
+            this.gameLoader.setMapDir('./renderer/maps/war_on_table.json');
+            this.gameLoader.setMode(this.data.ar ? 'ar' : 'vr');
+            this.gameLoader.loadMap(null, function() {
+                self.assetsEl = document.querySelector('a-assets');
+                self.map = self.gameLoader.getMap();
+                self.settings = self.gameLoader.getSettings();
 
-                    if (this.data.ar) {
-                        this.el.addEventListener('loaded', this.onAssetsLoaded.bind(this));
-                        this.el.addEventListener('placed_target_to_ar', this.onStabilized.bind(this));
-                    } else {
-                        this.el.addEventListener('loaded', this.onStabilized.bind(this));
-                    }
-                    this.el.addEventListener('start_game', this.onStartGame.bind(this));
-                    //console.warn("AFRAME Init");
+                switch (self.data.mode) {
+                    case 'single-player':
+                        self.ENEMY_COUNTER = 0;
 
-                    this.el.addEventListener('broadcast', this.onBroadcast.bind(this)); // Listen local event.
-                    this.el.addEventListener('executeRequest', this.onExecute.bind(this)); // Listen server broadcast.
-                    break;
-                case 'multi-player':
-                    this.socket = SOCKET;
-                    this.room_id = jQuery("#room_id").val();
-                    this.user = jQuery("#user").val();
-                    this.user_faction = jQuery("#user_faction").val() == '1' ? 'A' : 'B';
-                    //console.log("game.js initialized. ROOM_ID: " + ROOM_ID + ", USER: " + USER);
+                        if (self.data.ar) {
+                            self.assetsEl.addEventListener('loaded', self.onAssetsLoaded.bind(self));
+                            self.el.addEventListener('placed_target_to_ar', self.onStabilized.bind(self));
+                        } else {
+                            self.assetsEl.addEventListener('loaded', self.onAssetsLoaded.bind(self));
+                            self.el.addEventListener('gameloadscene', self.onStabilized.bind(self));
+                        }
+                        self.el.addEventListener('start_game', self.onStartGame.bind(self));
+                        //console.warn("AFRAME Init");
 
-                    this.el.addEventListener('loaded', this.onStabilized.bind(this));
-                    this.socket.on('client_start_game', this.onStartGame.bind(this));
-                    //console.warn("AFRAME Init");
+                        self.el.addEventListener('broadcast', self.onBroadcast.bind(self)); // Listen local event.
+                        self.el.addEventListener('executeRequest', self.onExecute.bind(self)); // Listen server broadcast.
+                        break;
+                    case 'multi-player':
+                        self.socket = SOCKET;
+                        self.room_id = jQuery("#room_id").val();
+                        self.user = jQuery("#user").val();
+                        self.user_faction = jQuery("#user_faction").val() == '1' ? 'A' : 'B';
+                        //console.log("game.js initialized. ROOM_ID: " + ROOM_ID + ", USER: " + USER);
 
-                    this.el.addEventListener('broadcast', this.onBroadcast.bind(this)); // Listen local event.
-                    this.socket.on('playingEvent', this.onExecute.bind(this)); // Listen server broadcast.
-                    break;
-                default:
-                    console.warn('GAME MODE ERROR.');
-            }
+                        self.assetsEl.addEventListener('loaded', self.onAssetsLoaded.bind(self));
+                        self.el.addEventListener('gameloadscene', self.onStabilized.bind(self));
+                        self.socket.on('client_start_game', self.onStartGame.bind(self));
+                        //console.warn("AFRAME Init");
+
+                        self.el.addEventListener('broadcast', self.onBroadcast.bind(self)); // Listen local event.
+                        self.socket.on('playingEvent', self.onExecute.bind(self)); // Listen server broadcast.
+                        break;
+                    default:
+                        console.warn('GAME MODE ERROR.');
+                }
+            });
         },
         onAssetsLoaded: function() {
-            // Inset shadow plane.
-            let planeGeometry = new THREE.PlaneGeometry(2000, 2000);
-            planeGeometry.rotateX(-Math.PI / 2);
-            let shadowMesh = new THREE.Mesh(planeGeometry, new THREE.ShadowMaterial({
-                color: 0x111111,
-                opacity: 0.2,
-            }));
-            shadowMesh.name = 'arShadowMesh';
-            shadowMesh.receiveShadow = true;
-            shadowMesh.position.y = 10000;
-            this.el.object3D.add(shadowMesh);
-
-            // Insert light in scene.
-            let light = document.createElement('a-entity');
-            light.setAttribute('light', {
-                type: 'ambient',
-                color: '#fff',
-                intensity: 1
-            });
-            let directionalLight = document.createElement('a-entity');
-            directionalLight.setAttribute('light', {
-                type: 'directional',
-                color: '#fff',
-                intensity: 0.3,
-                castShadow: true
-            });
-            directionalLight.setAttribute('position', '10 15 10');
-            this.el.appendChild(light);
-            this.el.appendChild(directionalLight);
-
-            // add reticle and table-object to scene.
-            let table = document.createElement('a-entity');
-            table.setAttribute('gltf-model', '#table');
-            table.setAttribute('id', 'ar-mode-baseEntity');
-            table.setAttribute('shadow', {
-                cast: true,
-                receive: true
-            });
-            // For complex AR scene testing.
-            table.insertAdjacentHTML('beforeend', '<a-entity gltf-model="renderer/assets/mill/model.gltf" position="-4.233 9.5 -7.462" scale="2 2 2" rotation="0 29.999999999999996 0"></a-entity><a-entity gltf-model="renderer/assets/mill/model.gltf" position="3.747 9.5 7.481" scale="2 2 2" rotation="0 210.00000000000003 0"></a-entity><a-entity gltf-model="renderer/assets/tree01/model.gltf" position="-1.16 7.443 -8.049" scale="0.008 0.008 0.008" rotation=""></a-entity><a-entity gltf-model="renderer/assets/tree01/model.gltf" position="0.682 7.443 -7.144" scale="0.008 0.008 0.008" rotation="0 80 0"></a-entity><a-entity gltf-model="renderer/assets/tree01/model.gltf" position="2.736 7.443 -8.005" scale="0.008 0.008 0.008" rotation="0 210.00000000000003 0"></a-entity><a-entity gltf-model="renderer/assets/tree01/model.gltf" position="4.492 7.443 -8.254" scale="0.008 0.008 0.008" rotation="0 140 0"></a-entity><a-entity gltf-model="renderer/assets/tree01/model.gltf" position="3.838 7.443 -5.63" scale="0.008 0.008 0.008" rotation="0 10 0"></a-entity><a-entity gltf-model="renderer/assets/tree01/model.gltf" position="4.679 7.443 -3.913" scale="0.008 0.008 0.008" rotation="0 95 0"></a-entity><a-entity gltf-model="renderer/assets/tree01/model.gltf" position="0.039 7.443 8.086" scale="0.008 0.008 0.008" rotation="0 210.00000000000003 0"></a-entity><a-entity gltf-model="renderer/assets/tree01/model.gltf" position="-1.942 7.443 7.219" scale="0.008 0.008 0.008" rotation="0 170 0"></a-entity><a-entity gltf-model="renderer/assets/tree01/model.gltf" position="-3.773 7.443 8.075" scale="0.008 0.008 0.008" rotation="0 270 0"></a-entity><a-entity gltf-model="renderer/assets/tree01/model.gltf" position="-4.689 7.443 6.142" scale="0.008 0.008 0.008" rotation=""></a-entity><a-entity gltf-model="renderer/assets/corn_field/model.gltf" position="-3.995 7.443 0.834" scale="0.15 0.15 0.15" rotation=""></a-entity><a-entity gltf-model="renderer/assets/corn_field/model.gltf" position="-2.302 7.443 -1.035" scale="0.15 0.15 0.15" rotation=""></a-entity><a-entity gltf-model="renderer/assets/corn_field/model.gltf" position="1.959 7.443 1.891" scale="0.15 0.15 0.15" rotation=""></a-entity><a-entity gltf-model="renderer/assets/corn_field/model.gltf" position="4.069 7.443 1.891" scale="0.15 0.15 0.15" rotation=""></a-entity><a-entity gltf-model="renderer/assets/stone/model.gltf" position="-3.888 7.443 4.785" scale="" rotation=""></a-entity><a-entity gltf-model="renderer/assets/stone/model.gltf" position="-3.036 7.443 3.242" scale="" rotation="0 38 0"></a-entity><a-entity gltf-model="renderer/assets/stone/model.gltf" position="2.151 7.443 -1.341" scale="" rotation="0 59.99999999999999 0"></a-entity><a-entity gltf-model="renderer/assets/stone/model.gltf" position="4.142 7.443 -1.341" scale="" rotation="0 210.00000000000003 0"></a-entity>');
-            let sceneEntity = document.createElement('a-entity');
-            sceneEntity.setAttribute('id', 'ar-mode-sceneEntity');
-            sceneEntity.setAttribute('shadow', {
-                cast: true,
-                receive: false
-            })
-            sceneEntity.setAttribute('position', '0 7.543 0');
-            table.appendChild(sceneEntity);
-            this.el.appendChild(table);
-
-            table.addEventListener('loaded', function() {
-                this.object3D.visible = false;
-
-                let reticle = document.createElement('a-entity');
-                // Affect base scene object scale.
-                reticle.setAttribute('reticle', {
-                    targetEl: '#' + this.id,
-                    scaleFactor: 0.08
-                });
-                this.sceneEl.appendChild(reticle);
-            });
+            this.gameLoader.loadScene();
         },
         onStabilized: function() {
             //console.warn('Assets successful loaded.');
-            this.sceneEntity = this.data.ar ? document.querySelector('#ar-mode-sceneEntity') : document.querySelector('a-scene');
+            this.sceneEntity = document.querySelector('#tdar-dynamic-scene');
             switch (this.data.mode) {
                 case 'single-player':
                     if (!this.el.is('tdar-game-running'))
@@ -130,7 +82,7 @@
             }
         },
         onStartGame: function() {
-            //console.warn('Client start game.')
+            //console.warn('Client start game.');
             let cursor = document.createElement('a-entity');
             cursor.setAttribute('cursor', {
                 fuse: false
@@ -141,60 +93,52 @@
             cursor.setAttribute('raycaster', 'objects: [data-raycastable]');
             document.querySelector('[camera]').appendChild(cursor);
 
-            jQuery.getJSON('./renderer/maps/webxr_test.json', (map) => {
-                /* SCENE LOADER */
-                map.factions.forEach(faction => {
-                    // load enemy path.
-                    faction.enemyPath.forEach(path => {
-                        var curveEl = document.createElement('a-entity');
-                        curveEl.setAttribute('path', {
-                            lineType: path.lineType
-                        });
-                        curveEl.setAttribute('id', faction.name + 'faction' + path.type + 'path');
-                        path.points.forEach((point) => {
-                            var pointEl = document.createElement('a-entity');
-                            pointEl.setAttribute('path-point', {});
-                            pointEl.setAttribute('position', point);
-                            curveEl.appendChild(pointEl);
-                        });
-
-                        // ONLY USE IN DEVELOPER TESTING
-                        //curveEl.setAttribute('draw-path', {
-                        //    path: '#' + faction.name + 'faction' + path.type + 'path'
-                        //});
-                        ////////////////////////////////
-
-                        this.sceneEntity.appendChild(curveEl);
+            /* SCENE LOADER */
+            this.map.dynamicScene.factions.forEach(faction => {
+                // load enemy path.
+                faction.enemyPath.forEach(path => {
+                    var curveEl = document.createElement('a-entity');
+                    curveEl.setAttribute('path', {
+                        lineType: path.lineType
+                    });
+                    curveEl.setAttribute('id', faction.name + 'faction' + path.type + 'path');
+                    path.points.forEach((point) => {
+                        var pointEl = document.createElement('a-entity');
+                        pointEl.setAttribute('path-point', {});
+                        pointEl.setAttribute('position', point);
+                        curveEl.appendChild(pointEl);
                     });
 
-                    // load tower bases.
-                    faction.towerBases.forEach(base => {
-                        baseEl = document.createElement('a-entity');
-                        baseEl.setAttribute('geometry', map.settings.towerBase.geometry);
-                        baseEl.setAttribute('material', map.settings.towerBase.material);
-                        baseEl.setAttribute('position', base.position);
-                        baseEl.setAttribute('data-raycastable', '');
-                        baseEl.setAttribute('tower-base', {
-                            faction: faction.name
-                        });
-                        this.sceneEntity.appendChild(baseEl);
-                    });
-
-                    // load wave spawner.
-                    waveSpawnerEl = document.createElement('a-entity');
-                    waveSpawnerEl.setAttribute('wave-spawner', faction.waveSpawner.schema);
-                    waveSpawnerEl.setAttribute('position', faction.waveSpawner.position);
-                    this.sceneEntity.appendChild(waveSpawnerEl);
-
-                    // load castle
-                    castleEl = document.createElement('a-entity');
-                    castleEl.setAttribute('castle', faction.castle.schema);
-                    castleEl.setAttribute('geometry', map.settings.castle.geometry);
-                    castleEl.setAttribute('position', faction.castle.position);
-                    this.sceneEntity.appendChild(castleEl);
-
-                    this.el.addState('tdar-game-running');
+                    this.sceneEntity.appendChild(curveEl);
                 });
+
+                // load tower bases.
+                faction.towerBases.forEach(base => {
+                    baseEl = document.createElement('a-entity');
+                    baseEl.setAttribute('geometry', this.settings.towerBase.geometry);
+                    baseEl.setAttribute('material', this.settings.towerBase.material);
+                    baseEl.setAttribute('position', base.position);
+                    baseEl.setAttribute('data-raycastable', '');
+                    baseEl.setAttribute('tower-base', {
+                        faction: faction.name
+                    });
+                    this.sceneEntity.appendChild(baseEl);
+                });
+
+                // load wave spawner.
+                waveSpawnerEl = document.createElement('a-entity');
+                waveSpawnerEl.setAttribute('wave-spawner', faction.waveSpawner.schema);
+                waveSpawnerEl.setAttribute('position', faction.waveSpawner.position);
+                this.sceneEntity.appendChild(waveSpawnerEl);
+
+                // load castle
+                castleEl = document.createElement('a-entity');
+                castleEl.setAttribute('castle', faction.castle.schema);
+                castleEl.setAttribute('geometry', this.settings.castle.geometry);
+                castleEl.setAttribute('position', faction.castle.position);
+                this.sceneEntity.appendChild(castleEl);
+
+                this.el.addState('tdar-game-running');
             });
         },
         onBroadcast: function(evt) {
@@ -276,4 +220,118 @@
             }
         }
     });
+    class GameLoader {
+        constructor(object, mapDir, mode) {
+            this.sceneEl = object;
+            this.mapDir = mapDir;
+            this.mode = mode;
+            this.map = null;
+            this.settings = null;
+        }
+        setMapDir(mapDir) {
+            this.mapDir = mapDir;
+        }
+        setMode(mode) {
+            this.mode = mode;
+        }
+        getMap() {
+            return this.map;
+        }
+        getSettings() {
+            return this.settings;
+        }
+        loadMap(mapDir, callback) {
+            let self = this;
+            let dir = mapDir ? mapDir : this.mapDir;
+
+            jQuery.getJSON(dir, map => {
+                self.map = map;
+                self.settings = map.settings;
+
+                let assetsEl = document.createElement('a-assets');
+                map.assets.forEach(asset => {
+                    let assetEl = document.createElement('a-asset-item');
+                    assetEl.setAttribute('id', asset.id);
+                    assetEl.setAttribute('src', asset.src);
+                    assetsEl.appendChild(assetEl);
+                });
+                self.sceneEl.appendChild(assetsEl);
+
+                callback();
+            });
+        }
+        loadScene(env) {
+            let self = this;
+            let mode = env ? env : this.mode;
+            if (mode == 'ar') {
+                // Inset shadow plane.
+                let planeGeometry = new THREE.PlaneGeometry(2000, 2000);
+                planeGeometry.rotateX(-Math.PI / 2);
+                let shadowMesh = new THREE.Mesh(planeGeometry, new THREE.ShadowMaterial({
+                    color: 0x111111,
+                    opacity: 0.2,
+                }));
+                shadowMesh.name = 'arShadowMesh';
+                shadowMesh.receiveShadow = true;
+                shadowMesh.position.y = 10000;
+                this.sceneEl.object3D.add(shadowMesh);
+
+                // Insert light in scene.
+                let light = document.createElement('a-entity');
+                light.setAttribute('light', {
+                    type: 'ambient',
+                    color: '#fff',
+                    intensity: 1
+                });
+                let directionalLight = document.createElement('a-entity');
+                directionalLight.setAttribute('light', {
+                    type: 'directional',
+                    color: '#fff',
+                    intensity: 0.3,
+                    castShadow: true
+                });
+                directionalLight.setAttribute('position', '10 15 10');
+                this.sceneEl.appendChild(light);
+                this.sceneEl.appendChild(directionalLight);
+            }
+
+            // add static scene.
+            let staticScene = document.createElement('a-entity');
+            staticScene.setAttribute('gltf-model', this.map.staticScene.model);
+            staticScene.setAttribute('id', 'tdar-static-scene');
+            staticScene.setAttribute('shadow', {
+                cast: true,
+                receive: true
+            });
+            if (this.map.staticScene.child)
+                staticScene.insertAdjacentHTML('beforeend', this.map.staticScene.child);
+
+            // add dynamic scene.
+            let dynamicScene = document.createElement('a-entity');
+            dynamicScene.setAttribute('id', 'tdar-dynamic-scene');
+            dynamicScene.setAttribute('shadow', {
+                cast: true,
+                receive: false
+            });
+            dynamicScene.setAttribute('position', this.map.dynamicScene.offset);
+            staticScene.appendChild(dynamicScene);
+            this.sceneEl.appendChild(staticScene);
+
+            if (mode == 'ar') {
+                staticScene.addEventListener('loaded', function() {
+                    this.object3D.visible = false;
+
+                    let reticle = document.createElement('a-entity');
+                    // Affect base scene object scale.
+                    reticle.setAttribute('reticle', {
+                        targetEl: '#' + this.id,
+                        scaleFactor: self.map.staticScene.scaleFactor
+                    });
+                    this.sceneEl.appendChild(reticle);
+                });
+            }
+
+            this.sceneEl.emit('gameloadscene');
+        }
+    }
 })();
