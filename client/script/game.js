@@ -83,6 +83,8 @@
         },
         onStartGame: function() {
             //console.warn('Client start game.');
+
+            // Insert cursor under camera.
             let cursor = document.createElement('a-entity');
             cursor.setAttribute('cursor', {
                 fuse: false
@@ -93,53 +95,7 @@
             cursor.setAttribute('raycaster', 'objects: [data-raycastable]');
             document.querySelector('[camera]').appendChild(cursor);
 
-            /* SCENE LOADER */
-            this.map.dynamicScene.factions.forEach(faction => {
-                // load enemy path.
-                faction.enemyPath.forEach(path => {
-                    var curveEl = document.createElement('a-entity');
-                    curveEl.setAttribute('path', {
-                        lineType: path.lineType
-                    });
-                    curveEl.setAttribute('id', faction.name + 'faction' + path.type + 'path');
-                    path.points.forEach((point) => {
-                        var pointEl = document.createElement('a-entity');
-                        pointEl.setAttribute('path-point', {});
-                        pointEl.setAttribute('position', point);
-                        curveEl.appendChild(pointEl);
-                    });
-
-                    this.sceneEntity.appendChild(curveEl);
-                });
-
-                // load tower bases.
-                faction.towerBases.forEach(base => {
-                    baseEl = document.createElement('a-entity');
-                    baseEl.setAttribute('geometry', this.settings.towerBase.geometry);
-                    baseEl.setAttribute('material', this.settings.towerBase.material);
-                    baseEl.setAttribute('position', base.position);
-                    baseEl.setAttribute('data-raycastable', '');
-                    baseEl.setAttribute('tower-base', {
-                        faction: faction.name
-                    });
-                    this.sceneEntity.appendChild(baseEl);
-                });
-
-                // load wave spawner.
-                waveSpawnerEl = document.createElement('a-entity');
-                waveSpawnerEl.setAttribute('wave-spawner', faction.waveSpawner.schema);
-                waveSpawnerEl.setAttribute('position', faction.waveSpawner.position);
-                this.sceneEntity.appendChild(waveSpawnerEl);
-
-                // load castle
-                castleEl = document.createElement('a-entity');
-                castleEl.setAttribute('castle', faction.castle.schema);
-                castleEl.setAttribute('geometry', this.settings.castle.geometry);
-                castleEl.setAttribute('position', faction.castle.position);
-                this.sceneEntity.appendChild(castleEl);
-
-                this.el.addState('tdar-game-running');
-            });
+            this.gameLoader.getDynamicScene().play();
         },
         onBroadcast: function(evt) {
             switch (this.data.mode) {
@@ -227,6 +183,9 @@
             this.mode = mode;
             this.map = null;
             this.settings = null;
+            this.anchorEl = null;
+            this.staticScene = null;
+            this.dynamicScene = null;
         }
         setMapDir(mapDir) {
             this.mapDir = mapDir;
@@ -240,6 +199,15 @@
         getSettings() {
             return this.settings;
         }
+        getAnchorEl() {
+            return this.anchorEl;
+        }
+        getStaticScene() {
+            return this.staticScene;
+        }
+        getDynamicScene() {
+            return this.dynamicScene;
+        }
         loadMap(mapDir, callback) {
             let self = this;
             let dir = mapDir ? mapDir : this.mapDir;
@@ -248,6 +216,7 @@
                 self.map = map;
                 self.settings = map.settings;
 
+                // Pre-load model by assets management system.
                 let assetsEl = document.createElement('a-assets');
                 map.assets.forEach(asset => {
                     let assetEl = document.createElement('a-asset-item');
@@ -264,7 +233,7 @@
             let self = this;
             let mode = env ? env : this.mode;
             if (mode == 'ar') {
-                // Inset shadow plane.
+                // Insert shadow plane.
                 let planeGeometry = new THREE.PlaneGeometry(2000, 2000);
                 planeGeometry.rotateX(-Math.PI / 2);
                 let shadowMesh = new THREE.Mesh(planeGeometry, new THREE.ShadowMaterial({
@@ -276,7 +245,7 @@
                 shadowMesh.position.y = 10000;
                 this.sceneEl.object3D.add(shadowMesh);
 
-                // Insert light in scene.
+                // Insert light to scene.
                 let light = document.createElement('a-entity');
                 light.setAttribute('light', {
                     type: 'ambient',
@@ -293,18 +262,27 @@
                 directionalLight.setAttribute('position', '10 15 10');
                 this.sceneEl.appendChild(light);
                 this.sceneEl.appendChild(directionalLight);
+
+                // Insert anchor container.
+                let anchorEl = document.createElement('a-entity');
+                anchorEl.setAttribute('id', 'tdar-anchor-container');
+                anchorEl.setAttribute('shadow', {
+                    cast: true,
+                    receive: true
+                });
+                this.sceneEl.appendChild(anchorEl);
+
+                this.sceneEl = this.anchorEl = anchorEl;
             }
 
             // add static scene.
             let staticScene = document.createElement('a-entity');
             staticScene.setAttribute('gltf-model', this.map.staticScene.model);
             staticScene.setAttribute('id', 'tdar-static-scene');
-            staticScene.setAttribute('shadow', {
-                cast: true,
-                receive: true
-            });
             if (this.map.staticScene.child)
                 staticScene.insertAdjacentHTML('beforeend', this.map.staticScene.child);
+            this.sceneEl.appendChild(staticScene);
+            this.staticScene = staticScene;
 
             // add dynamic scene.
             let dynamicScene = document.createElement('a-entity');
@@ -314,11 +292,65 @@
                 receive: false
             });
             dynamicScene.setAttribute('position', this.map.dynamicScene.offset);
-            staticScene.appendChild(dynamicScene);
-            this.sceneEl.appendChild(staticScene);
+            this.sceneEl.appendChild(dynamicScene);
+            this.dynamicScene = dynamicScene;
+
+            // Pause game after init.
+            this.dynamicScene.addEventListener('loaded', function() {
+                document.querySelector('#tdar-dynamic-scene').pause();
+            });
+
+            // add initial content to dynamic scene.
+            /* SCENE LOADER */
+            this.map.dynamicScene.factions.forEach(faction => {
+                // load enemy path.
+                faction.enemyPath.forEach(path => {
+                    var curveEl = document.createElement('a-entity');
+                    curveEl.setAttribute('path', {
+                        lineType: path.lineType
+                    });
+                    curveEl.setAttribute('id', faction.name + 'faction' + path.type + 'path');
+                    path.points.forEach((point) => {
+                        var pointEl = document.createElement('a-entity');
+                        pointEl.setAttribute('path-point', {});
+                        pointEl.setAttribute('position', point);
+                        curveEl.appendChild(pointEl);
+                    });
+
+                    dynamicScene.appendChild(curveEl);
+                });
+
+                // load tower bases.
+                faction.towerBases.forEach(base => {
+                    let baseEl = document.createElement('a-entity');
+                    baseEl.setAttribute('geometry', this.settings.towerBase.geometry);
+                    baseEl.setAttribute('material', this.settings.towerBase.material);
+                    baseEl.setAttribute('position', base.position);
+                    baseEl.setAttribute('data-raycastable', '');
+                    baseEl.setAttribute('tower-base', {
+                        faction: faction.name
+                    });
+                    dynamicScene.appendChild(baseEl);
+                });
+
+                // load wave spawner.
+                let waveSpawnerEl = document.createElement('a-entity');
+                waveSpawnerEl.setAttribute('wave-spawner', faction.waveSpawner.schema);
+                waveSpawnerEl.setAttribute('position', faction.waveSpawner.position);
+                dynamicScene.appendChild(waveSpawnerEl);
+
+                // load castle
+                let castleEl = document.createElement('a-entity');
+                castleEl.setAttribute('castle', faction.castle.schema);
+                castleEl.setAttribute('geometry', this.settings.castle.geometry);
+                castleEl.setAttribute('position', faction.castle.position);
+                dynamicScene.appendChild(castleEl);
+
+                //this.el.addState('tdar-game-running');
+            });
 
             if (mode == 'ar') {
-                staticScene.addEventListener('loaded', function() {
+                this.sceneEl.addEventListener('loaded', function() {
                     this.object3D.visible = false;
 
                     let reticle = document.createElement('a-entity');
@@ -329,9 +361,9 @@
                     });
                     this.sceneEl.appendChild(reticle);
                 });
+            } else {
+                document.querySelector('a-scene').emit('gameloadscene');
             }
-
-            this.sceneEl.emit('gameloadscene');
         }
     }
 })();
