@@ -48,7 +48,8 @@
                     "position": "-4.1 0 -4.7",
                     "schema": {
                         "id": "faction-A-wave-spawner",
-                        "faction": "A"
+                        "faction": "A",
+                        "timeOffSet": 500
                     }
                 },
                 "castle": {
@@ -90,11 +91,48 @@
     },
     "settings": {
         "towers": {
-            "fortBase": "#fort-base",
-            "fort": "#fort",
-            "animation_timeScale": 0.8,
-            "firePointOffset": "0 4.831 3.5",
-            "scale": "0.15 0.15 0.15"
+            "common": {
+                "fortBase": "#fort-base",
+                "fort": "#fort",
+                "animation_timeScale": 0.8,
+                "firePointOffset": "0 4.831 7",
+                "scale": "0.15 0.15 0.15"
+            },
+            "laser": [{
+                "restDuration": 1000,
+                "activateDuration": 1000,
+                "range": 5,
+                "damagePoint": 1,
+                "laserColor": "rgb(68,170,68)"
+            }, {
+                "restDuration": 500,
+                "activateDuration": 2000,
+                "range": 5,
+                "damagePoint": 2,
+                "laserColor": "rgb(68,68,170)"
+            }, {
+                "restDuration": 0,
+                "activateDuration": 1000,
+                "range": 5,
+                "damagePoint": 3,
+                "laserColor": "rgb(170,68,68)"
+            }],
+            "missile": [{
+                "restDuration": 4000,
+                "activateDuration": 1,
+                "range": 10,
+                "damagePoint": 50
+            }, {
+                "restDuration": 3000,
+                "activateDuration": 1,
+                "range": 11,
+                "damagePoint": 70
+            }, {
+                "restDuration": 1500,
+                "activateDuration": 1,
+                "range": 12,
+                "damagePoint": 100
+            }]
         },
         "towerBase": {
             "geometry": {

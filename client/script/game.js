@@ -167,7 +167,7 @@
                         document.querySelector('#' + content['id']).emit('spawn_enemy', {
                             id: content['enemy_id'],
                             faction: content['ws_faction'],
-                            healthPoint: 6,
+                            healthPoint: 150,
                             speed: 0.03,
                             targetCastle: content['ws_faction'] == 'A' ? '#faction-B-castle' : '#faction-A-castle'
                         });

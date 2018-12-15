@@ -38,8 +38,8 @@
     width: 100%;
     height: 100%;
     background-repeat: no-repeat;
-    background-attachment: fixed;
     background-position: center;
+    background-size: 100% 100%;
 }
 
 .tdar-ui-button-wrapper.hammer .tdar-ui-button {
@@ -56,4 +56,12 @@
 
 .tdar-ui-button-wrapper.rocket .tdar-ui-button {
     background-image: url(../renderer/assets/ui/rocket.svg);
+}
+
+.tdar-ui-button-wrapper.upgrade .tdar-ui-button {
+    background-image: url(../renderer/assets/ui/upgrade.svg);
+}
+
+.tdar-ui-button-wrapper.demolish .tdar-ui-button {
+    background-image: url(../renderer/assets/ui/demolish.svg);
 }
