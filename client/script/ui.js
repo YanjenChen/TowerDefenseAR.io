@@ -1,13 +1,13 @@
 (() => {
-    var MAX_UI = 3;
+    const MAX_UI = 3;
 
     AFRAME.registerSystem('tdar-game-ui', {
         schema: {
-			primary: {
-				type: 'boolean',
-				default: false
-			}
-		},
+            primary: {
+                type: 'boolean',
+                default: false
+            }
+        },
         init: function() {
             this.buttons = [];
 
@@ -41,28 +41,29 @@
                 return;
             }
 
+            this.removeUIs();
+
             let i = 0;
             UIs.forEach(UI => {
+                let buttonEl = this.buttons[i];
+                buttonEl.classList.remove('empty');
+                buttonEl.classList.add(UI.icon);
+                buttonEl.addEventListener('click', UI.callback);
+                i++;
+            });
+        },
+        removeUIs: function() {
+            for (i = 0; i < MAX_UI; i++) {
                 // Clear all style and callback.
                 let buttonEl = this.buttons[i];
                 buttonEl.className = '';
                 buttonEl.classList.add('tdar-ui-button-wrapper');
                 if (i == 0 && this.data.primary)
                     buttonEl.classList.add('primary');
+                buttonEl.classList.add('empty');
                 let newButtonEl = buttonEl.cloneNode(true);
                 buttonEl.parentNode.replaceChild(newButtonEl, buttonEl);
-
-                // Attach icon and callback to button.
-                newButtonEl.classList.add(UI.icon);
-                newButtonEl.addEventListener('click', UI.callback);
                 this.buttons[i] = newButtonEl;
-                i++;
-            });
-            for (i = MAX_UI - UIs.length; i > 0; i--) {
-                let buttonEl = this.buttons[i];
-                buttonEl.className = '';
-                buttonEl.classList.add('tdar-ui-button-wrapper');
-                buttonEl.classList.add('empty');
             }
         }
     });
