@@ -44,7 +44,7 @@
         },
         onStateAdded: function(evt) {
             if (evt.detail == 'cursor-hovered') {
-                this.el.sceneEl.systems['tdar-game-ui'].displayUIs(this.getUIsets());
+                this.el.sceneEl.systems['tdar-game-ui'].updateObjectControl(this.getUIsets());
             }
         },
         createLaserTower: function() {
@@ -81,7 +81,7 @@
         },
         onStateRemoved: function(evt) {
             if (evt.detail == 'cursor-hovered') {
-                this.el.sceneEl.systems['tdar-game-ui'].removeUIs();
+                this.el.sceneEl.systems['tdar-game-ui'].clearObjectControl();
             }
         },
         getUIsets: function() {
@@ -89,33 +89,38 @@
             if (this.el.is('empty')) {
                 uisets = [{
                     callback: this.createLaserTower,
-                    icon: 'beam'
+                    icon: 'beam',
+                    header: 'Beam'
                 }, {
                     callback: this.createMissileTower,
-                    icon: 'rocket'
+                    icon: 'rocket',
+                    header: 'Missile'
                 }];
             } else if (this.towerEl.components['tower'].isMaxTier()) {
                 uisets = [{
                     callback: this.removeTower,
-                    icon: 'demolish'
+                    icon: 'demolish',
+                    header: 'Remove'
                 }];
             } else {
                 uisets = [{
                     callback: this.removeTower,
-                    icon: 'demolish'
+                    icon: 'demolish',
+                    header: 'Remove'
                 }, {
                     callback: this.upgradeTower,
-                    icon: 'upgrade'
+                    icon: 'upgrade',
+                    header: 'Upgrade'
                 }];
             }
             return uisets;
         },
         updateUI: function() {
-            this.el.sceneEl.systems['tdar-game-ui'].removeUIs();
+            this.el.sceneEl.systems['tdar-game-ui'].clearObjectControl();
             var self = this;
             setTimeout(function() {
                 if (self.el.is('cursor-hovered'))
-                    self.el.sceneEl.systems['tdar-game-ui'].displayUIs(self.getUIsets());
+                    self.el.sceneEl.systems['tdar-game-ui'].updateObjectControl(self.getUIsets());
             }, 1000);
         }
     });
