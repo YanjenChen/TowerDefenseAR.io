@@ -177,3 +177,21 @@ h1.inverted, h3.inverted {
 .icon.two-coins {
     background-image: url(../renderer/assets/ui/two-coins.svg);
 }
+
+@media (orientation: portrait) {
+    .tdar-ui-container {
+        transform: scale(1.7, 1.7);
+    }
+    .tdar-ui-container.left.top {
+        transform-origin: left top;
+    }
+    .tdar-ui-container.right.top {
+        transform-origin: right top;
+    }
+    .tdar-ui-container.left.bottom {
+        transform-origin: left bottom;
+    }
+    .tdar-ui-container.right.bottom {
+        transform-origin: right bottom;
+    }
+}
