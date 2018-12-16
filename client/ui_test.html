@@ -1,0 +1,104 @@
+<!DOCTYPE HTML>
+<html>
+
+<head>
+    <title>Tower Defense AR</title>
+
+    <link rel="stylesheet" type="text/css" href="css/ui.css">
+</head>
+
+<body>
+    <div class="tdar-ui-container top left">
+        <div id="wave-monitor" class="wrapper verticle-grid stripe">
+            <div class="content text-center">
+                <h1 class="primary">NEXT WAVE: <span id="wave-timer">00:00</span></h1>
+            </div>
+            <div class="content block">
+                <div id="wave-content" class="wrapper horizontal-grid">
+                    <div class="icon barbute attacking">
+                    </div>
+                    <div class="icon barbute">
+                    </div>
+                    <div class="icon barbute">
+                    </div>
+                    <div class="icon barbute">
+                    </div>
+                    <div class="icon barbute">
+                    </div>
+                    <div class="icon barbute">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="tdar-ui-container top right">
+        <div id="status-monitor" class="wrapper verticle-grid stripe">
+            <div class="content icon-header primary">
+                <div class="icon two-coins"></div>
+                <h1 class="inverted"><span id="money-point">10</span></h1>
+            </div>
+            <div class="content icon-header">
+                <div class="icon life-bar"></div>
+                <h1 class="inverted"><span id="health-point">10</span></h1>
+            </div>
+        </div>
+    </div>
+    <div class="tdar-ui-container bottom left">
+        <div id="wavespawner-control" class="wrapper horizontal-grid">
+            <div class="tdar-button barbute">
+                <div class="button-icon"></div>
+                <h3 class="header">Knight</h3>
+                <div class="content icon-header">
+                    <div class="icon two-coins"></div>
+                    <h3 class="inverted"><span class="cost">10</span></h3>
+                </div>
+            </div>
+            <div class="tdar-button barbute">
+                <div class="button-icon"></div>
+                <h3 class="header">Knight</h3>
+                <div class="content icon-header">
+                    <div class="icon two-coins"></div>
+                    <h3 class="inverted"><span class="cost">10</span></h3>
+                </div>
+            </div>
+            <div class="tdar-button barbute">
+                <div class="button-icon"></div>
+                <h3 class="header">Knight</h3>
+                <div class="content icon-header">
+                    <div class="icon two-coins"></div>
+                    <h3 class="inverted"><span class="cost">10</span></h3>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="tdar-ui-container bottom right">
+        <div id="object-control" class="wrapper horizontal-grid">
+            <div class="tdar-button upgrade">
+                <div class="button-icon"></div>
+                <h3 class="header">Upgrade</h3>
+                <div class="content icon-header">
+                    <div class="icon two-coins"></div>
+                    <h3 class="inverted"><span class="cost">100</span></h3>
+                </div>
+            </div>
+            <div class="tdar-button demolish">
+                <div class="button-icon"></div>
+                <h3 class="header">Remove</h3>
+                <div class="content icon-header">
+                    <div class="icon two-coins"></div>
+                    <h3 class="inverted"><span class="cost">-</span></h3>
+                </div>
+            </div>
+            <div class="tdar-button">
+                <div class="button-icon"></div>
+                <h3 class="header">-</h3>
+                <div class="content icon-header">
+                    <div class="icon two-coins"></div>
+                    <h3 class="inverted"><span class="cost">-</span></h3>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

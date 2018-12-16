@@ -1,67 +1,179 @@
-.tdar-ui-buttons-container {
+h1, h3 {
+    margin: 0 auto;
+    color: white;
+    font-family: Arial, Helvetica, sans-serif;
+}
+h1 {
+    font-size: 1.75em;
+}
+h3 {
+    font-size: 1em;
+}
+h1.primary {
+    margin: 0 auto 10px auto;
+}
+h1.inverted, h3.inverted {
+    background-color: rgba(34, 116, 165, 30%);
+    border-radius: 1em;
+}
+
+.tdar-ui-container {
     position: fixed;
-    display: flex;
-    bottom: 30px;
-    right: 20px;
     margin: 1px;
     padding: 1px;
-    max-width: 120px;
-    flex-direction: column-reverse;
-    justify-content: flex-end;
+    max-width: 300px;
+    max-height: 20%;
+}
+.tdar-ui-container.top {
+    top: 30px;
+}
+.tdar-ui-container.left {
+    left: 30px;
+}
+.tdar-ui-container.bottom {
+    bottom: 15px;
+}
+.tdar-ui-container.right {
+    right: 30px;
 }
 
-.tdar-ui-button-wrapper {
-    width: 40px;
-    height: 40px;
-    margin: 10px auto;
+.tdar-ui-container > .wrapper {
     padding: 10px;
-    overflow: hidden;
-    border: black solid;
-    border-radius: 60px;
-    background-color: black;
+}
+.wrapper {
+    position: relative;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: space-between;
+}
+.wrapper.verticle-grid {
+    flex-direction: column;
+}
+.wrapper.horizontal-grid {
+    flex-direction: row;
+}
+.wrapper.stripe {
+    background-color: rgba(4, 167, 119, 30%);
+    border-style: solid;
+    border-width: 2px;
+    border-color: rgba(4, 167, 119, 70%);
+    border-radius: 5px;
 }
 
-.tdar-ui-button-wrapper.primary {
+.content {
+    margin: 1px;
+    padding: 0;
+    max-width: 100%;
+    overflow: hidden;
+}
+.content.primary {
+    margin-bottom: 10px;
+}
+.content.text-center {
+    text-align: center;
+}
+.content.block {
+    padding: 5px;
+    background-color: rgba(34, 116, 165, 30%);
+}
+.content.long {
+    min-width: none;
+    overflow: visible;
+}
+
+.icon {
+    width: 1.75em;
+    height: 1.75em;
+    margin: 2px;
+}
+.wrapper > .icon {
+    border: solid white 2px;
+}
+.wrapper > .icon.attacking {
+    border: solid rgb(247, 92, 3) 2px;
+    background-color: rgb(247, 92, 3);
+}
+
+.icon-header .icon {
+    display: inline-block;
+    margin: 0 5px 0 0;
+    vertical-align: middle;
+}
+.icon-header h1 {
+    display: inline-block;
+    vertical-align: middle;
+    min-width: 100px;
+    text-align: center;
+}
+
+.tdar-button {
+    width: 60px;
+    height: 100%;
+    margin: 5px;
+    padding: 5px;
+    overflow: hidden;
+    border: rgba(4, 167, 119, 70%) solid;
+    border-radius: 5px;
+    background-color: rgba(4, 167, 119, 30%) ;
+}
+.tdar-button.primary {
     width: 60px;
     height: 60px;
-    margin: 10px auto;
-    padding: 20px;
+    margin: 10px;
 }
-
-.tdar-ui-button-wrapper.empty {
-    background-color: transparent;
-    border-style: dashed;
-    border-width: 2px;
-}
-
-.tdar-ui-button {
-    width: 100%;
-    height: 100%;
+.tdar-button > .button-icon {
+    margin: 0 auto 5px auto;
+    width: 1.75em;
+    height: 1.75em;
     background-repeat: no-repeat;
     background-position: center;
     background-size: 100% 100%;
 }
+.tdar-button > .header {
+    text-align: center;
+    margin: 0 auto 3px auto;
+}
+.tdar-button > .icon-header {
+    margin: 0 auto;
+}
+.tdar-button > .icon-header .icon {
+    margin: 0 3px 0 0;
+    width: 1em;
+    height: 1em;
+    margin: 1px;
+}
+.tdar-button > .icon-header h3 {
+    display: inline-block;
+    vertical-align: middle;
+    min-width: 60%;
+    text-align: center;
+}
 
-.tdar-ui-button-wrapper.hammer .tdar-ui-button {
+.tdar-button.hammer .button-icon {
     background-image: url(../renderer/assets/ui/hammer-nails.svg);
 }
-
-.tdar-ui-button-wrapper.beam .tdar-ui-button {
+.tdar-button.beam .button-icon {
     background-image: url(../renderer/assets/ui/bubbling-beam.svg);
 }
-
-.tdar-ui-button-wrapper.bullets .tdar-ui-button {
+.tdar-button.bullets .button-icon {
     background-image: url(../renderer/assets/ui/bullets.svg);
 }
-
-.tdar-ui-button-wrapper.rocket .tdar-ui-button {
+.tdar-button.rocket .button-icon {
     background-image: url(../renderer/assets/ui/rocket.svg);
 }
-
-.tdar-ui-button-wrapper.upgrade .tdar-ui-button {
+.tdar-button.upgrade .button-icon {
     background-image: url(../renderer/assets/ui/upgrade.svg);
 }
-
-.tdar-ui-button-wrapper.demolish .tdar-ui-button {
+.tdar-button.demolish .button-icon {
     background-image: url(../renderer/assets/ui/demolish.svg);
+}
+.icon.barbute, .tdar-button.barbute .button-icon {
+    background-image: url(../renderer/assets/ui/barbute.svg);
+}
+.icon.life-bar {
+    background-image: url(../renderer/assets/ui/life-bar.svg);
+}
+.icon.two-coins {
+    background-image: url(../renderer/assets/ui/two-coins.svg);
 }
