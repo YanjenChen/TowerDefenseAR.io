@@ -149,6 +149,13 @@ h1.inverted, h3.inverted {
     min-width: 60%;
     text-align: center;
 }
+.tdar-button.disable {
+    border: rgba(20, 20, 20, 70%) solid;
+    background-color: rgba(20, 20, 20, 30%) ;
+}
+.tdar-button.disable > .icon-header h3 {
+    color: red;
+}
 
 .tdar-button.hammer .button-icon {
     background-image: url(../renderer/assets/ui/hammer-nails.svg);

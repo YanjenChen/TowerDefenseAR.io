@@ -49,7 +49,8 @@
                     "schema": {
                         "id": "faction-A-wave-spawner",
                         "faction": "A",
-                        "timeOffSet": 500
+                        "timeOffSet": 500,
+                        "duration": 10000
                     }
                 },
                 "castle": {
@@ -75,7 +76,9 @@
                     "position": "4 0 5",
                     "schema": {
                         "id": "faction-B-wave-spawner",
-                        "faction": "B"
+                        "faction": "B",
+                        "timeOffSet": 500,
+                        "duration": 10000
                     }
                 },
                 "castle": {
