@@ -150,11 +150,11 @@ h1.inverted, h3.inverted {
     text-align: center;
 }
 .tdar-button.disable {
-    border: rgba(20, 20, 20, 70%) solid;
-    background-color: rgba(20, 20, 20, 30%) ;
+    border: rgba(35, 53, 65, 70%) solid;
+    background-color: rgba(35, 53, 65, 30%) ;
 }
 .tdar-button.disable > .icon-header h3 {
-    color: red;
+    color: rgb(220, 0, 0);
 }
 
 .tdar-button.hammer .button-icon {
