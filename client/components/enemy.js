@@ -58,9 +58,9 @@
                 type: 'selector',
                 default: null
             },
-            cost:{
-              type:'number',
-              default: 10
+            cost: {
+                type: 'number',
+                default: 10
             }
         },
         init: function() {
@@ -73,14 +73,8 @@
             this.el.setAttribute('animation-mixer', {
                 timeScale: setting.animation_timeScale
             });
-<<<<<<< HEAD
             this.el.setAttribute('scale', setting.scale);
-=======
-            */
-            this.el.setAttribute('gltf-model', '#knight');
-            this.el.setAttribute('animation-mixer', 'timeScale: 3');
-            this.el.setAttribute('scale', '0.3 0.3 0.3');
->>>>>>> bd0118f... add basic cash system.
+
             this.system.registerEnemy(this.el);
             this.el.setAttribute('moveonpath', {
                 path: '#' + this.data.faction + 'faction' + this.data.type + 'path',
@@ -106,9 +100,10 @@
 
             this.currentHP -= evt.detail.damage;
             if (this.currentHP <= 0) {
-                cost=this.data.cost;
-                console.log("Cost="+ cost);
-                this.el.emit('enemydestroy', {cost: cost/2});
+                this.el.sceneEl.emit('enemydestroy', {
+                    cost: Math.floor(this.data.cost / 4),
+                    faction: this.data.faction
+                });
                 this.el.parentNode.removeChild(this.el);
 
             }
