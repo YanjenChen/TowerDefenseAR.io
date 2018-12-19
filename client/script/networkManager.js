@@ -7,16 +7,26 @@ class NetworkManager {
          *
          * CLASS PROPERTY
          *  mode: Game operation mode, one of ['single-player', 'multi-player'].
+         *  room_id: Room id received from server.
          *  sceneEl: DOM node point to <a-scene> element.
+         *  serverSimulator (private): server simulator for single player.
          *  SOCKET: socket object.
+         *  user: User name receive from server.
+         *  user_faction: User faction receive from server.
+         *  user_team_id: User team id received from server.
          */
         if (mode != 'single-player' || mode != 'multi-player') {
             console.warn('Network manager get wrong param.');
         }
 
         this.mode = mode;
+        this.room_id = jQuery("#room_id").val();
         this.sceneEl = sceneEl;
+        this.serverSimulator = new ServerSimulator(sceneEl);
         this.SOCKET = undefined;
+        this.user = jQuery("#user").val();
+        this.user_faction = jQuery("#user_faction").val();
+        this.user_team_id = jQuery("#user_team_id").val();
 
         this.getSocket = this.getSocket.bind(this);
         this.checkOnline = this.checkOnline.bind(this);
@@ -32,11 +42,24 @@ class NetworkManager {
     get mode() {
         return this.mode;
     }
+    get room_id() {
+        return this.room_id;
+    }
     get sceneEl() {
         return this.sceneEl;
     }
     get SOCKET() {
         return this.SOCKET;
+    }
+    get user() {
+        return this.user;
+    }
+    get user_faction() {
+        // map server representation to client representation.
+        return this.user_faction == '1' ? 'A' : 'B';
+    }
+    get user_team_id() {
+        return this.user_team_id;
     }
     checkOnline() {
         if (!this.SOCKET) {
@@ -44,15 +67,15 @@ class NetworkManager {
         }
         try {
             this.SOCKET.emit("nonPlayingEvent", {
-                user: jQuery("#user").val(),
+                user: this.user,
                 event_name: "checkOnline"
             }) // 確定玩家還在線，送訊號回去
 
             // 送訊過去，通知玩家已加入 (就是 取得玩家的 socket 物件)
             this.SOCKET.emit("playingEvent", {
-                user: jQuery("#user").val(),
-                user_team_id: jQuery("#user_team_id").val(),
-                room_id: jQuery("#room_id").val(),
+                user: this.user,
+                user_team_id: this.user_team_id,
+                room_id: this.room_id,
                 event_name: "informPlayerOnline"
             })
         } catch (e) {
@@ -97,5 +120,35 @@ class NetworkManager {
 
             }
         })
+    }
+    addEventListener(evtName, callback) {
+        console.log('NM ADD EVENTLISTNER HAS BEEN CALLED.');
+        
+        var self = this;
+        var wrapper = function(evt) {
+            if (self.mode == 'single-player')
+                evt = evt.detail;
+            callback(evt);
+        }
+
+        if (this.mode == 'multi-player') {
+            this.SOCKET.on(evtName, wrapper);
+        } else {
+            this.sceneEl.addEventListener(evtName, wrapper);
+        }
+    }
+    emit(evtName, detail) {
+        /*
+         * The format of evtName, detail is same as server API.
+         */
+        if (this.mode == 'multi-player') {
+            // wrap server require information.
+            detail.room_id = this.room_id;
+            detail.user = this.user;
+
+            this.SOCKET.emit(evtName, detail);
+        } else {
+            this.serverSimulator.emit(evtName, detail);
+        }
     }
 }

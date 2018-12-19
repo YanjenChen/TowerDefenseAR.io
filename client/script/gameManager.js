@@ -33,6 +33,9 @@ class GameManager {
         this.sceneEl = sceneEl;
         this.settings = null;
         this.staticScene = null;
+
+        this.loadConfig = this.loadConfig.bind(this);
+        this.loadScene = this.loadScene.bind(this);
     }
     get anchorEl() {
         return this.anchorEl;
@@ -67,8 +70,8 @@ class GameManager {
     get staticScene() {
         return this.staticScene;
     }
-    loadConfig(callback) {
-        if(!this.mapDir){
+    loadConfig() {
+        if(!this.configDir){
             console.warn('Game manager does not receive config directory.');
             return;
         }
@@ -86,14 +89,15 @@ class GameManager {
                 assetEl.setAttribute('src', asset.src);
                 assetsEl.appendChild(assetEl);
             });
+            assetsEl.addEventListener('loaded', self.loadScene);
             self.sceneEl.appendChild(assetsEl);
-
-            callback();
         });
     }
-    loadScene(env) {
+    loadScene() {
         let self = this;
-        let mode = env ? env : this.mode;
+        let mode = this.mode;
+        let sceneEl = this.sceneEl;
+
         if (mode == 'ar') {
             // Insert shadow plane.
             let planeGeometry = new THREE.PlaneGeometry(2000, 2000);
@@ -105,7 +109,7 @@ class GameManager {
             shadowMesh.name = 'arShadowMesh';
             shadowMesh.receiveShadow = true;
             shadowMesh.position.y = 10000;
-            this.sceneEl.object3D.add(shadowMesh);
+            sceneEl.object3D.add(shadowMesh);
 
             // Insert light to scene.
             let light = document.createElement('a-entity');
@@ -122,8 +126,8 @@ class GameManager {
                 castShadow: true
             });
             directionalLight.setAttribute('position', '10 15 10');
-            this.sceneEl.appendChild(light);
-            this.sceneEl.appendChild(directionalLight);
+            sceneEl.appendChild(light);
+            sceneEl.appendChild(directionalLight);
 
             // Insert anchor container.
             let anchorEl = document.createElement('a-entity');
@@ -132,19 +136,19 @@ class GameManager {
                 cast: true,
                 receive: true
             });
-            this.sceneEl.appendChild(anchorEl);
+            sceneEl.appendChild(anchorEl);
 
-            this.sceneEl = this.anchorEl = anchorEl;
+            sceneEl = this.anchorEl = anchorEl;
         }
 
         // add static scene.
         let staticScene = document.createElement('a-entity');
         staticScene.setAttribute('id', 'tdar-static-scene');
-        if (this.map.staticScene.model)
-            staticScene.setAttribute('gltf-model', this.map.staticScene.model);
-        if (this.map.staticScene.child)
-            staticScene.insertAdjacentHTML('beforeend', this.map.staticScene.child);
-        this.sceneEl.appendChild(staticScene);
+        if (this.configs.staticScene.model)
+            staticScene.setAttribute('gltf-model', this.configs.staticScene.model);
+        if (this.configs.staticScene.child)
+            staticScene.insertAdjacentHTML('beforeend', this.configs.staticScene.child);
+        sceneEl.appendChild(staticScene);
         this.staticScene = staticScene;
 
         // add dynamic scene.
@@ -154,15 +158,15 @@ class GameManager {
             cast: true,
             receive: false
         });
-        dynamicScene.setAttribute('position', this.map.dynamicScene.offset);
-        this.sceneEl.appendChild(dynamicScene);
+        dynamicScene.setAttribute('position', this.configs.dynamicScene.offset);
+        sceneEl.appendChild(dynamicScene);
         this.dynamicScene = dynamicScene;
 
-        // add obstacles to dynamic scene.
-        this.map.dynamicScene.obstacles.forEach(obs_position => {
+        // visualize obstacles to static scene.
+        this.configs.dynamicScene.obstacles.forEach(obs_position => {
             let obsEl = document.createElement('a-entity');
-            obsEl.setAttribute('geometry', this.map.settings.obstacle.geometry);
-            obsEl.setAttribute('material', this.map.settings.obstacle.material);
+            obsEl.setAttribute('geometry', this.configs.settings.obstacle.geometry);
+            obsEl.setAttribute('material', this.configs.settings.obstacle.material);
             obsEl.setAttribute('position', {
                 x: obs_position[0] + 0.5,
                 y: obs_position[1],
@@ -173,61 +177,11 @@ class GameManager {
 
         // Pause game after init.
         this.dynamicScene.addEventListener('loaded', function() {
-            document.querySelector('#tdar-dynamic-scene').pause();
+            self.dynamicScene.pause();
         });
 
         // add initial content to dynamic scene.
-        /* SCENE LOADER */
-        /*
-        this.map.dynamicScene.factions.forEach(faction => {
-            // load enemy path. DERPACTED, change to init path by calculation.
-            faction.enemyPath.forEach(path => {
-                var curveEl = document.createElement('a-entity');
-                curveEl.setAttribute('path', {
-                    lineType: path.lineType
-                });
-                curveEl.setAttribute('id', faction.name + 'faction' + path.type + 'path');
-                path.points.forEach((point) => {
-                    var pointEl = document.createElement('a-entity');
-                    pointEl.setAttribute('path-point', {});
-                    pointEl.setAttribute('position', point);
-                    curveEl.appendChild(pointEl);
-                });
-
-                dynamicScene.appendChild(curveEl);
-            });
-
-            // load tower bases.
-            faction.towerBases.forEach(base => {
-                let baseEl = document.createElement('a-entity');
-                baseEl.setAttribute('geometry', this.settings.towerBase.geometry);
-                baseEl.setAttribute('material', this.settings.towerBase.material);
-                baseEl.setAttribute('position', base.position);
-                baseEl.setAttribute('data-raycastable', '');
-                baseEl.setAttribute('tower-base', {
-                    faction: faction.name
-                });
-                dynamicScene.appendChild(baseEl);
-            });
-
-
-            // load wave spawner.
-            let waveSpawnerEl = document.createElement('a-entity');
-            waveSpawnerEl.setAttribute('wave-spawner', faction.waveSpawner.schema);
-            waveSpawnerEl.setAttribute('position', faction.waveSpawner.position);
-            dynamicScene.appendChild(waveSpawnerEl);
-
-            // load castle
-            let castleEl = document.createElement('a-entity');
-            castleEl.setAttribute('castle', faction.castle.schema);
-            castleEl.setAttribute('geometry', this.settings.castle.geometry);
-            castleEl.setAttribute('position', faction.castle.position);
-            dynamicScene.appendChild(castleEl);
-
-            //this.el.addState('tdar-game-running');
-        });
-        */
-        for (let i = 0; i < this.map.dynamicScene.width; i++) {
+        for (let i = 0; i < this.configs.dynamicScene.width; i++) {
             for (let k = 0; k < 10; k++) {
                 if (!(i == 1 && k == 1) && !(i == 18 && k == 8)) {
                     let baseEl = document.createElement('a-entity');
@@ -240,12 +194,12 @@ class GameManager {
                     });
                     baseEl.setAttribute('data-raycastable', '');
                     baseEl.setAttribute('tower-base', {
-                        faction: this.map.dynamicScene.factions[1].name
+                        faction: this.configs.dynamicScene.factions[1].name
                     });
                     dynamicScene.appendChild(baseEl);
                 }
             }
-            for (let k = 11; k < this.map.dynamicScene.depth; k++) {
+            for (let k = 11; k < this.configs.dynamicScene.depth; k++) {
                 if (!(i == 1 && k == 12) && !(i == 18 && k == 19)) {
                     let baseEl = document.createElement('a-entity');
                     baseEl.setAttribute('geometry', this.settings.towerBase.geometry);
@@ -257,13 +211,13 @@ class GameManager {
                     });
                     baseEl.setAttribute('data-raycastable', '');
                     baseEl.setAttribute('tower-base', {
-                        faction: this.map.dynamicScene.factions[0].name
+                        faction: this.configs.dynamicScene.factions[0].name
                     });
                     dynamicScene.appendChild(baseEl);
                 }
             }
         }
-        this.map.dynamicScene.factions.forEach(faction => {
+        this.configs.dynamicScene.factions.forEach(faction => {
             // load wave spawner.
             let waveSpawnerEl = document.createElement('a-entity');
             waveSpawnerEl.setAttribute('wave-spawner', faction.waveSpawner.schema);
@@ -285,41 +239,45 @@ class GameManager {
             });
             dynamicScene.appendChild(castleEl);
         });
+
         // Init path.
         let walkableMatrix = [];
-        for (let k = 0; k < this.map.dynamicScene.depth; k++) {
+        for (let k = 0; k < this.configs.dynamicScene.depth; k++) {
             let row = [];
-            for (let i = 0; i < this.map.dynamicScene.width; i++) {
+            for (let i = 0; i < this.configs.dynamicScene.width; i++) {
                 row.push(0);
             }
             walkableMatrix.push(row);
         }
-        this.map.dynamicScene.obstacles.forEach(obs_position => {
+        this.configs.dynamicScene.obstacles.forEach(obs_position => {
             walkableMatrix[obs_position[2]][obs_position[0]] = 1;
         });
-        this.walkableGrid = new PF.Grid(walkableMatrix);
-        this.calculatePathA();
-        this.calculatePathB();
+        this.gameGrid = new PF.Grid(walkableMatrix);
+        this.calculatePath('A');
+        this.calculatePath('B');
 
 
 
         if (mode == 'ar') {
-            this.sceneEl.addEventListener('loaded', function() {
+            // TODO: NEED UPDATE ALL SCRIPT HERE.
+            sceneEl.addEventListener('loaded', function() {
                 this.object3D.visible = false;
 
                 let reticle = document.createElement('a-entity');
                 // Affect base scene object scale.
                 reticle.setAttribute('reticle', {
                     targetEl: '#' + this.id,
-                    scaleFactor: self.map.staticScene.scaleFactor
+                    scaleFactor: self.configs.staticScene.scaleFactor
                 });
                 this.sceneEl.appendChild(reticle);
             });
         } else {
-            document.querySelector('a-scene').emit('gameloadscene');
+            this.sceneEl.systems['tdar-game'].networkManager.emit('nonPlayingEvent', {
+                event_name: 'model_ready'
+            });
         }
     }
-    updateWalkableGrid(x, z, walkable, callback) {
+    updateGameGrid(x, z, walkable, callback) {
         /*
          * SPEC
          *   (int) x: x coord on walkable map.
@@ -327,38 +285,43 @@ class GameManager {
          *   (boolen) walkable: walkable or not.
          *   (function) callback: callback function.
          */
-        this.walkableGrid.setWalkableAt(x, z, walkable);
+        this.gameGrid.setWalkableAt(x, z, walkable);
         if (callback)
             callback();
     }
-    calculatePathA() {
-        let grid = this.walkableGrid.clone();
-        let path = this.pathFinder.findPath(
-            this.map.dynamicScene.factions[0].waveSpawner.position[0],
-            this.map.dynamicScene.factions[0].waveSpawner.position[2],
-            this.map.dynamicScene.factions[1].castle.position[0],
-            this.map.dynamicScene.factions[1].castle.position[2],
-            grid
-        );
-        path = PF.Util.compressPath(path);
+    calculatePath(faction) {
+        /*
+         * SPEC
+         *   (string) faction: one of ['A', 'B'].
+         */
+        let grid = this.gameGrid.clone();;
+        let path;
+
+        if(faction == 'A') {
+            path = this.pathFinder.findPath(
+                this.configs.dynamicScene.factions[0].waveSpawner.position[0],
+                this.configs.dynamicScene.factions[0].waveSpawner.position[2],
+                this.configs.dynamicScene.factions[1].castle.position[0],
+                this.configs.dynamicScene.factions[1].castle.position[2],
+                grid
+            );
+        } else {
+            path = this.pathFinder.findPath(
+                this.configs.dynamicScene.factions[1].waveSpawner.position[0],
+                this.configs.dynamicScene.factions[1].waveSpawner.position[2],
+                this.configs.dynamicScene.factions[0].castle.position[0],
+                this.configs.dynamicScene.factions[0].castle.position[2],
+                grid
+            );
+        }
+
+        path = PF.Util.smoothenPath(grid, path);
         path = path.map((point) => {
             return [point[0] + 0.5, point[1] + 0.5];
         });
-        this.pathA = path;
-    }
-    calculatePathB() {
-        let grid = this.walkableGrid.clone();
-        let path = this.pathFinder.findPath(
-            this.map.dynamicScene.factions[1].waveSpawner.position[0],
-            this.map.dynamicScene.factions[1].waveSpawner.position[2],
-            this.map.dynamicScene.factions[0].castle.position[0],
-            this.map.dynamicScene.factions[0].castle.position[2],
-            grid
-        );
-        path = PF.Util.compressPath(path);
-        path = path.map((point) => {
-            return [point[0] + 0.5, point[1] + 0.5];
-        });
-        this.pathB = path;
+        delete this.enemyPath[faction];
+        this.enemyPath[faction] = path;
+
+        return path;
     }
 }
