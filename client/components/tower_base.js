@@ -1,127 +1,149 @@
 (() => {
-    AFRAME.registerComponent('tower-base', {
-        schema: {
-            faction: {
-                type: 'string',
-                default: 'A',
-                oneOf: ['A', 'B']
-            }
-        },
-        init: function() {
-            this.fortBase = undefined;
-            this.towerEl = undefined;
+	AFRAME.registerComponent('tower-base', {
+		schema: {
+			faction: {
+				type: 'string',
+				default: 'A',
+				oneOf: ['A', 'B']
+			}
+		},
+		init: function() {
+			this.fortBase = undefined;
+			this.towerEl = undefined;
+			this.gameloader = this.el.sceneEl.systems['tdar-game'].gameLoader;
 
-            this.el.addState('empty');
+			this.el.addState('empty');
 
-            this.onStateAdded = this.onStateAdded.bind(this);
-            this.onStateRemoved = this.onStateRemoved.bind(this);
-            this.createLaserTower = this.createLaserTower.bind(this);
-            this.createMissileTower = this.createMissileTower.bind(this);
-            this.upgradeTower = this.upgradeTower.bind(this);
-            this.removeTower = this.removeTower.bind(this);
-            this.getUIsets = this.getUIsets.bind(this);
-            this.updateUI = this.updateUI.bind(this);
+			this.onStateAdded = this.onStateAdded.bind(this);
+			this.onStateRemoved = this.onStateRemoved.bind(this);
+			this.createLaserTower = this.createLaserTower.bind(this);
+			this.createMissileTower = this.createMissileTower.bind(this);
+			this.upgradeTower = this.upgradeTower.bind(this);
+			this.removeTower = this.removeTower.bind(this);
+			this.getUIsets = this.getUIsets.bind(this);
+			this.updateUI = this.updateUI.bind(this);
 
-            this.el.addEventListener('stateadded', this.onStateAdded);
-            this.el.addEventListener('stateremoved', this.onStateRemoved);
-        },
-        tick: function(time, timeDelta) {
-            // ONLY USE IN DEVELOPER TESTING
-            if (this.el.is('cursor-hovered'))
-                this.el.setAttribute('glow', {
-                    enabled: true
-                });
-            else
-                this.el.setAttribute('glow', {
-                    enabled: false
-                });
-            ////////////////////////////////
-        },
-        remove: function() {
-            delete this.towerEl;
+			this.el.addEventListener('stateadded', this.onStateAdded);
+			this.el.addEventListener('stateremoved', this.onStateRemoved);
+		},
+		tick: function(time, timeDelta) {
+			// ONLY USE IN DEVELOPER TESTING
+			if (this.el.is('cursor-hovered'))
+				this.el.setAttribute('glow', {
+					enabled: true
+				});
+			else
+				this.el.setAttribute('glow', {
+					enabled: false
+				});
+			////////////////////////////////
+		},
+		remove: function() {
+			delete this.towerEl;
 
-            this.el.removeEventListener('click', this.onClick.bind(this));
-        },
-        onStateAdded: function(evt) {
-            if (evt.detail == 'cursor-hovered') {
-                this.el.sceneEl.systems['tdar-game-ui'].updateObjectControl(this.getUIsets());
-            }
-        },
-        createLaserTower: function() {
-            this.towerEl = document.createElement('a-entity');
-            this.towerEl.setAttribute('tower', {
-                faction: this.data.faction,
-                type: 'laser',
-                tier: 0
-            });
-            this.el.appendChild(this.towerEl);
-            this.el.removeState('empty');
+			this.el.removeEventListener('click', this.onClick.bind(this));
+		},
+		onStateAdded: function(evt) {
+			if (evt.detail == 'cursor-hovered') {
+				this.el.sceneEl.systems['tdar-game-ui'].updateObjectControl(this.getUIsets());
+			}
+		},
+		createLaserTower: function() {
+			this.towerEl = document.createElement('a-entity');
+			this.towerEl.setAttribute('tower', {
+				faction: this.data.faction,
+				type: 'laser',
+				tier: 0
+			});
+			this.el.appendChild(this.towerEl);
+			this.el.removeState('empty');
+			this.gameloader.updateWalkableGrid(
+				Math.floor(this.el.object3D.position.x),
+				Math.floor(this.el.object3D.position.z),
+				false
+			);
+			this.data.faction == 'A' ? this.gameloader.calculatePathB() : this.gameloader.calculatePathA();
+			this.el.sceneEl.emit('systemupdatepath', { faction: this.data.faction });
+			this.updateUI();
+		},
+		createMissileTower: function() {
+			this.towerEl = document.createElement('a-entity');
+			this.towerEl.setAttribute('tower', {
+				faction: this.data.faction,
+				type: 'missile',
+				tier: 0
+			});
+			this.el.appendChild(this.towerEl);
+			this.el.removeState('empty');
+			this.gameloader.updateWalkableGrid(
+				Math.floor(this.el.object3D.position.x),
+				Math.floor(this.el.object3D.position.z),
+				false
+			);
+			this.data.faction == 'A' ? this.gameloader.calculatePathB() : this.gameloader.calculatePathA();
+            this.el.sceneEl.emit('systemupdatepath', { faction: this.data.faction });
             this.updateUI();
-        },
-        createMissileTower: function() {
-            this.towerEl = document.createElement('a-entity');
-            this.towerEl.setAttribute('tower', {
-                faction: this.data.faction,
-                type: 'missile',
-                tier: 0
-            });
-            this.el.appendChild(this.towerEl);
-            this.el.removeState('empty');
+		},
+		upgradeTower: function() {
+			this.towerEl.components['tower'].upgradeTier();
+			this.updateUI();
+		},
+		removeTower: function() {
+			this.towerEl.parentNode.removeChild(this.towerEl);
+			this.towerEl = undefined;
+			this.el.addState('empty');
+			this.gameloader.updateWalkableGrid(
+				Math.floor(this.el.object3D.position.x),
+				Math.floor(this.el.object3D.position.z),
+				true
+			);
+			this.data.faction == 'A' ? this.gameloader.calculatePathB() : this.gameloader.calculatePathA();
+            this.el.sceneEl.emit('systemupdatepath', { faction: this.data.faction });
             this.updateUI();
-        },
-        upgradeTower: function() {
-            this.towerEl.components['tower'].upgradeTier();
-            this.updateUI();
-        },
-        removeTower: function() {
-            this.towerEl.parentNode.removeChild(this.towerEl);
-            this.towerEl = undefined;
-            this.el.addState('empty');
-            this.updateUI();
-        },
-        onStateRemoved: function(evt) {
-            if (evt.detail == 'cursor-hovered') {
-                this.el.sceneEl.systems['tdar-game-ui'].clearObjectControl();
-            }
-        },
-        getUIsets: function() {
-            var uisets;
-            if (this.el.is('empty')) {
-                uisets = [{
-                    callback: this.createLaserTower,
-                    icon: 'beam',
-                    header: 'Beam'
-                }, {
-                    callback: this.createMissileTower,
-                    icon: 'rocket',
-                    header: 'Missile'
-                }];
-            } else if (this.towerEl.components['tower'].isMaxTier()) {
-                uisets = [{
-                    callback: this.removeTower,
-                    icon: 'demolish',
-                    header: 'Remove'
-                }];
-            } else {
-                uisets = [{
-                    callback: this.removeTower,
-                    icon: 'demolish',
-                    header: 'Remove'
-                }, {
-                    callback: this.upgradeTower,
-                    icon: 'upgrade',
-                    header: 'Upgrade'
-                }];
-            }
-            return uisets;
-        },
-        updateUI: function() {
-            this.el.sceneEl.systems['tdar-game-ui'].clearObjectControl();
-            var self = this;
-            setTimeout(function() {
-                if (self.el.is('cursor-hovered'))
-                    self.el.sceneEl.systems['tdar-game-ui'].updateObjectControl(self.getUIsets());
-            }, 1000);
-        }
-    });
+		},
+		onStateRemoved: function(evt) {
+			if (evt.detail == 'cursor-hovered') {
+				this.el.sceneEl.systems['tdar-game-ui'].clearObjectControl();
+			}
+		},
+		getUIsets: function() {
+			var uisets;
+			if (this.el.is('empty')) {
+				uisets = [{
+					callback: this.createLaserTower,
+					icon: 'beam',
+					header: 'Beam'
+				}, {
+					callback: this.createMissileTower,
+					icon: 'rocket',
+					header: 'Missile'
+				}];
+			} else if (this.towerEl.components['tower'].isMaxTier()) {
+				uisets = [{
+					callback: this.removeTower,
+					icon: 'demolish',
+					header: 'Remove'
+				}];
+			} else {
+				uisets = [{
+					callback: this.removeTower,
+					icon: 'demolish',
+					header: 'Remove'
+				}, {
+					callback: this.upgradeTower,
+					icon: 'upgrade',
+					header: 'Upgrade'
+				}];
+			}
+			return uisets;
+		},
+		updateUI: function() {
+			this.el.sceneEl.systems['tdar-game-ui'].clearObjectControl();
+			var self = this;
+			setTimeout(function() {
+				if (self.el.is('cursor-hovered'))
+					self.el.sceneEl.systems['tdar-game-ui'].updateObjectControl(self.getUIsets());
+			}, 1000);
+		}
+	});
 })();
