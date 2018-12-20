@@ -1,4 +1,4 @@
-AFRAME.registerSystem('cash', {
+AFRAME.registerComponent('cash', {
     schema: {
         userFaction: {
             type: 'string',
@@ -11,19 +11,19 @@ AFRAME.registerSystem('cash', {
         }
     }, // System schema. Parses into `this.data`.
     init: function() {
+        this.gameManager = this.el.sceneEl.systems['tdar-game'].gameManager;
+        this.networkManager = this.el.sceneEl.systems['tdar-game'].networkManager;
+        this.uiManager = this.el.sceneEl.systems['tdar-game'].uiManager;
+
         this.updatemoney = this.updatemoney.bind(this);
         this.moneyA = 0;
         this.moneyB = 0;
         this.cashrateA = 1;
         this.cashrateB = 1;
         this.timecounter = 0;
-        // this.el.addEventListener('buildtower', this.updatemoney);
-        // this.el.addEventListener('wavecost', this.updatemoney);
+
         this.el.addEventListener('enemydestroy', this.updatemoney);
-        this.updateUI = this.el.systems['tdar-game-ui'].updateMoneyPoint;
-        this.updateUI(this.data.userFaction == 'A' ? this.moneyA: this.moneyB);
-        // console.log("cash init");
-        // Called on scene initialization.
+        this.uiManager.updateMoneyPoint(this.data.userFaction == 'A' ? this.moneyA: this.moneyB);
     },
     tick: function(time, timedelta) {
         this.timecounter += timedelta;
@@ -31,9 +31,7 @@ AFRAME.registerSystem('cash', {
             this.moneyA += this.cashrateA;
             this.moneyB += this.cashrateB;
             this.timecounter -= this.data.incrementalDuration;
-            // console.log("MoneyA: " + this.moneyA);
-            // console.log("MoneyB: " + this.moneyB);
-            this.updateUI(this.data.userFaction == 'A' ? this.moneyA: this.moneyB);
+            this.uiManager.updateMoneyPoint(this.data.userFaction == 'A' ? this.moneyA: this.moneyB);
         }
     },
     remove: function() {
@@ -55,7 +53,7 @@ AFRAME.registerSystem('cash', {
             this.moneyA += event.detail.cost;
             // console.log("updatemoneyA: " + this.moneyA);
         }
-        this.updateUI(this.data.userFaction == 'A' ? this.moneyA: this.moneyB);
+        this.uiManager.updateMoneyPoint(this.data.userFaction == 'A' ? this.moneyA: this.moneyB);
     }
     // Other handlers and methods.
 });

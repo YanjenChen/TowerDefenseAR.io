@@ -25,6 +25,7 @@
 			let self = this;
 			let gameManager = this.gameManager = new GameManager(this.el, CONFIG_DIR, this.data.ar ? 'ar': 'vr');
 			let networkManager = this.networkManager = new NetworkManager(this.el, this.data.mode);
+			let uiManager = this.uiManager = new UIManager(this.el);
 
 			networkManager.addEventListener('client_start_game', this.onStartGame.bind(this));
 			networkManager.addEventListener('playingEvent', this.onExecute.bind(this));
@@ -51,8 +52,8 @@
 
 			switch (content['event_name']) {
 				case 'enemy_get_damaged':
-					if (document.querySelector('#' + content['id']) != null)
-						document.querySelector('#' + content['id']).emit('be-attacked', {
+					if (this.gameManager.dynamicScene.querySelector('#' + content['id']) != null)
+						this.gameManager.dynamicScene.querySelector('#' + content['id']).emit('be-attacked', {
 							damage: content['damage']
 						});
 					break;
@@ -66,14 +67,14 @@
 
 					break;
 				case 'wave_spawner_create_enemy':
-					if (document.querySelector('#' + content['id']) != null) {
+					if (this.gameManager.dynamicScene.querySelector('#' + content['id']) != null) {
 						//console.log(content['ws_faction'] == 'A' ? '#faction-B-castle' : '#faction-A-castle');
 
-						document.querySelector('#' + content['id']).emit('spawn_enemy', {
+						this.gameManager.dynamicScene.querySelector('#' + content['id']).emit('spawn_enemy', {
 							id: content['enemy_id'],
 							faction: content['ws_faction'],
 							healthPoint: 600,
-							speed: 0.03,
+							speed: 8,
 							targetCastle: content['ws_faction'] == 'A' ? '#faction-B-castle' : '#faction-A-castle'
 						});
 					}

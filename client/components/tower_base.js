@@ -8,9 +8,12 @@
 			}
 		},
 		init: function() {
+			this.gameManager = this.el.sceneEl.systems['tdar-game'].gameManager;
+			this.networkManager = this.el.sceneEl.systems['tdar-game'].networkManager;
+			this.uiManager = this.el.sceneEl.systems['tdar-game'].uiManager;
+
 			this.fortBase = undefined;
 			this.towerEl = undefined;
-			this.gameloader = this.el.sceneEl.systems['tdar-game'].gameLoader;
 
 			this.el.addState('empty');
 
@@ -25,6 +28,10 @@
 
 			this.el.addEventListener('stateadded', this.onStateAdded);
 			this.el.addEventListener('stateremoved', this.onStateRemoved);
+
+			this.el.addEventListener('click', function(evt) {
+				console.log(evt.detail.intersection.point);
+			});
 		},
 		tick: function(time, timeDelta) {
 			// ONLY USE IN DEVELOPER TESTING
@@ -45,7 +52,7 @@
 		},
 		onStateAdded: function(evt) {
 			if (evt.detail == 'cursor-hovered') {
-				this.el.sceneEl.systems['tdar-game-ui'].updateObjectControl(this.getUIsets());
+				this.uiManager.updateObjectControl(this.getUIsets());
 			}
 		},
 		createLaserTower: function() {
@@ -57,12 +64,12 @@
 			});
 			this.el.appendChild(this.towerEl);
 			this.el.removeState('empty');
-			this.gameloader.updateWalkableGrid(
+			this.gameManager.updateGameGrid(
 				Math.floor(this.el.object3D.position.x),
 				Math.floor(this.el.object3D.position.z),
 				false
 			);
-			this.data.faction == 'A' ? this.gameloader.calculatePathB() : this.gameloader.calculatePathA();
+			this.gameManager.calculatePath(this.data.faction == 'A' ? 'B' : 'A');
 			this.el.sceneEl.emit('systemupdatepath', { faction: this.data.faction });
 			this.updateUI();
 		},
@@ -75,14 +82,14 @@
 			});
 			this.el.appendChild(this.towerEl);
 			this.el.removeState('empty');
-			this.gameloader.updateWalkableGrid(
+			this.gameManager.updateGameGrid(
 				Math.floor(this.el.object3D.position.x),
 				Math.floor(this.el.object3D.position.z),
 				false
 			);
-			this.data.faction == 'A' ? this.gameloader.calculatePathB() : this.gameloader.calculatePathA();
-            this.el.sceneEl.emit('systemupdatepath', { faction: this.data.faction });
-            this.updateUI();
+			this.gameManager.calculatePath(this.data.faction == 'A' ? 'B' : 'A');
+			this.el.sceneEl.emit('systemupdatepath', { faction: this.data.faction });
+			this.updateUI();
 		},
 		upgradeTower: function() {
 			this.towerEl.components['tower'].upgradeTier();
@@ -92,18 +99,18 @@
 			this.towerEl.parentNode.removeChild(this.towerEl);
 			this.towerEl = undefined;
 			this.el.addState('empty');
-			this.gameloader.updateWalkableGrid(
+			this.gameManager.updateGameGrid(
 				Math.floor(this.el.object3D.position.x),
 				Math.floor(this.el.object3D.position.z),
 				true
 			);
-			this.data.faction == 'A' ? this.gameloader.calculatePathB() : this.gameloader.calculatePathA();
-            this.el.sceneEl.emit('systemupdatepath', { faction: this.data.faction });
-            this.updateUI();
+			this.gameManager.calculatePath(this.data.faction == 'A' ? 'B' : 'A');
+			this.el.sceneEl.emit('systemupdatepath', { faction: this.data.faction });
+			this.updateUI();
 		},
 		onStateRemoved: function(evt) {
 			if (evt.detail == 'cursor-hovered') {
-				this.el.sceneEl.systems['tdar-game-ui'].clearObjectControl();
+				this.uiManager.clearObjectControl();
 			}
 		},
 		getUIsets: function() {
@@ -138,11 +145,11 @@
 			return uisets;
 		},
 		updateUI: function() {
-			this.el.sceneEl.systems['tdar-game-ui'].clearObjectControl();
+			this.uiManager.clearObjectControl();
 			var self = this;
 			setTimeout(function() {
 				if (self.el.is('cursor-hovered'))
-					self.el.sceneEl.systems['tdar-game-ui'].updateObjectControl(self.getUIsets());
+					self.uiManager.updateObjectControl(self.getUIsets());
 			}, 1000);
 		}
 	});

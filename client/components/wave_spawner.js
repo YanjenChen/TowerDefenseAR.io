@@ -24,6 +24,10 @@
             }
         },
         init: function() {
+            this.gameManager = this.el.sceneEl.systems['tdar-game'].gameManager;
+			this.networkManager = this.el.sceneEl.systems['tdar-game'].networkManager;
+			this.uiManager = this.el.sceneEl.systems['tdar-game'].uiManager;
+
             this.el.setAttribute('id', this.data.id);
             this.timeCounter = 0;
             this.spawnCounter = 0;
@@ -31,7 +35,7 @@
             this.el.addEventListener('spawn_enemy', this._spawnEnemy.bind(this));
         },
         tick: function(time, timeDelta) {
-            if (this.el.is('activate')) {
+            if (this.el.is('activate') && this.data.amount > 0) {
                 if (this.timeCounter > this.data.timeOffSet) {
                     this.spawnCounter++;
                     /* following is local method */
@@ -42,7 +46,7 @@
                         speed: 4
                     });
                     */
-                    this.el.sceneEl.emit('broadcast', {
+                    this.networkManager.emit('playingEvent', {
                         event_name: 'wave_spawner_request_spawn_enemy',
                         id: this.data.id,
                         ws_faction: this.data.faction,
@@ -67,7 +71,7 @@
         _spawnEnemy: function(evt) {
             var enemyEl = document.createElement('a-entity');
             enemyEl.setAttribute('enemy', evt.detail);
-            this.el.sceneEl.systems['tdar-game'].sceneEntity.appendChild(enemyEl);
+            this.gameManager.dynamicScene.appendChild(enemyEl);
 
             if (this.spawnCounter >= this.data.amount) {
                 this.spawnCounter = 0;

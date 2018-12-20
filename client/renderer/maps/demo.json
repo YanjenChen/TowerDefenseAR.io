@@ -1,96 +1,81 @@
 {
-    "assets": [{
-        "id": "knight",
-        "src": "renderer/assets/knight.gltf"
-    }, {
-        "id": "fort",
-        "src": "renderer/assets/fort.gltf"
-    }, {
-        "id": "fort-base",
-        "src": "renderer/assets/fort_base.gltf"
-    }, {
-        "id": "tree",
-        "src": "renderer/assets/tree01/model.gltf"
-    }, {
-        "id": "stone",
-        "src": "renderer/assets/stone/model.gltf"
-    }, {
-        "id": "mill",
-        "src": "renderer/assets/mill/model.gltf"
-    }],
+    "assets": {
+        "knight": "renderer/assets/knight.gltf",
+        "fort": "renderer/assets/fort.gltf",
+        "fort-base": "renderer/assets/fort_base.gltf",
+        "tree": "renderer/assets/tree01/model.gltf",
+        "stone": "renderer/assets/stone/model.gltf",
+        "mill": "renderer/assets/mill/model.gltf"
+    },
+    "globalVar": {
+        "gridConfig": {
+            "width": 40,
+            "depth": 40
+        },
+        "sceneScale": 0.5
+    },
     "staticScene": {
-        "scaleFactor": 1
+        "abstractName": [{
+            "position": {
+                "x": 0,
+                "y": 0,
+                "z": 0
+            },
+            "rotation": {
+                "x": 0,
+                "y": 0,
+                "z": 0
+            },
+            "scale": {
+                "x": 0,
+                "y": 0,
+                "z": 0
+            }
+        }]
     },
     "dynamicScene": {
-        "offset": "0 0 0",
-        "factions": [{
-                "name": "A",
-                "waveSpawner": {
-                    "position": [1, 0, 1],
-                    "schema": {
-                        "id": "faction-A-wave-spawner",
-                        "faction": "A",
-                        "timeOffSet": 500,
-                        "duration": 10000
-                    }
-                },
-                "castle": {
-                    "position": [1, 0, 12],
-                    "schema": {
-                        "id": "faction-A-castle",
-                        "faction": "A",
-                        "healthPoint": 40
-                    }
+        "wave-spawner": {
+            "A": [{
+                "position": {
+                    "x": 0,
+                    "y": 0,
+                    "z": 0
+                }
+            }],
+            "B": [{
+                "position": {
+                    "x": 0,
+                    "y": 0,
+                    "z": 0
+                }
+            }]
+        },
+        "castle": {
+            "A": {
+                "position": {
+                    "x": 0,
+                    "y": 0,
+                    "z": 0
                 }
             },
-            {
-                "name": "B",
-                "waveSpawner": {
-                    "position": [18, 0, 19],
-                    "schema": {
-                        "id": "faction-B-wave-spawner",
-                        "faction": "B",
-                        "timeOffSet": 500,
-                        "duration": 10000
-                    }
-                },
-                "castle": {
-                    "position": [18, 0, 8],
-                    "schema": {
-                        "id": "faction-B-castle",
-                        "faction": "B",
-                        "healthPoint": 20
-                    }
+            "B": {
+                "position": {
+                    "x": 0,
+                    "y": 0,
+                    "z": 0
                 }
             }
-        ],
-        "width": 20,
-        "depth": 21,
-        "obstacles": [
-            [0, 0, 10],
-            [1, 0, 10],
-            [2, 0, 10],
-            [3, 0, 10],
-            [4, 0, 10],
-            [5, 0, 10],
-            [6, 0, 10],
-            [7, 0, 10],
-            [8, 0, 10],
-            [9, 0, 10],
-            [10, 0, 10],
-            [11, 0, 10],
-            [12, 0, 10],
-            [13, 0, 10],
-            [14, 0, 10],
-            [15, 0, 10],
-            [16, 0, 10],
-            [17, 0, 10],
-            [18, 0, 10],
-            [19, 0, 10]
-        ]
+        },
+        "obstacle": [{
+            "position": {
+                "x": 0,
+                "y": 0,
+                "z": 0
+            }
+        }]
     },
     "settings": {
-        "towers": {
+        "tower": {
             "common": {
                 "fortBase": "#fort-base",
                 "fort": "#fort",
@@ -134,51 +119,15 @@
                 "damagePoint": 100
             }]
         },
-        "towerBase": {
-            "geometry": {
-                "primitive": "box",
-                "width": 1,
-                "height": 0.2,
-                "depth": 1
-            },
-            "material": {
-                "color": "#769cbd"
-            }
-        },
-        "obstacle": {
-            "geometry": {
-                "primitive": "box",
-                "width": 1,
-                "height": 0.2,
-                "depth": 1
-            },
-            "material": {
-                "color": "#5c6b73"
-            }
-        },
         "castle": {
-            "geometry": {
-                "primitive": "box",
-                "width": 0.25,
-                "height": 0.2,
-                "depth": 0.25
-            }
-        },
-        "bullet": {
-            "geometry": {
-                "primitive": "sphere",
-                "radius": 0.05,
-                "segmentsHeight": 2,
-                "segmentsWidth": 2
-            },
-            "material": {
-                "color": "white"
+            "common": {
+                "healthPoint": 200
             }
         },
         "enemy": {
-            "model": "#knight",
-            "animation_timeScale": 1.4,
-            "scale": "0.3 0.3 0.3"
+            "common": {
+                "animation_timeScale": 1.4
+            }
         }
     }
 }

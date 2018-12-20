@@ -1,6 +1,4 @@
 (() => {
-	//var ID_COUNTER = 0;
-
 	AFRAME.registerSystem('enemy', {
 		init: function() {
 			this.faction = {
@@ -9,21 +7,19 @@
 			};
 			this.faction.A.enemies = [];
 			this.faction.B.enemies = [];
-			//this._idCounter = 0;
 			this.el.addEventListener('systemupdatepath', this.onPathUpdated.bind(this));
 		},
 		registerEnemy: function(el) {
 			var fac = el.components.enemy.data.faction;
-			//el.setAttribute('id', 'enemy-' + (this._idCounter++).toString());
 			this.faction[fac].enemies.push(el);
-			document.querySelector('a-scene').systems['tower'].updateEnemies(fac);
+			this.el.systems['tower'].updateEnemies(fac);
 		},
 		unregisterEnemy: function(el) {
 			var fac = el.components.enemy.data.faction;
 			var index = this.faction[fac].enemies.indexOf(el);
 			if (index > -1) {
 				this.faction[fac].enemies.splice(index, 1);
-				document.querySelector('a-scene').systems['tower'].updateEnemies(fac);
+				this.el.systems['tower'].updateEnemies(fac);
 			}
 		},
 		onPathUpdated: function(evt) {
@@ -75,7 +71,11 @@
 		},
 		init: function() {
 			//console.log('Initial enemy.');
-			let setting = this.el.sceneEl.systems['tdar-game'].settings.enemy;
+			this.gameManager = this.el.sceneEl.systems['tdar-game'].gameManager;
+			this.networkManager = this.el.sceneEl.systems['tdar-game'].networkManager;
+			this.uiManager = this.el.sceneEl.systems['tdar-game'].uiManager;
+
+			let setting = this.gameManager.settings.enemy;
 
 			this.currentHP = this.data.healthPoint;
 			this.el.setAttribute('id', this.data.id);
@@ -92,14 +92,12 @@
 			    speed: this.data.speed
 			});
 			*/
-			this.gameloader = this.el.sceneEl.systems['tdar-game'].gameLoader;
 			this.line = null;
 			this.lineLength = null;
 			this._initLine();
 			this.el.setAttribute('enemy', {
 				speed: this.data.speed / (2 * Math.PI)
 			});
-			this.timeCounter = 0;
 			this.completeDist = 0;
 
 			this.el.addEventListener('be-attacked', this._onBeAttacked.bind(this));
@@ -108,25 +106,22 @@
 		},
 		tick: function(time, timeDelta) {
 			if (!this.el.is('endofpath')) {
-				this.timeCounter += (timeDelta * this.data.timeRatio);
-				this.completeDist += this.data.speed * this.timeCounter;
+				this.completeDist += this.data.speed * timeDelta * this.data.timeRatio;
 
 				if (this.completeDist >= this.lineLength) {
 					this.el.addState('endofpath');
 					this.el.emit('movingended');
 				} else {
-					let p = this.line.getUtoTmapping(0, this.completeDist);
-					p = this.line.getPoint(p);
-					this.el.object3D.position.copy(p);
-					let d = this.el.parentNode.object3D.localToWorld(p);
+					let p = this.line.getPointAt(this.completeDist / this.lineLength);
+					let d = this.el.parentNode.object3D.localToWorld(p.clone());
 					this.el.object3D.lookAt(d);
+					this.el.object3D.position.copy(p);
 				}
 			}
 		},
 		remove: function() {
 			delete this.currentHP;
 			delete this.line;
-			delete this.timeCounter;
 			delete this.completeDist;
 			this.system.unregisterEnemy(this.el);
 			this.el.removeEventListener('be-attacked', this._onBeAttacked.bind(this));
@@ -153,35 +148,13 @@
 			}
 		},
 		_initLine: function() {
-			let points = this.data.faction == 'A' ? this.gameloader.getPathA() : this.gameloader.getPathB();
-			let pathPoints = points.map(point => {
-				let p = new THREE.Vector3(point[0], 0, point[1]);
-				return p;
-			});
-			this.line = new THREE['CatmullRomCurve3'](pathPoints);
+			this.line = new THREE['CatmullRomCurve3'](this.gameManager.enemyPath[this.data.faction]);
 			this.lineLength = this.line.getLength();
 		},
 		_onPathUpdated: function() {
-            console.log('FACTION', this.data.faction, 'UPDATE PATH');
-
-			let points = this.data.faction == 'A' ? this.gameloader.getPathA() : this.gameloader.getPathB();
-			let minDistance = Infinity;
-			let ptr = points.length - 1;
-			for (let i = 0; i < points.length - 1; i++) {
-				let p = new THREE.Vector3(points[i][0], 0, points[i][1]);
-				if (p.distanceTo(this.el.object3D.position) < minDistance)
-					ptr = i;
-			}
-			points = points.slice(ptr);
-			points.splice(0, 0, [this.el.object3D.position.x, this.el.object3D.position.z]);
-			let pathPoints = points.map(point => {
-				let p = new THREE.Vector3(point[0], 0, point[1]);
-				return p;
-			});
 			delete this.line;
-			this.line = new THREE['CatmullRomCurve3'](pathPoints);
+			this.line = this.gameManager.getNewPath(this.el.object3D.position.x, this.el.object3D.position.z, this.data.faction);
 			this.lineLength = this.line.getLength();
-			this.timeCounter = 0;
 			this.completeDist = 0;
 		}
 	});

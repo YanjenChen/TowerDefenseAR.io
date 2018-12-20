@@ -3,8 +3,6 @@
 
 <head>
     <title>Tower Defense AR</title>
-
-    <meta name="aframe-enable-ar-scene">
     <!--
     LIBRARY EXPLAINATION
         aframe.min.js: main renderer library.
@@ -27,19 +25,7 @@
     <link rel="stylesheet" type="text/css" href="css/reticle.css">
     <link rel="stylesheet" type="text/css" href="css/ui.css">
 
-    <script src="components/core/glow.js"></script>
-    <script src="components/core/reticle.js"></script>
-    <script src="components/core/path.js"></script>
-    <script src="components/core/trace.js"></script>
-    <script src="components/enemy.js"></script>
-    <script src="components/wave_spawner.js"></script>
-    <script src="components/bullet.js"></script>
-    <script src="components/tower.js"></script>
-    <script src="components/tower_base.js"></script>
-    <script src="components/castle.js"></script>
-
-    <script src="script/ui.js"></script>
-    <script src="script/game.js"></script>
+    <script src="components/grid.js"></script>
 </head>
 
 <body>
@@ -51,7 +37,7 @@
         For more information, google "aframe" and read it's tutorial.
     -->
 
-    <a-scene stats tdar-game-ui tdar-game="mode: single-player; ar: true" light="defaultLightsEnabled: false" shadow="autoUpdate: false">
+    <a-scene stats background="color: grey" vr-mode-ui="enabled: false">
         <a-assets>
             <a-asset-item id="knight" src="renderer/assets/knight.gltf"></a-asset-item>
             <a-asset-item id="fort" src="renderer/assets/fort.gltf"></a-asset-item>
@@ -64,7 +50,12 @@
             <a-asset-item id="grass" src="renderer/assets/grass/model.gltf"></a-asset-item>
         </a-assets>
 
-        <a-entity camera></a-entity>
+        <a-entity grid="width: 40; depth: 40" scale="0.5 0.5 0.5"></a-entity>
+
+        <a-entity position="0 10 0" rotation="-70 0 0" camera wasd-controls>
+            <a-entity cursor="fuse: false;" position="0 0 -1">
+            </a-entity>
+        </a-entity>
     </a-scene>
 
     <!--

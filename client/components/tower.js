@@ -11,7 +11,7 @@
             this.faction.B.enemies = [];
         },
         updateEnemies: function(fac) {
-            this.faction[fac].enemies = document.querySelector('a-scene').systems['enemy'].faction[fac].enemies;
+            this.faction[fac].enemies = this.el.systems['enemy'].faction[fac].enemies;
         }
     });
 
@@ -34,7 +34,11 @@
         },
         init: function() {
             // load tower settings.
-            let setting = this.setting = this.el.sceneEl.systems['tdar-game'].settings.towers;
+            this.gameManager = this.el.sceneEl.systems['tdar-game'].gameManager;
+			this.networkManager = this.el.sceneEl.systems['tdar-game'].networkManager;
+			this.uiManager = this.el.sceneEl.systems['tdar-game'].uiManager;
+
+            let setting = this.setting = this.gameManager.settings.towers;
 
 
 
@@ -207,14 +211,14 @@
                         // Attack by missile.
                         var missileEl = document.createElement('a-entity');
                         this.firePoint.object3D.getWorldPosition(p);
-                        missileEl.object3D.position.copy(this.el.sceneEl.systems['tdar-game'].sceneEntity.object3D.worldToLocal(p));
+                        missileEl.object3D.position.copy(this.gameManager.dynamicScene.object3D.worldToLocal(p));
                         missileEl.setAttribute('missile', {
                             damagePoint: 100,
                             attackRange: 1.5,
                             speed: 0.5,
                             targetPos: this.targetEl.object3D.position
                         });
-                        this.el.sceneEl.systems['tdar-game'].sceneEntity.appendChild(missileEl);
+                        this.gameManager.dynamicScene.appendChild(missileEl);
                         break;
                     case 'laser':
                         // Attack by laser.
@@ -223,7 +227,7 @@
                         this.targetEl.object3D.getWorldPosition(p);
                         laserMesh.geometry.vertices[1].copy(this.rotationPart.object3D.worldToLocal(p));
                         laserMesh.geometry.verticesNeedUpdate = true;
-                        this.el.sceneEl.emit('broadcast', {
+                        this.networkManager.emit('playingEvent', {
                             event_name: 'enemy_be_attacked',
                             id: this.targetEl.getAttribute('id'),
                             damage: 1

@@ -32,6 +32,10 @@
             }
         },
         init: function() {
+            this.gameManager = this.el.sceneEl.systems['tdar-game'].gameManager;
+			this.networkManager = this.el.sceneEl.systems['tdar-game'].networkManager;
+			this.uiManager = this.el.sceneEl.systems['tdar-game'].uiManager;
+
             let p3 = this.data.targetPos.clone();
             let p1 = this.el.object3D.position.clone();
             let p2 = p3.clone().sub(p1).multiplyScalar(0.5).add(p1);
@@ -53,14 +57,6 @@
             this.completeDist = 0;
 
             this.el.addEventListener('movingended', this.onMovingEnded.bind(this));
-
-            // Temporary load curve.
-            /*
-            let lineMaterial = new THREE.LineBasicMaterial({});
-            var lineGeometry = new THREE.Geometry();
-            lineGeometry.vertices = this.curve.getPoints(30);
-            this.el.sceneEl.systems['tdar-game'].sceneEntity.setObject3D('tmpcurve', new THREE.Line(lineGeometry, lineMaterial));
-            */
         },
         tick: function(time, timeDelta) {
             if (!this.el.is('endofpath')) {
@@ -87,7 +83,7 @@
             delete this.completeDist;
         },
         onMovingEnded: function() {
-            let enemySystem = document.querySelector('a-scene').systems['enemy'];
+            let enemySystem = this.el.sceneEl.systems['enemy'];
             let enemyList = enemySystem.faction.A.enemies.concat(enemySystem.faction.B.enemies);
             var self = this;
 
@@ -95,14 +91,14 @@
                 var explosionEl = document.createElement('a-entity');
                 explosionEl.object3D.position.copy(this.el.object3D.position);
                 explosionEl.setAttribute('explosion', {});
-                this.el.sceneEl.systems['tdar-game'].sceneEntity.appendChild(explosionEl);
+                this.gameManager.dynamicScene.appendChild(explosionEl);
             }
 
             // Attack enemy if is in attack range.
             enemyList.forEach((enemyEl) => {
                 let distance = self.el.object3D.position.distanceTo(enemyEl.object3D.position);
                 if (distance < self.data.attackRange) {
-                    self.el.sceneEl.emit('broadcast', {
+                    self.networkManager.emit('playingEvent', {
                         event_name: 'enemy_be_attacked',
                         id: enemyEl.getAttribute('id'),
                         damage: self.data.damagePoint

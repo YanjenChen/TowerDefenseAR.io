@@ -86,6 +86,8 @@
             }
         },
         init: function() {
+            console.warn('Old component moveonpath is using.');
+
             this.lineType = this.data.path.components['path'].data.lineType;
             if (this.lineType == 'Line') {
                 this.lines = this.data.path.components['path'].lines;

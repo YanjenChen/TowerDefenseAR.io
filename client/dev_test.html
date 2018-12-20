@@ -26,14 +26,17 @@
 
     <link rel="stylesheet" type="text/css" href="css/ui.css">
 
-    <script src="script/ui.js"></script>
+    <script src="script/uiManager.js"></script>
+    <script src="script/serverSimulator.js"></script>
+    <script src="script/networkManager.js"></script>
+    <script src="script/gameManager.js"></script>
     <script src="script/cash.js"></script>
     <script src="script/game.js"></script>
 </head>
 
 <body>
     <a-scene stats background="color: grey" tdar-game-ui tdar-game="mode: single-player; ar: false" vr-mode-ui="enabled: false">
-        <a-entity position="-3 10 10.5" rotation="-45 -90 0" camera wasd-controls="acceleration: 150">
+        <a-entity position="6 10 10.5" rotation="-80 -90 0" camera wasd-controls="acceleration: 150">
         </a-entity>
     </a-scene>
 </body>

@@ -15,7 +15,7 @@ class NetworkManager {
          *  user_faction: User faction receive from server.
          *  user_team_id: User team id received from server.
          */
-        if (mode != 'single-player' || mode != 'multi-player') {
+        if (mode != 'single-player' && mode != 'multi-player') {
             console.warn('Network manager get wrong param.');
         }
 
@@ -38,28 +38,6 @@ class NetworkManager {
                 setInterval(this.checkOnline, 1000)
             })
         }
-    }
-    get mode() {
-        return this.mode;
-    }
-    get room_id() {
-        return this.room_id;
-    }
-    get sceneEl() {
-        return this.sceneEl;
-    }
-    get SOCKET() {
-        return this.SOCKET;
-    }
-    get user() {
-        return this.user;
-    }
-    get user_faction() {
-        // map server representation to client representation.
-        return this.user_faction == '1' ? 'A' : 'B';
-    }
-    get user_team_id() {
-        return this.user_team_id;
     }
     checkOnline() {
         if (!this.SOCKET) {
@@ -122,8 +100,8 @@ class NetworkManager {
         })
     }
     addEventListener(evtName, callback) {
-        console.log('NM ADD EVENTLISTNER HAS BEEN CALLED.');
-        
+        //console.log('NM ADD EVENTLISTNER HAS BEEN CALLED.');
+
         var self = this;
         var wrapper = function(evt) {
             if (self.mode == 'single-player')
