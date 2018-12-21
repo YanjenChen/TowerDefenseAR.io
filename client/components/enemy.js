@@ -68,7 +68,6 @@
             }
         },
         init: function() {
-            // console.log('Initial enemy.');
             this.gameManager = this.el.sceneEl.systems['tdar-game'].gameManager;
             this.networkManager = this.el.sceneEl.systems['tdar-game'].networkManager;
             this.uiManager = this.el.sceneEl.systems['tdar-game'].uiManager;
@@ -78,10 +77,10 @@
             this.setting = this.gameManager.settings.enemy;
 
 
-            this.el.setObject3D('mesh', this.gameManager.object3DPrototypes[setting.common.mesh].clone());
+            this.el.setObject3D('mesh', this.gameManager.object3DPrototypes[this.setting.common.mesh].model.clone());
             this.el.setAttribute('id', this.data.id);
             this.el.setAttribute('animation-mixer', {
-                timeScale: setting.common.animation_timeScale
+                timeScale: this.setting.common.animation_timeScale
             });
             this.system.registerEnemy(this.el);
 

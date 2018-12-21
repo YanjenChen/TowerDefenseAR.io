@@ -36,62 +36,50 @@
 			}
 		},
 		init: function() {
-			// load tower settings.
 			this.gameManager = this.el.sceneEl.systems['tdar-game'].gameManager;
 			this.networkManager = this.el.sceneEl.systems['tdar-game'].networkManager;
-			this.uiManager = this.el.sceneEl.systems['tdar-game'].uiManager;
-
-			let setting = this.setting = this.gameManager.settings.towers;
 
 
+			this.setting = this.gameManager.settings.towers;
 
-			// load object3D model.
-			this.fortBase = document.createElement('a-entity');
-			this.fortBase.setAttribute('gltf-model', setting.common.fortBase);
-			this.el.appendChild(this.fortBase);
 
-			this.rotationPart = document.createElement('a-entity');
-			this.rotationPart.setAttribute('gltf-model', setting.common.fort);
-			this.rotationPart.setAttribute('animation-mixer', {
-				timeScale: setting.common.animation_timeScale,
+			this.el.setObject3D('mesh', this.gameManager.object3DPrototypes[this.setting.common.mesh].model.clone());
+			this.el.setAttribute('animation-mixer', {
+				timeScale: this.setting.common.animation_timeScale,
 				loop: 'once'
 			});
-			// set fire point.
-			this.firePoint = document.createElement('a-entity');
-			this.firePoint.setAttribute('position', setting.common.firePointOffset);
-			/*
-			this.firePoint.setAttribute('geometry', {
-			    primitive: "sphere",
-			    radius: 1,
-			    segmentsHeight: 2,
-			    segmentsWidth: 2
+			this.roter = this.el.getObject3D('mesh').children.find(x => x.name == 'roter');
+			this.muzzle = this.roter.children.find(x => x.name == 'muzzle');
+			//console.log(this.roter, this.muzzle);
+
+
+			// play create animation.
+			let self = this;
+			this.el.addState('initializing');
+			this.el.addEventListener('animation-finished', function() {
+				self.el.removeState('initializing');
+				self.el.removeEventListener('animation-finished', this);
 			});
-			*/
-			this.rotationPart.appendChild(this.firePoint);
-			this.el.appendChild(this.rotationPart);
 
-			this.el.setAttribute('scale', setting.common.scale);
 
+			this.upgradeTier = this.upgradeTier.bind(this);
+			this.isMaxTier = this.isMaxTier.bind(this);
+			this.onFire = this.onFire.bind(this);
 
 
 			// initialize tower parameters.
 			this.targetEl = null;
 			this.targetFac = (this.data.faction == 'A') ? 'B' : 'A';
 			this.timeCounter = 0;
-			this.el.addEventListener('fire', this._onFire.bind(this));
+			this.restDuration = null;
+			this.activateDuration = null;
+			this.range = null;
+			this.damagePoint = null;
+			this.laserLine = null;
+			this.tmpVec = new THREE.Vector3();
 
-			let self = this;
-			this.el.addState('initializing');
-			this.rotationPart.addEventListener('animation-finished', function() {
-				self.el.removeState('initializing');
-				self.rotationPart.removeEventListener('animation-finished', this);
-			});
 
-			this.el.addEventListener('stateadded', this._onStateAdded.bind(this));
-			this.el.addEventListener('stateremoved', this._onStateRemoved.bind(this));
-
-			this.upgradeTier = this.upgradeTier.bind(this);
-			this.isMaxTier = this.isMaxTier.bind(this);
+			this.el.addEventListener('fire', this.onFire);
 		},
 		update: function() {
 			let currentSetting = this.setting[this.data.type][this.data.tier];
@@ -100,21 +88,27 @@
 			this.range = currentSetting.range;
 			this.damagePoint = currentSetting.damagePoint;
 
+
 			// Initial laser object.
 			if (this.data.type == 'laser') {
-				let laserMaterial = new THREE.LineBasicMaterial({
-					blending: THREE.AdditiveBlending,
-					color: currentSetting.laserColor,
-					transparent: true
-				});
-				let laserGeometry = new THREE.Geometry();
-				laserGeometry.vertices.push(
-					new THREE.Vector3(0, 0, 0),
-					new THREE.Vector3(0, 0, 0)
-				);
-				let laserMesh = new THREE.Line(laserGeometry, laserMaterial);
-				laserMesh.visible = false;
-				this.rotationPart.setObject3D('laser', laserMesh);
+				if (this.laserLine === null) {
+					let laserMaterial = new THREE.LineBasicMaterial({
+						blending: THREE.AdditiveBlending,
+						color: currentSetting.laserColor,
+						transparent: true
+					});
+					let laserGeometry = new THREE.Geometry();
+					laserGeometry.vertices.push(
+						new THREE.Vector3(0, 0, 0),
+						new THREE.Vector3(0, 0, 0)
+					);
+					this.laserLine = new THREE.Line(laserGeometry, laserMaterial);
+					this.laserLine.visible = false;
+					this.el.setObject3D('laser', this.laserLine);
+				} else {
+					this.laserLine.material.color = new THREE.Color(currentSetting.laserColor);
+					this.laserLine.material.needsUpdate = true;
+				}
 			}
 		},
 		tick: function(time, timeDelta) {
@@ -122,151 +116,117 @@
 				return;
 
 			if (this.el.is('activate')) {
-				if (this._checkTargetDistance()) {
-					let p = new THREE.Vector3();
-					this.targetEl.object3D.getWorldPosition(p);
-					this.rotationPart.object3D.lookAt(p);
-
+				if (this.checkTargetDistance()) {
 					this.timeCounter += timeDelta;
+					this.targetEl.object3D.getWorldPosition(this.tmpVec);
+					this.rotationPart.object3D.lookAt(this.tmpVec);
+
+
 					if (this.timeCounter >= this.restDuration && !this.el.is('attacking')) {
 						this.el.addState('attacking');
-					} else if (this.el.is('attacking')) {
+						this.timeCounter = 0;
+						if (this.data.type == 'laser')
+							this.laserLine.visible = true;
+					}
+
+					if (this.el.is('attacking'))
 						this.el.emit('fire');
-						if (this.timeCounter >= this.activateDuration) {
-							this.el.removeState('attacking');
-						}
+
+					if (this.timeCounter >= this.activateDuration && this.el.is('attacking')) {
+						this.el.removeState('attacking');
+						this.timeCounter = 0;
+						if (this.data.type == 'laser')
+							this.laserLine.visible = false;
 					}
 				} else {
-					// ONLY USE IN DEVELOPER TESTING
-					/*
-					this.targetEl.setAttribute('glow', {
-						enabled: false
-					});
-					*/
-					////////////////////////////////
 					this.el.removeState('activate');
 					this.el.removeState('attacking');
+					this.timeCounter = 0;
+					this.targetEl = null;
+					if (this.data.type == 'laser')
+						this.laserLine.visible = false;
 				}
 			} else {
-				if (this._getNearestEnemy()) {
-					// ONLY USE IN DEVELOPER TESTING
-					/*
-                    this.targetEl.setAttribute('glow', {
-                        enabled: true
-                    });
-					*/
-					////////////////////////////////
+				if (this.getNearestEnemy()) {
 					this.el.addState('activate');
-					this.el.addState('attacking');
+					this.timeCounter = 0;
 				}
 			}
 		},
 		remove: function() {
-			// ONLY USE IN DEVELOPER TESTING
-			/*
-            if (this.targetEl != null)
-                this.targetEl.setAttribute('glow', {
-                    enabled: false
-                });
-			*/
-			////////////////////////////////
-			delete this.fortBase;
-			delete this.rotationPart;
-			delete this.firePoint;
+			delete this.gameManager;
+			delete this.networkManager;
+
+			delete this.setting;
+
+			this.el.removeAttribute('animation-mixer');
+			this.el.removeObject3D('mesh');
+
+			delete this.roter;
+			delete this.muzzle;
+
 			delete this.targetEl;
 			delete this.targetFac;
-			delete this.duration;
 			delete this.timeCounter;
 			delete this.restDuration;
 			delete this.activateDuration;
 			delete this.range;
 			delete this.damagePoint;
-			this.el.removeEventListener('fire', this._onFire.bind(this));
+			delete this.laserLine;
+			delete this.tmpVec;
+
+			this.el.removeEventListener('fire', this.onFire);
 		},
-		_checkTargetDistance: function() {
+		checkTargetDistance: function() {
 			if (this.system.faction[this.targetFac].enemies.indexOf(this.targetEl) < 0) // Prevent target doesn't exist cause null error.
 				return false;
-			let p = new THREE.Vector3();
-			this.targetEl.object3D.getWorldPosition(p);
-			return (this.el.parentNode.object3D.worldToLocal(p).distanceTo(this.el.object3D.position) < this.range);
+			return (this.targetEl.object3D.position.distanceTo(this.el.object3D.position) < this.range);
 		},
-		_getNearestEnemy: function() {
+		getNearestEnemy: function() {
 			if (this.system.faction[this.targetFac].enemies.length <= 0) // Prevent empty array cause error.
 				return false;
 
-			var minDistance = Infinity;
-			this.system.faction[this.targetFac].enemies.forEach((enemyEl) => {
-				let p = new THREE.Vector3();
-				enemyEl.object3D.getWorldPosition(p);
-				var distance = this.el.parentNode.object3D.worldToLocal(p).distanceTo(this.el.object3D.position);
+			let minDistance = Infinity;
+			this.system.faction[this.targetFac].enemies.forEach(enemyEl => {
+				let distance = enemyEl.object3D.position.distanceTo(this.el.object3D.position);
 				if (distance < minDistance) {
 					minDistance = distance;
 					this.targetEl = enemyEl;
 				}
 			});
-			return this._checkTargetDistance();
+			return (minDistance < this.range);
 		},
-		_onFire: function() {
-			if (this.el.sceneEl.querySelector('#' + this.targetEl.id)) {
-				let p = new THREE.Vector3();
+		onFire: function() {
+			if (this.gameManager.dynamicScene.querySelector('#' + this.targetEl.id)) {
 				switch (this.data.type) {
 					case 'missile':
-						// Attack by missile.
-						var missileEl = document.createElement('a-entity');
-						this.firePoint.object3D.getWorldPosition(p);
-						missileEl.object3D.position.copy(this.gameManager.dynamicScene.object3D.worldToLocal(p));
+						let missileEl = document.createElement('a-entity');
+						this.muzzle.getWorldPosition(this.tmpVec);
+						missileEl.object3D.position.copy(this.gameManager.dynamicScene.object3D.worldToLocal(this.tmpVec));
 						missileEl.setAttribute('missile', {
-							damagePoint: 100,
-							attackRange: 1.5,
-							speed: 0.5,
+							damagePoint: this.damagePoint,
+							attackRange: this.setting[this.data.type][this.data.tier].attackRange,
+							speed: this.setting[this.data.type][this.data.tier].speed,
 							targetPos: this.targetEl.object3D.position
 						});
 						this.gameManager.dynamicScene.appendChild(missileEl);
 						break;
 					case 'laser':
-						// Attack by laser.
-						let laserMesh = this.rotationPart.getObject3D('laser');
-						laserMesh.geometry.vertices[0].copy(this.firePoint.object3D.position);
-						this.targetEl.object3D.getWorldPosition(p);
-						laserMesh.geometry.vertices[1].copy(this.rotationPart.object3D.worldToLocal(p));
-						laserMesh.geometry.verticesNeedUpdate = true;
+						this.muzzle.getWorldPosition(this.tmpVec);
+						this.laserLine.geometry.vertices[0].copy(this.laserLine.parent.worldToLocal(this.tmpVec));
+
+						this.targetEl.object3D.getWorldPosition(this.tmpVec);
+						this.laserLine.geometry.vertices[1].copy(this.laserLine.parent.worldToLocal(this.tmpVec));
+
+						this.laserLine.geometry.verticesNeedUpdate = true;
 						this.networkManager.emit('playingEvent', {
 							event_name: 'enemy_be_attacked',
-							id: this.targetEl.getAttribute('id'),
-							damage: 1
+							id: this.targetEl.id,
+							damage: this.damagePoint,
+							type: this.data.type
 						});
 						break;
 				}
-
-			}
-		},
-		_onStateAdded: function(evt) {
-			switch (evt.detail) {
-				case 'activate':
-					this.timeCounter = 0;
-					break;
-				case 'attacking':
-					this.timeCounter = 0;
-					if (this.data.type == 'laser') {
-						let laserMesh = this.rotationPart.getObject3D('laser');
-						laserMesh.visible = true;
-					}
-					break;
-			}
-		},
-		_onStateRemoved: function(evt) {
-			switch (evt.detail) {
-				case 'activate':
-					this.timeCounter = 0;
-					this.targetEl = null;
-					break;
-				case 'attacking':
-					this.timeCounter = 0;
-					if (this.data.type == 'laser') {
-						let laserMesh = this.rotationPart.getObject3D('laser');
-						laserMesh.visible = false;
-					}
-					break;
 			}
 		},
 		upgradeTier: function() {

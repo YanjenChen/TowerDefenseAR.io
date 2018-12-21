@@ -1,11 +1,25 @@
 {
     "assets": {
-        "knight": "renderer/assets/knight.gltf",
-        "fort": "renderer/assets/fort.gltf",
-        "fort-base": "renderer/assets/fort_base.gltf",
-        "tree": "renderer/assets/tree01/model.gltf",
-        "stone": "renderer/assets/stone/model.gltf",
-        "mill": "renderer/assets/mill/model.gltf"
+        "knight": {
+            "src": "renderer/assets/knight.gltf",
+            "scalar": 0.8
+        },
+        "fort": {
+            "src": "renderer/assets/fort.gltf",
+            "scalar": 1.5
+        },
+        "tree": {
+            "src": "renderer/assets/tree01/model.gltf",
+            "scalar": 2
+        },
+        "stone": {
+            "src": "renderer/assets/stone/model.gltf",
+            "scalar": 1
+        },
+        "mill": {
+            "src": "renderer/assets/mill/model.gltf",
+            "scalar": 3
+        }
     },
     "globalVar": {
         "gridConfig": {
@@ -77,11 +91,8 @@
     "settings": {
         "tower": {
             "common": {
-                "fortBase": "#fort-base",
-                "fort": "#fort",
                 "animation_timeScale": 0.8,
-                "firePointOffset": "0 4.831 7",
-                "scale": "0.15 0.15 0.15"
+                "mesh": "knight"
             },
             "laser": [{
                 "restDuration": 1000,
@@ -106,17 +117,23 @@
                 "restDuration": 4000,
                 "activateDuration": 1,
                 "range": 10,
-                "damagePoint": 50
+                "damagePoint": 50,
+                "attackRange": 1.5,
+                "speed": 0.5
             }, {
                 "restDuration": 3000,
                 "activateDuration": 1,
                 "range": 11,
-                "damagePoint": 70
+                "damagePoint": 70,
+                "attackRange": 1.6,
+                "speed": 0.5
             }, {
                 "restDuration": 1500,
                 "activateDuration": 1,
                 "range": 12,
-                "damagePoint": 100
+                "damagePoint": 100,
+                "attackRange": 1.6,
+                "speed": 0.8
             }]
         },
         "castle": {

@@ -17,9 +17,9 @@
 			}
 		},
 		init: function() {
-			//this.gameManager = this.el.sceneEl.systems['tdar-game'].gameManager;
+			this.gameManager = this.el.sceneEl.systems['tdar-game'].gameManager;
 			//this.networkManager = this.el.sceneEl.systems['tdar-game'].networkManager;
-			//this.uiManager = this.el.sceneEl.systems['tdar-game'].uiManager;
+			this.uiManager = this.el.sceneEl.systems['tdar-game'].uiManager;
 
 			let geometry = new THREE.Geometry();
 			let material = new THREE.LineBasicMaterial({ color: 0x546269 });
@@ -46,24 +46,47 @@
 			reticle.visible = false;
 			this.el.setObject3D('reticle', reticle);
 
-			this.el.addEventListener('raycaster-intersected', this.onRaycasterIntersected.bind(this));
+			this.onRaycasterIntersected = this.onRaycasterIntersected.bind(this);
+			this.el.addEventListener('raycaster-intersected', this.onRaycasterIntersected);
 
 			this.getIntersection = null;
 			this.prevCheckTime = 0;
+			this.intersectedPoint = new THREE.Vector3();
 		},
 		tick: function(time, timeDelta) {
 			if (this.el.is('cursor-hovered') && time - this.prevCheckTime > this.data.interval) {
 				if (!this.getIntersection)
 					return;
 
-				let p = this.getIntersection(this.el).point.clone();
-				this.el.object3D.worldToLocal(p);
-				this.reticle.position.setX(Math.floor(p.x + 0.5));
-                this.reticle.position.setZ(Math.floor(p.z + 0.5));
-                this.reticle.visible = true;
+				this.intersectedPoint.copy(this.getIntersection(this.el).point);
+				this.el.object3D.worldToLocal(this.intersectedPoint);
+				this.reticle.position.setX(Math.floor(this.intersectedPoint.x + 0.5));
+				this.reticle.position.setZ(Math.floor(this.intersectedPoint.z + 0.5));
+				this.reticle.visible = true;
+
+				let gridCoord = this.gameManager.sceneToGamegrid(this.intersectedPoint);
+				let selectedBase = this.gameManager.towerBases[gridCoord.x][gridCoord.z];
+				if (selectedBase === undefined)
+					console.warn('TowerBases have undefined element');
+				if (selectedBase)
+					this.uiManager.updateObjectControl(selectedBase.getUIsets());
 
 				this.prevCheckTime = time;
 			}
+		},
+		remove: function() {
+			this.el.removeObject3D('grid');
+			this.el.removeObject3D('plane');
+			this.el.removeObject3D('reticle');
+
+			delete this.gameManager;
+			delete this.uiManager;
+
+			delete this.reticle;
+			delete this.getIntersection;
+			delete this.prevCheckTime;
+
+			this.el.removeEventListener('raycaster-intersected', this.onRaycasterIntersected);
 		},
 		onRaycasterIntersected: function(evt) {
 			this.getIntersection = evt.detail.getIntersection;

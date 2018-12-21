@@ -19,7 +19,7 @@ class GameManager {
 		 *  sceneEl: DOM node which point to <a-scene> element.
 		 *  settings: Contain all components' static params.
 		 *  staticScene: <a-entity> which indicate game static scene, all static object3D should be contained under this entity.
-		 *  towerBases: Two dimensional array of <a-entity>.components.['tower-base'], use to quick access UI content.
+		 *  towerBases: Two dimensional array of <a-entity>.components['tower-base'], use to quick access UI content.
 		 */
 		this.anchorEl = null;
 		this.configs = null;
@@ -60,7 +60,7 @@ class GameManager {
 			jQuery.each(configs.assets, function(key, value) {
 				let assetEl = document.createElement('a-asset-item');
 				assetEl.setAttribute('id', key);
-				assetEl.setAttribute('src', value);
+				assetEl.setAttribute('src', value.src);
 				assetsEl.appendChild(assetEl);
 			});
 
@@ -202,7 +202,6 @@ class GameManager {
 					jQuery.each(values, function(faction, el) {
 						let entity = document.createElement('a-entity');
 						entity.setAttribute('id', name + '-' + faction);
-						idCounter++;
 						entity.setAttribute(name, {
 							faction: faction,
 							healthPoint: this.settings[name].common.healthPoint
@@ -222,6 +221,23 @@ class GameManager {
 					break;
 			}
 		});
+		// Init towerBases. (Assume gameGrid has updated to init state.)
+		this.towerBases = [];
+		for (let i = 0; i < globalVar.gridConfig.width; i++) {
+			let column = [];
+			for (let k = 0; k < globalVar.gridConfig.depth; k++) {
+				if (this.gameGrid.isWalkableAt(i, k)) {
+					let towerBaseEl = document.createElement('a-entity');
+					towerBaseEl.object3D.position.set(this.gamegridToScene({ x: i, y: 0, z: k }));
+					towerBaseEl.setAttribute('tower-base', {});
+					column.push(towerBaseEl.components['tower-base']);
+					dynamicScene.appendChild(towerBaseEl);
+				} else {
+					column.push(null);
+				}
+			}
+			this.towerBases.push(column);
+		}
 		dynamicScene.object3D.scale.set(globalVar.sceneScale, globalVar.sceneScale, globalVar.sceneScale);
 		sceneEl.appendChild(dynamicScene);
 		this.dynamicScene = dynamicScene;
@@ -425,28 +441,37 @@ class GameManager {
 
 		let assets = [];
 		jQuery.each(this.configs.assets, function(key, value) {
-			assets.push({ key: key, value: value });
+			assets.push({ key: key, src: value.src, scalar: value.scalar });
 		});
 
 		const loaderPromises = assets.map(async asset => {
 			const loader = promisifyLoader(new THREE.GLTFLoader());
-			const gltfModel = await loader.load(asset.value);
+			const gltfModel = await loader.load(asset.src);
 			let model = gltfModel.scene || gltfModel.scenes[0];
 
 			// normalize size.
 			let bbox = new THREE.Box3().setFromObject(model);
-			if (bbox.max.x < bbox.max.z)
-				model.scale.set(1 / bbox.max.x, 1 / bbox.max.x, 1 / bbox.max.x);
-			else
-				model.scale.set(1 / bbox.max.z, 1 / bbox.max.z, 1 / bbox.max.z);
-			delete bbox;
+			let width = bbox.max.x - bbox.min.x;
+			let height = bbox.max.y - bbox.min.y;
+			let depth = bbox.max.z - bbox.min.z;
 
-			return { key: asset.key, model: model };
+			if (width < depth)
+				model.scale.set(1 / depth, 1 / depth, 1 / depth);
+			else
+				model.scale.set(1 / width, 1 / width, 1 / width);
+			model.scale.multiplyScalar(asset.scalar);
+
+			bbox = new THREE.Box3().setFromObject(model);
+			width = bbox.max.x - bbox.min.x;
+			height = bbox.max.y - bbox.min.y;
+			depth = bbox.max.z - bbox.min.z;
+
+			return { key: asset.key, model: model, width: width, height: height, depth: depth };
 		});
 
 		for (const loaderPromise of loaderPromises) {
 			const result = await loaderPromise;
-			this.object3DPrototypes[result.key] = result.model;
+			this.object3DPrototypes[result.key] = result;
 			console.log('LOAD ASSET.');
 		}
 

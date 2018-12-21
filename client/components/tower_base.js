@@ -1,4 +1,6 @@
 (() => {
+	const PROCESS_TIME = 1000;
+
 	AFRAME.registerComponent('tower-base', {
 		schema: {
 		},
@@ -8,13 +10,10 @@
 			this.uiManager = this.el.sceneEl.systems['tdar-game'].uiManager;
 			this.cashManager = this.el.sceneEl.systems['tdar-game'].cashManager;
 
-			this.fortBase = undefined;
-			this.towerEl = undefined;
 
 			this.el.addState('empty');
 
-			this.onStateAdded = this.onStateAdded.bind(this);
-			this.onStateRemoved = this.onStateRemoved.bind(this);
+
 			this.createLaserTower = this.createLaserTower.bind(this);
 			this.createMissileTower = this.createMissileTower.bind(this);
 			this.upgradeTower = this.upgradeTower.bind(this);
@@ -22,43 +21,23 @@
 			this.getUIsets = this.getUIsets.bind(this);
 			this.updateUI = this.updateUI.bind(this);
 
-			this.el.addEventListener('stateadded', this.onStateAdded);
-			this.el.addEventListener('stateremoved', this.onStateRemoved);
-
-			this.el.addEventListener('click', function(evt) {
-				console.log(evt.detail.intersection.point);
-			});
+			this.timeCounter = 0;
 		},
 		tick: function(time, timeDelta) {
-			// ONLY USE IN DEVELOPER TESTING
-			if (this.el.is('cursor-hovered'))
-				this.el.setAttribute('glow', {
-					enabled: true
-				});
-			else
-				this.el.setAttribute('glow', {
-					enabled: false
-				});
-			////////////////////////////////
-		},
-		remove: function() {
-			delete this.towerEl;
-
-			this.el.removeEventListener('click', this.onClick.bind(this));
-		},
-		onStateAdded: function(evt) {
-			if (evt.detail == 'cursor-hovered') {
-				this.uiManager.updateObjectControl(this.getUIsets());
+			if(this.el.is('processing')) {
+				this.timeCounter += timeDelta;
+				if(this.timeCounter >= PROCESS_TIME)
+					this.el.removeState('processing');
 			}
 		},
+		remove: function() {
+		},
 		createLaserTower: function() {
-			this.towerEl = document.createElement('a-entity');
-			this.towerEl.setAttribute('tower', {
+			this.el.setAttribute('tower', {
 				faction: this.data.faction,
 				type: 'laser',
 				tier: 0
 			});
-			this.el.appendChild(this.towerEl);
 			this.el.removeState('empty');
 			this.gameManager.updateGameGrid(
 				Math.floor(this.el.object3D.position.x),
@@ -103,11 +82,6 @@
 			this.gameManager.calculatePath(this.data.faction == 'A' ? 'B' : 'A');
 			this.el.sceneEl.emit('systemupdatepath', { faction: this.data.faction });
 			this.updateUI();
-		},
-		onStateRemoved: function(evt) {
-			if (evt.detail == 'cursor-hovered') {
-				this.uiManager.clearObjectControl();
-			}
 		},
 		getUIsets: function() {
 			var uisets;
