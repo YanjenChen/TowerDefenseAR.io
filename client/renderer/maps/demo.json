@@ -127,7 +127,30 @@
         "enemy": {
             "common": {
                 "animation_timeScale": 1.4
+            },
+            "normal": {
+                "damage": 1,
+                "speed": 0.8,
+                "laserEffectiveness": 1,
+                "missileEffectiveness": 1
+            },
+            "resistLaser": {
+                "damage": 2,
+                "speed": 0.5,
+                "laserEffectiveness": 0.5,
+                "missileEffectiveness": 1.2
+            },
+            "resistMissile": {
+                "damage": 2,
+                "speed": 0.5,
+                "laserEffectiveness": 1.2,
+                "missileEffectiveness": 0.5
             }
+        },
+        "cash": {
+            "incrementalDuration": 10000,
+            "amplifyAmount": 1,
+            "basicIncreaseAmount": 5
         }
     }
 }

@@ -19,17 +19,27 @@
 			ar: {
 				type: 'boolean',
 				default: false,
+			},
+			userFaction: {
+				type: 'string',
+				default: 'A',
+				oneOf: ['A', 'B']
 			}
 		},
 		init: function() {
 			let self = this;
-			let gameManager = this.gameManager = new GameManager(this.el, CONFIG_DIR, this.data.ar ? 'ar': 'vr');
+			let gameManager = this.gameManager = new GameManager(this.el, CONFIG_DIR, this.data.ar ? 'ar' : 'vr');
 			let networkManager = this.networkManager = new NetworkManager(this.el, this.data.mode);
 			let uiManager = this.uiManager = new UIManager(this.el);
+			this.cashManager = null;
 
 			networkManager.addEventListener('client_start_game', this.onStartGame.bind(this));
 			networkManager.addEventListener('playingEvent', this.onExecute.bind(this));
 			gameManager.loadConfig();
+		},
+		tick: function(time, timedelta) {
+			if (this.cashManager)
+				this.cashManager.tick(time, timedelta);
 		},
 		onStartGame: function() {
 			//console.warn('Client start game.');
@@ -58,7 +68,10 @@
 						});
 					break;
 				case 'castle_get_damaged':
-
+					if (this.gameManager.dynamicScene.querySelector('#' + content['id']) != null)
+						this.gameManager.dynamicScene.querySelector('#' + content['id']).emit('castle-get-damage', {
+							damage: content['damage']
+						});
 					break;
 				case 'create_tower_success':
 
@@ -78,6 +91,9 @@
 							targetCastle: content['ws_faction'] == 'A' ? '#faction-B-castle' : '#faction-A-castle'
 						});
 					}
+					break;
+				case 'execute_update_cash':
+					this.cashManager.executeUpdateCash(content['amount'], content['faction']);
 					break;
 			}
 		}

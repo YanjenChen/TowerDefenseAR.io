@@ -72,6 +72,11 @@ class GameManager {
 		let sceneEl = this.sceneEl;
 		let globalVar = this.configs.globalVar;
 
+
+		// Init cash manager.
+		sceneEl.systems['tdar-game'].cashManager = new CashManager(sceneEl);
+
+
 		if (mode == 'ar') {
 			// Insert shadow plane.
 			let planeGeometry = new THREE.PlaneGeometry(2000, 2000);
@@ -167,12 +172,17 @@ class GameManager {
 			cast: true,
 			receive: false
 		});
+		let idCounter;
 		jQuery.each(this.configs.dynamicScene, function(name, values) {
 			switch (name) {
 				case 'wave-spawner':
+					// Assign id "wave-spawner-A-{id}" for each entity.
+					idCounter = 0;
 					jQuery.each(values, function(faction, arr) {
 						arr.forEach(el => {
 							let entity = document.createElement('a-entity');
+							entity.setAttribute('id', name + '-' + faction + '-' + idCounter.toString());
+							idCounter++;
 							entity.setAttribute(name, {
 								faction: faction
 							});
@@ -186,10 +196,15 @@ class GameManager {
 					});
 					break;
 				case 'castle':
+					// Assign id "castle-A-{id}" for each entity.
+					idCounter = 0;
 					jQuery.each(values, function(faction, el) {
 						let entity = document.createElement('a-entity');
+						entity.setAttribute('id', name + '-' + faction + '-' + idCounter.toString());
+						idCounter++;
 						entity.setAttribute(name, {
-							faction: faction
+							faction: faction,
+							healthPoint: this.settings[name].common.healthPoint
 						});
 						entity.object3D.position.set(
 							el.position.x + 0.5,
@@ -281,9 +296,6 @@ class GameManager {
 		this.calculatePath('A');
 		this.calculatePath('B');
 
-
-		// For testing.
-		this.sceneEl.setAttribute('cash', {});
 
 		if (mode == 'ar') {
 			// TODO: NEED UPDATE ALL SCRIPT HERE.

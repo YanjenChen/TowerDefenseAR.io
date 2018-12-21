@@ -31,9 +31,9 @@
 
 	AFRAME.registerComponent('enemy', {
 		schema: {
-			id: {
-				type: 'string',
-				default: ''
+			damage: {
+				type: 'number',
+				default: 1
 			},
 			faction: {
 				type: 'string',
@@ -41,12 +41,27 @@
 				oneOf: ['A', 'B']
 			},
 			healthPoint: {
+				// Receive from server.
 				type: 'number',
 				default: 1
+			},
+			id: {
+				// Receive from server.
+				type: 'string',
+				default: ''
+			},
+			reward: {
+				// Receive from server.
+				type: 'number',
+				default: 10
 			},
 			speed: {
 				type: 'number',
 				default: 0.5
+			},
+			targetCastle: {
+				type: 'selector',
+				default: null
 			},
 			timeRatio: {
 				type: 'number',
@@ -55,22 +70,10 @@
 			type: {
 				type: 'string',
 				default: 'default'
-			},
-			damage: {
-				type: 'number',
-				default: 1
-			},
-			targetCastle: {
-				type: 'selector',
-				default: null
-			},
-			cost: {
-				type: 'number',
-				default: 10
 			}
 		},
 		init: function() {
-			//console.log('Initial enemy.');
+			// console.log('Initial enemy.');
 			this.gameManager = this.el.sceneEl.systems['tdar-game'].gameManager;
 			this.networkManager = this.el.sceneEl.systems['tdar-game'].networkManager;
 			this.uiManager = this.el.sceneEl.systems['tdar-game'].uiManager;
