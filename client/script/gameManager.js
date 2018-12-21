@@ -41,6 +41,8 @@ class GameManager {
 		this.loadConfig = this.loadConfig.bind(this);
 		this.loadScene = this.loadScene.bind(this);
 		this.loadObject3D = this.loadObject3D.bind(this);
+		this.sceneToGamegrid = this.sceneToGamegrid.bind(this);
+		this.gamegridToScene = this.gamegridToScene.bind(this);
 	}
 	loadConfig() {
 		if (!this.configDir) {
@@ -196,11 +198,10 @@ class GameManager {
 					});
 					break;
 				case 'castle':
-					// Assign id "castle-A-{id}" for each entity.
-					idCounter = 0;
+					// Assign id "castle-A" for each entity.
 					jQuery.each(values, function(faction, el) {
 						let entity = document.createElement('a-entity');
-						entity.setAttribute('id', name + '-' + faction + '-' + idCounter.toString());
+						entity.setAttribute('id', name + '-' + faction);
 						idCounter++;
 						entity.setAttribute(name, {
 							faction: faction,
@@ -362,32 +363,32 @@ class GameManager {
 
 		return path;
 	}
-	getNewPath(x, z, faction) {
+	getNewPath(pos, faction) {
 		/*
 		 * Calculate the shortest path from given position to castle.
 		 *
 		 * SPEC
-		 *  (int) x: grid coordnate x.
-		 *  (int) z: grid coordnate z.
+		 *	(Vec3) startPos
 		 *  (string) faction: one of ['A', 'B'].
 		 */
-		let xGrid = Math.floor(x);
-		let zGrid = Math.floor(z);
+		const startPos = pos;
+		let transPos = this.sceneToGamegrid(startPos);
 		let grid = this.gameGrid.clone();
 		let path;
+		let self = this;
 
 		if (faction == 'A') {
 			path = this.pathFinder.findPath(
-				xGrid,
-				zGrid,
+				transPos.x,
+				transPos.z,
 				this.configs.dynamicScene.factions[1].castle.position[0],
 				this.configs.dynamicScene.factions[1].castle.position[2],
 				grid
 			);
 		} else {
 			path = this.pathFinder.findPath(
-				xGrid,
-				zGrid,
+				transPos.x,
+				transPos.z,
 				this.configs.dynamicScene.factions[0].castle.position[0],
 				this.configs.dynamicScene.factions[0].castle.position[2],
 				grid
@@ -395,11 +396,29 @@ class GameManager {
 		}
 
 		path = path.map(point => {
-			return new THREE.Vector3(point[0] + 0.5, 0, point[1] + 0.5);
+			return new THREE.Vector3(self.gamegridToScene({
+				x: point[0],
+				y: 0,
+				z: point[1]
+			}));
 		});
-		path.splice(0, 1, new THREE.Vector3(x, 0, z));
+		path.splice(0, 1, startPos.clone());
 
 		return new THREE['CatmullRomCurve3'](path);
+	}
+	sceneToGamegrid(position) {
+		return {
+			x: Math.floor(position.x + (this.configs.globalVar.gridConfig.width / 2)),
+			y: position.y,
+			z: Math.floor(position.z + (this.configs.globalVar.gridConfig.depth / 2))
+		}
+	}
+	gamegridToScene(position) {
+		return {
+			x: position.x + 0.5 - (this.configs.globalVar.gridConfig.width / 2),
+			y: position.y,
+			z: position.z + 0.5 - (this.configs.globalVar.gridConfig.depth / 2)
+		}
 	}
 	async loadObject3D() {
 		console.log('ENTER LOAD OBJECT3D.');

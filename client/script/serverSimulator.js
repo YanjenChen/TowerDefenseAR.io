@@ -39,7 +39,10 @@ class ServerSimulator {
 						break;
 					case 'wave_spawner_request_spawn_enemy':
 						detail.event_name = 'wave_spawner_create_enemy';
+						detail.healthPoint = Math.ceil(detail.time / 60000) * 100;
 						detail.enemy_id = 'enemy-' + this.enemyCounter.toString();
+						detail.reward = Math.ceil(detail.time / 60000) * 5;
+						detail.targetCastle = detail.ws_faction == 'A' ? '#castle-B' : '#castle-A';
 						this.enemyCounter++;
 						break;
 					case 'request_update_cash':

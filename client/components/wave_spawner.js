@@ -42,7 +42,8 @@
 					event_name: 'wave_spawner_request_spawn_enemy',
 					id: this.el.id,
 					ws_faction: this.data.faction,
-					type: 'default'
+					type: 'normal',
+					time: time
 				});
 
 				this.timeCounter = 0
@@ -70,6 +71,7 @@
 			}
 
 			var enemyEl = document.createElement('a-entity');
+			enemyEl.object3D.position.copy(this.el.object3D.position);
 			enemyEl.setAttribute('enemy', evt.detail);
 			this.gameManager.dynamicScene.appendChild(enemyEl);
 		}

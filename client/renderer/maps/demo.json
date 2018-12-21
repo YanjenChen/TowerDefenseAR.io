@@ -126,7 +126,8 @@
         },
         "enemy": {
             "common": {
-                "animation_timeScale": 1.4
+                "animation_timeScale": 1.4,
+                "mesh": "knight"
             },
             "normal": {
                 "damage": 1,

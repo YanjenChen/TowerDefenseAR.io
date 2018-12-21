@@ -84,11 +84,12 @@
 						//console.log(content['ws_faction'] == 'A' ? '#faction-B-castle' : '#faction-A-castle');
 
 						this.gameManager.dynamicScene.querySelector('#' + content['id']).emit('spawn_enemy', {
-							id: content['enemy_id'],
 							faction: content['ws_faction'],
-							healthPoint: 600,
-							speed: 8,
-							targetCastle: content['ws_faction'] == 'A' ? '#faction-B-castle' : '#faction-A-castle'
+							healthPoint: content['healthPoint'],
+							id: content['enemy_id'],
+							reward: content['reward'],
+							targetCastle: content['targetCastle'],
+							type: content['type']
 						});
 					}
 					break;

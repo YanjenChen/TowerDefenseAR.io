@@ -1,16 +1,12 @@
 (() => {
 	AFRAME.registerComponent('tower-base', {
 		schema: {
-			faction: {
-				type: 'string',
-				default: 'A',
-				oneOf: ['A', 'B']
-			}
 		},
 		init: function() {
 			this.gameManager = this.el.sceneEl.systems['tdar-game'].gameManager;
 			this.networkManager = this.el.sceneEl.systems['tdar-game'].networkManager;
 			this.uiManager = this.el.sceneEl.systems['tdar-game'].uiManager;
+			this.cashManager = this.el.sceneEl.systems['tdar-game'].cashManager;
 
 			this.fortBase = undefined;
 			this.towerEl = undefined;
