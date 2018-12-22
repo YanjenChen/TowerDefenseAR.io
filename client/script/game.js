@@ -74,7 +74,16 @@
 						});
 					break;
 				case 'create_tower_success':
-
+					if (this.gameManager.dynamicScene.querySelector('#' + content['id']) != null)
+						this.gameManager.dynamicScene.querySelector('#' + content['id']).emit('create-tower', content);
+					break;
+				case 'do_tower_upgrade':
+					if (this.gameManager.dynamicScene.querySelector('#' + content['id']) != null)
+						this.gameManager.dynamicScene.querySelector('#' + content['id']).emit('upgrade-tower', content);
+					break;
+				case 'do_tower_remove':
+					if (this.gameManager.dynamicScene.querySelector('#' + content['id']) != null)
+						this.gameManager.dynamicScene.querySelector('#' + content['id']).emit('remove-tower', content);
 					break;
 				case 'tower_get_damaged':
 

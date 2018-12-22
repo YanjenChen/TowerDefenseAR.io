@@ -34,6 +34,12 @@ class ServerSimulator {
 					case 'request_create_tower':
 						detail.event_name = 'create_tower_success';
 						break;
+					case 'request_upgrade_tower':
+						detail.event_name = 'do_tower_upgrade';
+						break;
+					case 'request_remove_tower':
+						detail.event_name = 'do_tower_remove';
+						break;
 					case 'tower_be_attacked':
 						detail.event_name = 'tower_get_damaged';
 						break;

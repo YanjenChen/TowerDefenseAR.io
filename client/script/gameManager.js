@@ -41,6 +41,8 @@ class GameManager {
 		this.loadConfig = this.loadConfig.bind(this);
 		this.loadScene = this.loadScene.bind(this);
 		this.loadObject3D = this.loadObject3D.bind(this);
+		this.updateGameGrid = this.updateGameGrid.bind(this);
+		this.updateGameGridArea = this.updateGameGridArea.bind(this);
 		this.sceneToGamegrid = this.sceneToGamegrid.bind(this);
 		this.gamegridToScene = this.gamegridToScene.bind(this);
 	}
@@ -229,6 +231,7 @@ class GameManager {
 				if (this.gameGrid.isWalkableAt(i, k)) {
 					let towerBaseEl = document.createElement('a-entity');
 					towerBaseEl.object3D.position.set(this.gamegridToScene({ x: i, y: 0, z: k }));
+					towerBaseEl.setAttribute('id', 'tower-base-' + i.toString() + '-' + k.toString());
 					towerBaseEl.setAttribute('tower-base', {});
 					column.push(towerBaseEl.components['tower-base']);
 					dynamicScene.appendChild(towerBaseEl);
@@ -345,11 +348,40 @@ class GameManager {
 		if (callback)
 			callback();
 	}
+	updateGameGridArea(min, max, walkable, callback) {
+		/*
+		 * SPEC
+		 *   (Vec3 like) min: min coord in scene coord.
+		 *   (Vec3 like) max: max coord in scene coord.
+		 *   (boolen) walkable: walkable or not.
+		 *   (function) callback: callback function.
+		 */
+		let gridMin = this.sceneToGamegrid(min);
+		let gridMax = this.sceneToGamegrid(max);
+
+		for (let i = gridMin.x; i <= gridMax.x; i++) {
+			if (i < 0 || i >= this.configs.globalVar.gridConfig.width)
+				continue;
+
+			for (let k = gridMin.z; k <= gridMax.z; k++) {
+				if (k < 0 || k >= this.configs.globalVar.gridConfig.depth)
+					continue;
+
+				this.updateGameGrid(i, k, walkable);
+			}
+		}
+
+		if (callback)
+			callback();
+	}
 	calculatePath(faction) {
 		/*
 		 * SPEC
 		 *   (string) faction: one of ['A', 'B'].
 		 */
+		console.warn('Depracted function calculatePath has been called.');
+		return;
+
 		let grid = this.gameGrid.clone();
 		let path;
 

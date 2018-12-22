@@ -47,7 +47,9 @@
 			this.el.setObject3D('reticle', reticle);
 
 			this.onRaycasterIntersected = this.onRaycasterIntersected.bind(this);
+			this.onStateremoved = this.onStateremoved.bind(this);
 			this.el.addEventListener('raycaster-intersected', this.onRaycasterIntersected);
+			this.el.addEventListener('stateremoved', this.onStateremoved);
 
 			this.getIntersection = null;
 			this.prevCheckTime = 0;
@@ -90,6 +92,9 @@
 		},
 		onRaycasterIntersected: function(evt) {
 			this.getIntersection = evt.detail.getIntersection;
+		},
+		onStateremoved: function(evt) {
+
 		}
 	});
 })();
