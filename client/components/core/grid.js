@@ -94,7 +94,11 @@
 			this.getIntersection = evt.detail.getIntersection;
 		},
 		onStateremoved: function(evt) {
-
+			switch (evt.detail) {
+				case 'cursor-hovered':
+					this.reticle.visible = false;
+					break;
+			}
 		}
 	});
 })();
