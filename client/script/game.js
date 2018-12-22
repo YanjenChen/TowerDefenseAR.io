@@ -31,7 +31,7 @@
             let gameManager = this.gameManager = new GameManager(this.el, CONFIG_DIR, this.data.ar ? 'ar' : 'vr');
             let networkManager = this.networkManager = new NetworkManager(this.el, this.data.mode);
             let uiManager = this.uiManager = new UIManager(this.el);
-            this.cashManager = null;	// Will init in gameManager.
+            this.cashManager = null; // Will init in gameManager.
 
             networkManager.addEventListener('client_start_game', this.onStartGame.bind(this));
             networkManager.addEventListener('playingEvent', this.onExecute.bind(this));
@@ -51,7 +51,7 @@
                 fuse: false
             });
             cursor.setAttribute('position', '0 0 -0.1');
-            cursor.setAttribute('raycaster', 'objects: [grid]');
+            cursor.setAttribute('raycaster', 'objects: #tdar-game-grid');
             document.querySelector('[camera]').appendChild(cursor);
 
             //console.log('Dynamic scene play.');
@@ -63,9 +63,7 @@
             switch (content['event_name']) {
                 case 'enemy_get_damaged':
                     if (this.gameManager.dynamicScene.querySelector('#' + content['id']) != null)
-                        this.gameManager.dynamicScene.querySelector('#' + content['id']).emit('be-attacked', {
-                            damage: content['damage']
-                        });
+                        this.gameManager.dynamicScene.querySelector('#' + content['id']).emit('be-attacked', content);
                     break;
                 case 'castle_get_damaged':
                     if (this.gameManager.dynamicScene.querySelector('#' + content['id']) != null)

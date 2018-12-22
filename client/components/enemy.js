@@ -78,7 +78,7 @@
 
 
             this.el.setAttribute('gltf-model', '#' + this.setting.common.mesh);
-            this.el.object3D.scale.copy(this.gameManager.object3DPrototypes[this.setting.common.mesh].model.scale).multiplyScalar(this.gameManager.configs.assets[this.setting.common.mesh].scalar);
+            this.el.object3D.scale.copy(this.gameManager.object3DPrototypes[this.setting.common.mesh].model.scale);
             // this.el.setObject3D('mesh', this.gameManager.object3DPrototypes[this.setting.common.mesh].model.clone());
             this.el.setAttribute('id', this.data.id);
             this.el.setAttribute('animation-mixer', {

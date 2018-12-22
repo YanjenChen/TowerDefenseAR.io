@@ -8,6 +8,7 @@
         init: function() {
             this.gameManager = this.el.sceneEl.systems['tdar-game'].gameManager;
             this.networkManager = this.el.sceneEl.systems['tdar-game'].networkManager;
+            this.uiManager = this.el.sceneEl.systems['tdar-game'].uiManager;
             this.cashManager = this.el.sceneEl.systems['tdar-game'].cashManager;
 
 
@@ -37,6 +38,7 @@
                 this.timeCounter += timeDelta;
                 if (this.timeCounter >= PROCESS_TIME) {
                     this.el.removeState('processing');
+                    this.gameManager.gridEl.components['grid'].onTowerEndProcess(this);
                     this.timeCounter = 0;
                 }
             }
@@ -44,6 +46,7 @@
         remove: function() {
             delete this.gameManager;
             delete this.networkManager;
+            delete this.uiManager;
             delete this.cashManager;
 
             delete this.timeCounter;
@@ -68,6 +71,8 @@
                 faction: this.el.sceneEl.systems['tdar-game'].data.userFaction,
                 type: type
             });
+
+            this.uiManager.updateObjectControl([]);
         },
         requestLaser: function() {
             this.requestTower('laser');
@@ -104,6 +109,8 @@
                 event_name: 'request_upgrade_tower',
                 id: this.el.id
             });
+
+            this.uiManager.updateObjectControl([]);
         },
         upgradeTower: function() {
             this.el.addState('processing');
@@ -120,6 +127,8 @@
                 faction: this.el.sceneEl.systems['tdar-game'].data.userFaction,
                 id: this.el.id
             });
+
+            this.uiManager.updateObjectControl([]);
         },
         removeTower: function(evt) {
             this.el.removeAttribute('tower');

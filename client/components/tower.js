@@ -44,7 +44,7 @@
 
 
             this.el.setAttribute('gltf-model', '#' + this.setting.common.mesh);
-            this.el.object3D.scale.copy(this.gameManager.object3DPrototypes[this.setting.common.mesh].model.scale).multiplyScalar(this.gameManager.configs.assets[this.setting.common.mesh].scalar);
+            this.el.object3D.scale.copy(this.gameManager.object3DPrototypes[this.setting.common.mesh].model.scale);
             // this.el.setObject3D('mesh', this.gameManager.object3DPrototypes[this.setting.common.mesh].model.clone());
 
             let self = this;
@@ -163,6 +163,8 @@
             delete this.networkManager;
 
             delete this.setting;
+
+            this.el.removeObject3D('laser');
 
             this.el.removeAttribute('gltf-model');
             this.el.removeAttribute('animation-mixer');

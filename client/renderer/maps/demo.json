@@ -2,11 +2,11 @@
     "assets": {
         "knight": {
             "src": "renderer/assets/knight.gltf",
-            "scalar": 0.8
+            "scalar": 0.6
         },
         "fort": {
             "src": "renderer/assets/fort.gltf",
-            "scalar": 1
+            "scalar": 1.4
         },
         "tree": {
             "src": "renderer/assets/tree01/model.gltf",
@@ -30,7 +30,7 @@
     },
     "staticScene": {
         "abstractName": [{
-            "position": {
+            "scenePosition": {
                 "x": 0,
                 "y": 0,
                 "z": 0
@@ -47,14 +47,14 @@
     "dynamicScene": {
         "wave-spawner": {
             "A": [{
-                "position": {
+                "gridPosition": {
                     "x": 2,
                     "y": 0,
                     "z": 2
                 }
             }],
             "B": [{
-                "position": {
+                "gridPosition": {
                     "x": 2,
                     "y": 0,
                     "z": 18
@@ -63,14 +63,14 @@
         },
         "castle": {
             "A": {
-                "position": {
+                "gridPosition": {
                     "x": 18,
                     "y": 0,
                     "z": 2
                 }
             },
             "B": {
-                "position": {
+                "gridPosition": {
                     "x": 18,
                     "y": 0,
                     "z": 18
@@ -109,21 +109,21 @@
                 "range": 10,
                 "damagePoint": 50,
                 "attackRange": 1.5,
-                "speed": 0.5
+                "speed": 10
             }, {
                 "restDuration": 3000,
                 "activateDuration": 1,
                 "range": 11,
                 "damagePoint": 70,
                 "attackRange": 1.6,
-                "speed": 0.5
+                "speed": 10
             }, {
                 "restDuration": 1500,
                 "activateDuration": 1,
                 "range": 12,
                 "damagePoint": 100,
                 "attackRange": 1.6,
-                "speed": 0.8
+                "speed": 12
             }]
         },
         "castle": {

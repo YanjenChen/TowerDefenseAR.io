@@ -52,47 +52,60 @@
             this.el.setObject3D('reticle', reticle);
 
             this.onRaycasterIntersected = this.onRaycasterIntersected.bind(this);
-            this.onStateremoved = this.onStateremoved.bind(this);
             this.el.addEventListener('raycaster-intersected', this.onRaycasterIntersected);
-            this.el.addEventListener('stateremoved', this.onStateremoved);
 
             this.getIntersection = null;
             this.prevCheckTime = 0;
-            this.prevGridCoord = {
+            this.prevCoord = {
                 x: null,
                 y: null,
                 z: null
             };
             this.intersectedPoint = new THREE.Vector3();
+
+            this.hoveringBase = null;
+
+            this.updateUI = this.updateUI.bind(this);
+            this.onTowerEndProcess = this.onTowerEndProcess.bind(this);
         },
         tick: function(time, timeDelta) {
-            if (this.el.is('cursor-hovered') && time - this.prevCheckTime > this.data.interval) {
-                if (!this.getIntersection)
-                    return;
+            if (time - this.prevCheckTime > this.data.interval) {
+                // console.log(this.el.is('cursor-hovered'));
+                if (this.el.is('cursor-hovered')) {
+                    if (!this.getIntersection)
+                        return;
 
-                this.intersectedPoint.copy(this.getIntersection(this.el).point);
-                this.el.object3D.worldToLocal(this.intersectedPoint);
-                this.reticle.position.setX(Math.floor(this.intersectedPoint.x + 0.5));
-                this.reticle.position.setZ(Math.floor(this.intersectedPoint.z + 0.5));
-                this.reticle.visible = true;
 
-                let gridCoord = this.gameManager.sceneToGamegrid(this.intersectedPoint);
-                if (!(this.prevGridCoord.x == gridCoord.x && this.prevGridCoord.z == gridCoord.z)) {
-                    this.prevGridCoord = gridCoord;
-                    this.el.addState('ui-dirty');
+                    this.intersectedPoint.copy(this.getIntersection(this.el).point);
+                    this.el.object3D.worldToLocal(this.intersectedPoint);
+
+                    let x = Math.floor(this.intersectedPoint.x + 0.5);
+                    let z = Math.floor(this.intersectedPoint.z + 0.5);
+
+                    if (!(x <= -this.data.width / 2 || x >= this.data.width / 2 || z <= -this.data.depth / 2 || z >= this.data.depth / 2)) {
+                        this.reticle.position.setX(x);
+                        this.reticle.position.setZ(z);
+                        this.reticle.visible = true;
+
+                        if (!(this.prevCoord.x == x && this.prevCoord.z == z)) {
+                            this.prevCoord.x = x;
+                            this.prevCoord.z = z;
+                            this.updateUI();
+                        }
+
+                        if (this.gameManager.areaIsPlaceable(this.reticle.position, HOVER_REGION, HOVER_REGION, true)) {
+                            this.reticle.material.color.set(0x6a787f);
+                            this.reticle.material.needsUpdate = true;
+                        } else {
+                            this.reticle.material.color.set(0x83787F);
+                            this.reticle.material.needsUpdate = true;
+                        }
+                    } else {
+                        this.reticle.visible = false;
+                    }
+                } else {
+                    this.reticle.visible = false;
                 }
-
-                if (this.el.is('ui-dirty')) {
-                    let selectedBase = this.gameManager.towerBases[gridCoord.x][gridCoord.z];
-                    if (selectedBase === undefined)
-                        console.warn('TowerBases have undefined element');
-                    if (selectedBase)
-                        this.uiManager.updateObjectControl(selectedBase.getUIsets());
-                    else
-                        this.uiManager.updateObjectControl([]);
-                    this.el.removeState('ui-dirty');
-                }
-
                 this.prevCheckTime = time;
             }
         },
@@ -107,21 +120,35 @@
             delete this.reticle;
             delete this.getIntersection;
             delete this.prevCheckTime;
-            delete this.prevGridCoord;
+            delete this.prevCoord;
             delete this.intersectedPoint;
+            delete this.hoveringBase;
 
             this.el.removeEventListener('raycaster-intersected', this.onRaycasterIntersected);
         },
         onRaycasterIntersected: function(evt) {
             this.getIntersection = evt.detail.getIntersection;
         },
-        onStateremoved: function(evt) {
-            switch (evt.detail) {
-                case 'cursor-hovered':
-                    this.reticle.visible = false;
-                    this.uiManager.updateObjectControl([]);
-                    break;
+        updateUI: function() {
+            let x = Math.floor(this.intersectedPoint.x + 0.5 + (this.data.width / 2));
+            let z = Math.floor(this.intersectedPoint.z + 0.5 + (this.data.depth / 2));
+            let selectedBase = this.hoveringBase = this.gameManager.towerBases[x][z];
+            if (selectedBase === undefined)
+                console.warn('TowerBases have undefined element or access wrong idex: ', x, z);
+            let placeable = this.gameManager.areaIsPlaceable(this.reticle.position, HOVER_REGION, HOVER_REGION, true);
+            let isEmpty = selectedBase.el.is('empty');
+
+            if (placeable) {
+                this.uiManager.updateObjectControl(selectedBase.getUIsets());
+            } else if (!isEmpty) {
+                this.uiManager.updateObjectControl(selectedBase.getUIsets());
+            } else {
+                this.uiManager.updateObjectControl([]);
             }
+        },
+        onTowerEndProcess: function(base) {
+            if (base === this.hoveringBase)
+                this.uiManager.updateObjectControl(base.getUIsets());
         }
     });
 })();

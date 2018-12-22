@@ -12,6 +12,7 @@ class GameManager {
          *  configDir: Directory of the config file.
          *  dynamicScene: <a-entity> which indicate game dynamic scene, all dynamic object3D should be contained under this entity.
          *  gameGrid: PF.Grid object which store dynamic game walkable grid.
+         *  gridEl: <a-entity grid> of the displayed grid.
          *  mode: Game operation mode, one of ['ar', 'vr'].
          *  object3DPrototypes: object with property { key: asset.key, model: THREE.object3D, width: width, height: height, depth: depth }, use to speed up performance.
          *  pathFinder: PF.AStarFinder. Handle graph search.
@@ -26,6 +27,7 @@ class GameManager {
         this.configDir = configDir;
         this.dynamicScene = null;
         this.gameGrid = null;
+        this.gridEl = null;
         this.mode = mode;
         this.object3DPrototypes = {};
         this.pathFinder = new PF.AStarFinder();
@@ -43,6 +45,7 @@ class GameManager {
         this.updateGameGrid = this.updateGameGrid.bind(this);
         this.updateGameGridArea = this.updateGameGridArea.bind(this);
         this.updateGameGridByModel = this.updateGameGridByModel.bind(this);
+        this.areaIsPlaceable = this.areaIsPlaceable.bind(this);
         //this.calculatePath = this.calculatePath.bind(this);
         this.getNewPath = this.getNewPath.bind(this);
         this.sceneToGamegrid = this.sceneToGamegrid.bind(this);
@@ -148,6 +151,7 @@ class GameManager {
         });
         gridEl.object3D.scale.set(globalVar.sceneScale, globalVar.sceneScale, globalVar.sceneScale);
         sceneEl.appendChild(gridEl);
+        this.gridEl = gridEl;
 
 
         // add static scene.
@@ -160,33 +164,21 @@ class GameManager {
                 values.forEach(value => {
                     let objectEl = document.createElement('a-entity');
                     objectEl.setAttribute('gltf-model', '#' + name);
-                    /*
-                    let object3D = self.object3DPrototypes[name].model.clone();
-                    */
-                    let scePos = self.gamegridToScene(value.position);
-                    objectEl.object3D.position.set(scePos.x, scePos.y, scePos.z);
-                    // object3D.position.set(scePos.x, scePos.y, scePos.z);
+                    objectEl.object3D.position.set(value.scenePosition.x, value.scenePosition.y, value.scenePosition.z);
                     if (value.rotation)
                         objectEl.object3D.rotation.set(value.rotation.x, value.rotation.y, value.rotation.z);
-                    // object3D.rotation.set(value.rotation.x, value.rotation.y, value.rotation.z);
                     if (value.scalar)
                         objectEl.object3D.scale.copy(self.object3DPrototypes[name].model.scale).multiplyScalar(value.scalar);
-                    // object3D.scale.multiplyScalar(value.scalar);
                     staticScene.appendChild(objectEl);
                     self.updateGameGridByModel(
-                        objectEl.object3D.position,
+                        value.scenePosition,
                         name,
-                        false,
+                        value.walkable,
                         value.scalar
                     );
                     /*
-                    staticScene.object3D.add(object3D);
-                    self.updateGameGridByModel(
-                        object3D.position,
-                        name,
-                        false,
-                        value.scalar
-                    );
+                    TODO:
+                        Load object3D using self.object3DPrototypes[name].model.clone()
                     */
                 });
             }
@@ -226,7 +218,7 @@ class GameManager {
                             entity.setAttribute(name, {
                                 faction: faction
                             });
-                            let scePos = self.gamegridToScene(el.position);
+                            let scePos = self.gamegridToScene(el.gridPosition);
                             entity.object3D.position.set(scePos.x, scePos.y, scePos.z);
                             dynamicScene.appendChild(entity);
                         });
@@ -241,7 +233,7 @@ class GameManager {
                             faction: faction,
                             healthPoint: self.settings[name].common.healthPoint
                         });
-                        let scePos = self.gamegridToScene(el.position);
+                        let scePos = self.gamegridToScene(el.gridPosition);
                         entity.object3D.position.set(scePos.x, scePos.y, scePos.z);
                         dynamicScene.appendChild(entity);
                     });
@@ -252,17 +244,17 @@ class GameManager {
         });
         // Init towerBases. (Assume gameGrid has updated to init state.)
         this.towerBases = [];
-        for (let i = 0; i < globalVar.gridConfig.width; i++) {
+        for (let i = -globalVar.gridConfig.width / 2; i <= globalVar.gridConfig.width / 2; i += 1) {
             let column = [];
-            for (let k = 0; k < globalVar.gridConfig.depth; k++) {
-                if (this.gameGrid.isWalkableAt(i, k)) {
+            for (let k = -globalVar.gridConfig.depth / 2; k <= globalVar.gridConfig.depth / 2; k += 1) {
+                let p = {
+                    x: i,
+                    y: 0,
+                    z: k
+                };
+                if (this.areaIsPlaceable(p, 2, 2, true)) {
                     let towerBaseEl = document.createElement('a-entity');
-                    let scePos = this.gamegridToScene({
-                        x: i,
-                        y: 0,
-                        z: k
-                    });
-                    towerBaseEl.object3D.position.set(scePos.x, scePos.y, scePos.z);
+                    towerBaseEl.object3D.position.set(i, 0, k);
                     towerBaseEl.setAttribute('id', 'tower-base-' + i.toString() + '-' + k.toString());
                     towerBaseEl.setAttribute('tower-base', {});
                     column.push(towerBaseEl.components['tower-base']);
@@ -318,14 +310,21 @@ class GameManager {
     }
     updateGameGridArea(min, max, walkable, callback) {
         /*
-         * SPEC
-         *   (Vec3 like) min: min coord in scene coord.
-         *   (Vec3 like) max: max coord in scene coord.
-         *   (boolen) walkable: walkable or not.
-         *   (function) callback: callback function.
+         *  SPEC
+         *      (Vec3 like) min: min coord in dynamicScene coord.
+         *      (Vec3 like) max: max coord in dynamicScene coord.
+         *      (boolen) walkable: walkable or not.
+         *      (function) callback: callback function.
          */
+        const maxShift = {
+            x: max.x + (this.configs.globalVar.gridConfig.width / 2),
+            y: 0,
+            z: max.z + (this.configs.globalVar.gridConfig.depth / 2)
+        };
         let gridMin = this.sceneToGamegrid(min);
         let gridMax = this.sceneToGamegrid(max);
+        if (gridMax.x == maxShift.x) gridMax.x -= 1;
+        if (gridMax.z == maxShift.z) gridMax.z -= 1;
 
         for (let i = gridMin.x; i <= gridMax.x; i++) {
             if (i < 0 || i >= this.configs.globalVar.gridConfig.width)
@@ -344,11 +343,11 @@ class GameManager {
     }
     updateGameGridByModel(pos, modelName, walkable, scalar) {
         /*
-         * SPEC
-         *   (Vec3 like) pos: scene position of the object.
-         *   (string) modelName: model name in config file.
-         *   (boolen) walkable: walkable or not.
-         *   (number) scalar: (Optional) scalar of this model.
+         *  SPEC
+         *      (Vec3 like) pos: position in dynamicScene of the object.
+         *      (string) modelName: model name in config file.
+         *      (boolen) walkable: walkable or not.
+         *      (number) scalar: (Optional) scalar of this model.
          */
         const scenePos = pos;
 
@@ -367,6 +366,55 @@ class GameManager {
             z: scenePos.z + (info.depth / 2) * scalar
         };
         this.updateGameGridArea(min, max, walkable);
+    }
+    areaIsPlaceable(pos, width, depth, mute) {
+        /*
+         *  EXPLAIN:
+         *      Check area on game grid is placeable.
+         *  SPEC
+         *      (Vec3 like) pos: position in dynamicScene.
+         *      (number) width: width of the area.
+         *      (number) depth: depth of the area.
+         *      (boolen) mute: (Optional) set to true to turn off output warning.
+         */
+
+        const scenePos = pos;
+        let min = {
+            x: scenePos.x - (width / 2) + (this.configs.globalVar.gridConfig.width / 2),
+            y: 0,
+            z: scenePos.z - (depth / 2) + (this.configs.globalVar.gridConfig.depth / 2)
+        };
+        let max = {
+            x: scenePos.x + (width / 2) + (this.configs.globalVar.gridConfig.width / 2),
+            y: 0,
+            z: scenePos.z + (depth / 2) + (this.configs.globalVar.gridConfig.depth / 2)
+        };
+        let gridMin = {
+            x: Math.floor(min.x),
+            y: 0,
+            z: Math.floor(min.z)
+        };
+        let gridMax = {
+            x: Math.floor(max.x),
+            y: 0,
+            z: Math.floor(max.z)
+        };
+        if (gridMax.x == max.x) gridMax.x -= 1;
+        if (gridMax.z == max.z) gridMax.z -= 1;
+
+        for (let i = gridMin.x; i <= gridMax.x; i++) {
+            if (i < 0 || i >= this.configs.globalVar.gridConfig.width)
+                return false;
+
+            for (let k = gridMin.z; k <= gridMax.z; k++) {
+                if (k < 0 || k >= this.configs.globalVar.gridConfig.depth)
+                    return false;
+
+                if (!this.gameGrid.isWalkableAt(i, k))
+                    return false;
+            }
+        }
+        return true;
     }
     calculatePath(faction) {
         /*
@@ -423,16 +471,16 @@ class GameManager {
             path = this.pathFinder.findPath(
                 transPos.x,
                 transPos.z,
-                this.configs.dynamicScene.castle['B'].position.x,
-                this.configs.dynamicScene.castle['B'].position.z,
+                this.configs.dynamicScene.castle['B'].gridPosition.x,
+                this.configs.dynamicScene.castle['B'].gridPosition.z,
                 grid
             );
         } else {
             path = this.pathFinder.findPath(
                 transPos.x,
                 transPos.z,
-                this.configs.dynamicScene.castle['A'].position.x,
-                this.configs.dynamicScene.castle['A'].position.z,
+                this.configs.dynamicScene.castle['A'].gridPosition.x,
+                this.configs.dynamicScene.castle['A'].gridPosition.z,
                 grid
             );
         }
@@ -449,19 +497,27 @@ class GameManager {
 
         return new THREE['CatmullRomCurve3'](path);
     }
-    sceneToGamegrid(position) {
+    sceneToGamegrid(position, mute) {
+        /*
+         *  EXPLAIN:
+         *      Transform dynamicScene position (real number space) to game grid position (one block on grid).
+         */
         let p = {
             x: Math.floor(position.x + (this.configs.globalVar.gridConfig.width / 2)),
             y: position.y,
             z: Math.floor(position.z + (this.configs.globalVar.gridConfig.depth / 2))
         }
-        if (p.x < 0 || p.x >= this.configs.globalVar.gridConfig.width || p.z < 0 || p.z >= this.configs.globalVar.gridConfig.depth)
+        if ((p.x < 0 || p.x >= this.configs.globalVar.gridConfig.width || p.z < 0 || p.z >= this.configs.globalVar.gridConfig.depth) && !mute)
             console.warn('Function sceneToGamegrid return position out of grid range: ', p);
 
         return p;
     }
-    gamegridToScene(position) {
-        if (position.x < 0 || position.x >= this.configs.globalVar.gridConfig.width || position.z < 0 || position.z >= this.configs.globalVar.gridConfig.depth)
+    gamegridToScene(position, mute) {
+        /*
+         *  EXPLAIN:
+         *      Transform game grid position (one block on grid) to dynamicScene position (real number space).
+         */
+        if ((position.x < 0 || position.x >= this.configs.globalVar.gridConfig.width || position.z < 0 || position.z >= this.configs.globalVar.gridConfig.depth) && !mute)
             console.warn('Function gamegridToScene receive position out of grid range: ', position);
 
         return {
