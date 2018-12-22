@@ -23,13 +23,13 @@ class CashManager {
 		this.networkManager = sceneEl.systems['tdar-game'].networkManager;
 		this.uiManager = sceneEl.systems['tdar-game'].uiManager;
 
-		this.amplifyAmount = gameManager.settings.cash.amplifyAmount;
-		this.basicIncreaseAmount = gameManager.settings.cash.basicIncreaseAmount;
+		this.amplifyAmount = this.gameManager.settings.cash.amplifyAmount;
+		this.basicIncreaseAmount = this.gameManager.settings.cash.basicIncreaseAmount;
 		this.currentMoney = {
 			A: 0,
 			B: 0
 		};
-		this.incrementalDuration = gameManager.settings.cash.incrementalDuration;
+		this.incrementalDuration = this.gameManager.settings.cash.incrementalDuration;
 		this.moneyAmplifer = {
 			A: 0,
 			B: 0

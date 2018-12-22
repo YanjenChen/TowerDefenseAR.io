@@ -29,6 +29,8 @@
 			this.timeCounter = 0;
 			this.spawnCounter = 0;
 
+			this.el.addState('activate');
+
 			this.el.addEventListener('spawn_enemy', this.onSpawnEnemy);
 		},
 		tick: function(time, timeDelta) {
@@ -71,9 +73,9 @@
 			}
 
 			var enemyEl = document.createElement('a-entity');
+			this.gameManager.dynamicScene.appendChild(enemyEl);
 			enemyEl.object3D.position.copy(this.el.object3D.position);
 			enemyEl.setAttribute('enemy', evt.detail);
-			this.gameManager.dynamicScene.appendChild(enemyEl);
 		}
 	});
 })();

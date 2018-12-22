@@ -12,17 +12,14 @@
     <!--
     LOAD COMPONENTS
     -->
-    <script src="components/core/glow.js"></script>
-    <script src="components/core/path.js"></script>
-    <script src="components/core/trace.js"></script>
     <script src="components/core/explosion.js"></script>
-    <script src="components/enemy.js"></script>
-    <script src="components/wave_spawner.js"></script>
-    <script src="components/bullet.js"></script>
-    <script src="components/missile.js"></script>
-    <script src="components/tower.js"></script>
-    <script src="components/tower_base.js"></script>
+    <script src="components/core/grid.js"></script>
     <script src="components/castle.js"></script>
+    <script src="components/enemy.js"></script>
+    <script src="components/missile.js"></script>
+    <script src="components/tower_base.js"></script>
+    <script src="components/tower.js"></script>
+    <script src="components/wave_spawner.js"></script>
 
     <link rel="stylesheet" type="text/css" href="css/ui.css">
 
@@ -30,13 +27,13 @@
     <script src="script/serverSimulator.js"></script>
     <script src="script/networkManager.js"></script>
     <script src="script/gameManager.js"></script>
-    <script src="script/cash.js"></script>
+    <script src="script/cashManager.js"></script>
     <script src="script/game.js"></script>
 </head>
 
 <body>
-    <a-scene stats background="color: grey" tdar-game-ui tdar-game="mode: single-player; ar: false" vr-mode-ui="enabled: false">
-        <a-entity position="6 10 10.5" rotation="-80 -90 0" camera wasd-controls="acceleration: 150">
+    <a-scene stats background="color: grey" tdar-game="mode: single-player; ar: false; userFaction: 'A'" vr-mode-ui="enabled: false">
+        <a-entity position="0 10 8" rotation="-70 0 0" camera wasd-controls="acceleration: 65">
         </a-entity>
     </a-scene>
 </body>

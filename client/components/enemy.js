@@ -52,12 +52,12 @@
                 default: 10
             },
             targetCastle: {
-				// Receive from server.
+                // Receive from server.
                 type: 'selector',
                 default: null
             },
             timeRatio: {
-				// const.
+                // const.
                 type: 'number',
                 default: 0.001
             },
@@ -77,7 +77,9 @@
             this.setting = this.gameManager.settings.enemy;
 
 
-            this.el.setObject3D('mesh', this.gameManager.object3DPrototypes[this.setting.common.mesh].model.clone());
+            this.el.setAttribute('gltf-model', '#' + this.setting.common.mesh);
+            this.el.object3D.scale.copy(this.gameManager.object3DPrototypes[this.setting.common.mesh].model.scale).multiplyScalar(this.gameManager.configs.assets[this.setting.common.mesh].scalar);
+            // this.el.setObject3D('mesh', this.gameManager.object3DPrototypes[this.setting.common.mesh].model.clone());
             this.el.setAttribute('id', this.data.id);
             this.el.setAttribute('animation-mixer', {
                 timeScale: this.setting.common.animation_timeScale
@@ -130,8 +132,9 @@
             delete this.completeDist;
 
             this.system.unregisterEnemy(this.el);
+            this.el.removeAttribute('gltf-model');
             this.el.removeAttribute('animation-mixer');
-            this.el.removeObject3D('mesh');
+            // this.el.removeObject3D('mesh');
             this.el.removeEventListener('be-attacked', this.onBeAttacked);
             this.el.removeEventListener('movingended', this.onArrived);
             this.el.removeEventListener('pathupdate', this.onPathUpdated);
@@ -164,6 +167,9 @@
         onPathUpdated: function() {
             delete this.line;
             this.line = this.gameManager.getNewPath(this.el.object3D.position, this.data.faction);
+
+            //console.log(this.line);
+
             this.lineLength = this.line.getLength();
             this.completeDist = 0;
         }

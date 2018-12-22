@@ -1,526 +1,541 @@
 class GameManager {
-	constructor(sceneEl, configDir, mode) {
-		/*
-		 * FUNCTION API SPEC
-		 *  mapDir: Directory of the game map.
-		 *  mode: Game operation mode, one of ['ar', 'vr'].
-		 *  sceneEl: DOM node point to <a-scene> element.
-		 *
-		 * CLASS PROPERTY
-		 *  anchorEl: <a-entity> which indicate AR anchor entity, all object3D should be contained under this entity.
-		 *  configs: Object receive from mapDir, contain all game initial params.
-		 *  configDir: Directory of the config file.
-		 *  dynamicScene: <a-entity> which indicate game dynamic scene, all dynamic object3D should be contained under this entity.
-		 *  gameGrid: PF.Grid object which store dynamic game walkable grid.
-		 *  mode: Game operation mode, one of ['ar', 'vr'].
-		 *  object3DPrototypes: object with property {key: THREE.object3D}, use to speed up performance.
-		 *  pathFinder: PF.AStarFinder. Handle graph search.
-		 *  enemyPath: Object contain two faction's enemy moving path.
-		 *  sceneEl: DOM node which point to <a-scene> element.
-		 *  settings: Contain all components' static params.
-		 *  staticScene: <a-entity> which indicate game static scene, all static object3D should be contained under this entity.
-		 *  towerBases: Two dimensional array of <a-entity>.components['tower-base'], use to quick access UI content.
-		 */
-		this.anchorEl = null;
-		this.configs = null;
-		this.configDir = configDir;
-		this.dynamicScene = null;
-		this.gameGrid = null;
-		this.mode = mode;
-		this.object3DPrototypes = {};
-		this.pathFinder = new PF.AStarFinder();
-		this.enemyPath = {
-			A: null,
-			B: null
-		};
-		this.sceneEl = sceneEl;
-		this.settings = null;
-		this.staticScene = null;
-		this.towerBases = null;
+    constructor(sceneEl, configDir, mode) {
+        /*
+         * FUNCTION API SPEC
+         *  mapDir: Directory of the game map.
+         *  mode: Game operation mode, one of ['ar', 'vr'].
+         *  sceneEl: DOM node point to <a-scene> element.
+         *
+         * CLASS PROPERTY
+         *  anchorEl: <a-entity> which indicate AR anchor entity, all object3D should be contained under this entity.
+         *  configs: Object receive from mapDir, contain all game initial params.
+         *  configDir: Directory of the config file.
+         *  dynamicScene: <a-entity> which indicate game dynamic scene, all dynamic object3D should be contained under this entity.
+         *  gameGrid: PF.Grid object which store dynamic game walkable grid.
+         *  mode: Game operation mode, one of ['ar', 'vr'].
+         *  object3DPrototypes: object with property { key: asset.key, model: THREE.object3D, width: width, height: height, depth: depth }, use to speed up performance.
+         *  pathFinder: PF.AStarFinder. Handle graph search.
+         *  enemyPath: Object contain two faction's enemy moving path.
+         *  sceneEl: DOM node which point to <a-scene> element.
+         *  settings: Contain all components' static params.
+         *  staticScene: <a-entity> which indicate game static scene, all static object3D should be contained under this entity.
+         *  towerBases: Two dimensional array of <a-entity>.components['tower-base'], use to quick access UI content.
+         */
+        this.anchorEl = null;
+        this.configs = null;
+        this.configDir = configDir;
+        this.dynamicScene = null;
+        this.gameGrid = null;
+        this.mode = mode;
+        this.object3DPrototypes = {};
+        this.pathFinder = new PF.AStarFinder();
+        this.enemyPath = {
+            A: null,
+            B: null
+        };
+        this.sceneEl = sceneEl;
+        this.settings = null;
+        this.staticScene = null;
+        this.towerBases = null;
 
-		this.loadConfig = this.loadConfig.bind(this);
-		this.loadScene = this.loadScene.bind(this);
-		this.loadObject3D = this.loadObject3D.bind(this);
-		this.updateGameGrid = this.updateGameGrid.bind(this);
-		this.updateGameGridArea = this.updateGameGridArea.bind(this);
-		this.sceneToGamegrid = this.sceneToGamegrid.bind(this);
-		this.gamegridToScene = this.gamegridToScene.bind(this);
-	}
-	loadConfig() {
-		if (!this.configDir) {
-			console.warn('Game manager does not receive config directory.');
-			return;
-		}
+        this.loadConfig = this.loadConfig.bind(this);
+        this.loadScene = this.loadScene.bind(this);
+        this.updateGameGrid = this.updateGameGrid.bind(this);
+        this.updateGameGridArea = this.updateGameGridArea.bind(this);
+        this.updateGameGridByModel = this.updateGameGridByModel.bind(this);
+        //this.calculatePath = this.calculatePath.bind(this);
+        this.getNewPath = this.getNewPath.bind(this);
+        this.sceneToGamegrid = this.sceneToGamegrid.bind(this);
+        this.gamegridToScene = this.gamegridToScene.bind(this);
+        this.loadObject3D = this.loadObject3D.bind(this);
+    }
+    loadConfig() {
+        if (!this.configDir) {
+            console.warn('Game manager does not receive config directory.');
+            return;
+        }
 
-		let self = this;
-		jQuery.getJSON(this.configDir, configs => {
-			self.configs = configs;
-			self.settings = configs.settings;
+        let self = this;
+        jQuery.getJSON(this.configDir, configs => {
+            self.configs = configs;
+            self.settings = configs.settings;
 
-			// Pre-load model by assets management system.
-			let assetsEl = document.createElement('a-assets');
-			jQuery.each(configs.assets, function(key, value) {
-				let assetEl = document.createElement('a-asset-item');
-				assetEl.setAttribute('id', key);
-				assetEl.setAttribute('src', value.src);
-				assetsEl.appendChild(assetEl);
-			});
+            // Pre-load model by assets management system.
+            let assetsEl = document.createElement('a-assets');
+            jQuery.each(configs.assets, function(key, value) {
+                let assetEl = document.createElement('a-asset-item');
+                assetEl.setAttribute('id', key);
+                assetEl.setAttribute('src', value.src);
+                assetsEl.appendChild(assetEl);
+            });
 
-			assetsEl.addEventListener('loaded', self.loadObject3D);
-			self.sceneEl.appendChild(assetsEl);
-		});
-	}
-	loadScene() {
-		let self = this;
-		let mode = this.mode;
-		let sceneEl = this.sceneEl;
-		let globalVar = this.configs.globalVar;
-
-
-		// Init cash manager.
-		sceneEl.systems['tdar-game'].cashManager = new CashManager(sceneEl);
-
-
-		if (mode == 'ar') {
-			// Insert shadow plane.
-			let planeGeometry = new THREE.PlaneGeometry(2000, 2000);
-			planeGeometry.rotateX(-Math.PI / 2);
-			let shadowMesh = new THREE.Mesh(planeGeometry, new THREE.ShadowMaterial({
-				color: 0x111111,
-				opacity: 0.2,
-			}));
-			shadowMesh.name = 'arShadowMesh';
-			shadowMesh.receiveShadow = true;
-			shadowMesh.position.y = 10000;
-			sceneEl.object3D.add(shadowMesh);
-
-			// Insert light to scene.
-			let light = document.createElement('a-entity');
-			light.setAttribute('light', {
-				type: 'ambient',
-				color: '#fff',
-				intensity: 1
-			});
-			let directionalLight = document.createElement('a-entity');
-			directionalLight.setAttribute('light', {
-				type: 'directional',
-				color: '#fff',
-				intensity: 0.3,
-				castShadow: true
-			});
-			directionalLight.setAttribute('position', '10 15 10');
-			sceneEl.appendChild(light);
-			sceneEl.appendChild(directionalLight);
-
-			// Insert anchor container.
-			let anchorEl = document.createElement('a-entity');
-			anchorEl.setAttribute('id', 'tdar-anchor-container');
-			anchorEl.setAttribute('shadow', {
-				cast: true,
-				receive: true
-			});
-			sceneEl.appendChild(anchorEl);
-
-			sceneEl = this.anchorEl = anchorEl;
-		}
-
-		// add static scene.
-		let staticScene = document.createElement('a-entity');
-		staticScene.setAttribute('id', 'tdar-static-scene');
-		jQuery.each(this.configs.staticScene, function(name, values) {
-			if (name != 'abstractName') {
-				values.forEach(value => {
-					let object3D = self.object3DPrototypes[name].clone();
-					object3D.position.set(value.position);
-					if (value.rotation)
-						object3D.rotation.set(value.rotation);
-					if (value.scale)
-						object3D.scale.set(
-							object3D.scale.x * value.scale.x,
-							object3D.scale.y * value.scale.y,
-							object3D.scale.z * value.scale.z
-						);
-					staticScene.object3D.add(object3D);
-				});
-			}
-		});
-		staticScene.object3D.scale.set(globalVar.sceneScale, globalVar.sceneScale, globalVar.sceneScale);
-		sceneEl.appendChild(staticScene);
-		this.staticScene = staticScene;
+            assetsEl.addEventListener('loaded', self.loadObject3D);
+            self.sceneEl.appendChild(assetsEl);
+        });
+    }
+    loadScene() {
+        let self = this;
+        let mode = this.mode;
+        let sceneEl = this.sceneEl;
+        let globalVar = this.configs.globalVar;
 
 
-		// Init grid system.
-		let walkableMatrix = [];
-		for (let k = 0; k < globalVar.gridConfig.depth; k++) {
-			let row = [];
-			for (let i = 0; i < globalVar.gridConfig.width; i++) {
-				row.push(0);
-			}
-			walkableMatrix.push(row);
-		}
-		this.gameGrid = new PF.Grid(walkableMatrix);
-		let gridEl = document.createElement('a-entity');
-		gridEl.setAttribute('id', 'tdar-game-grid');
-		gridEl.setAttribute('grid', {
-			width: globalVar.gridConfig.width,
-			depth: globalVar.gridConfig.depth
-		});
-		gridEl.object3D.scale.set(globalVar.sceneScale, globalVar.sceneScale, globalVar.sceneScale);
-		sceneEl.appendChild(gridEl);
+        // Init cash manager.
+        sceneEl.systems['tdar-game'].cashManager = new CashManager(sceneEl);
 
 
-		// add dynamic scene.
-		let dynamicScene = document.createElement('a-entity');
-		dynamicScene.setAttribute('id', 'tdar-dynamic-scene');
-		dynamicScene.setAttribute('shadow', {
-			cast: true,
-			receive: false
-		});
-		let idCounter;
-		jQuery.each(this.configs.dynamicScene, function(name, values) {
-			switch (name) {
-				case 'wave-spawner':
-					// Assign id "wave-spawner-A-{id}" for each entity.
-					idCounter = 0;
-					jQuery.each(values, function(faction, arr) {
-						arr.forEach(el => {
-							let entity = document.createElement('a-entity');
-							entity.setAttribute('id', name + '-' + faction + '-' + idCounter.toString());
-							idCounter++;
-							entity.setAttribute(name, {
-								faction: faction
-							});
-							entity.object3D.position.set(
-								el.position.x + 0.5,
-								el.position.y,
-								el.position.z + 0.5
-							);
-							dynamicScene.appendChild(entity);
-						});
-					});
-					break;
-				case 'castle':
-					// Assign id "castle-A" for each entity.
-					jQuery.each(values, function(faction, el) {
-						let entity = document.createElement('a-entity');
-						entity.setAttribute('id', name + '-' + faction);
-						entity.setAttribute(name, {
-							faction: faction,
-							healthPoint: this.settings[name].common.healthPoint
-						});
-						entity.object3D.position.set(
-							el.position.x + 0.5,
-							el.position.y,
-							el.position.z + 0.5
-						);
-						dynamicScene.appendChild(entity);
-					});
-					break;
-				case 'obstacle':
-					values.forEach(el => {
-						self.updateGameGrid(el.position.x, el.position.z, false);
-					});
-					break;
-			}
-		});
-		// Init towerBases. (Assume gameGrid has updated to init state.)
-		this.towerBases = [];
-		for (let i = 0; i < globalVar.gridConfig.width; i++) {
-			let column = [];
-			for (let k = 0; k < globalVar.gridConfig.depth; k++) {
-				if (this.gameGrid.isWalkableAt(i, k)) {
-					let towerBaseEl = document.createElement('a-entity');
-					towerBaseEl.object3D.position.set(this.gamegridToScene({ x: i, y: 0, z: k }));
-					towerBaseEl.setAttribute('id', 'tower-base-' + i.toString() + '-' + k.toString());
-					towerBaseEl.setAttribute('tower-base', {});
-					column.push(towerBaseEl.components['tower-base']);
-					dynamicScene.appendChild(towerBaseEl);
-				} else {
-					column.push(null);
-				}
-			}
-			this.towerBases.push(column);
-		}
-		dynamicScene.object3D.scale.set(globalVar.sceneScale, globalVar.sceneScale, globalVar.sceneScale);
-		sceneEl.appendChild(dynamicScene);
-		this.dynamicScene = dynamicScene;
+        if (mode == 'ar') {
+            // Insert shadow plane.
+            console.warn('Old AR script has been executed.');
+
+            let planeGeometry = new THREE.PlaneGeometry(2000, 2000);
+            planeGeometry.rotateX(-Math.PI / 2);
+            let shadowMesh = new THREE.Mesh(planeGeometry, new THREE.ShadowMaterial({
+                color: 0x111111,
+                opacity: 0.2,
+            }));
+            shadowMesh.name = 'arShadowMesh';
+            shadowMesh.receiveShadow = true;
+            shadowMesh.position.y = 10000;
+            sceneEl.object3D.add(shadowMesh);
+
+            // Insert light to scene.
+            let light = document.createElement('a-entity');
+            light.setAttribute('light', {
+                type: 'ambient',
+                color: '#fff',
+                intensity: 1
+            });
+            let directionalLight = document.createElement('a-entity');
+            directionalLight.setAttribute('light', {
+                type: 'directional',
+                color: '#fff',
+                intensity: 0.3,
+                castShadow: true
+            });
+            directionalLight.setAttribute('position', '10 15 10');
+            sceneEl.appendChild(light);
+            sceneEl.appendChild(directionalLight);
+
+            // Insert anchor container.
+            let anchorEl = document.createElement('a-entity');
+            anchorEl.setAttribute('id', 'tdar-anchor-container');
+            anchorEl.setAttribute('shadow', {
+                cast: true,
+                receive: true
+            });
+            sceneEl.appendChild(anchorEl);
+
+            sceneEl = this.anchorEl = anchorEl;
+        }
 
 
-		// Pause game after init.
-		this.dynamicScene.addEventListener('loaded', function() {
-			self.dynamicScene.pause();
-		});
+        // Init grid system.
+        let walkableMatrix = [];
+        for (let k = 0; k < globalVar.gridConfig.depth; k++) {
+            let row = [];
+            for (let i = 0; i < globalVar.gridConfig.width; i++) {
+                row.push(0);
+            }
+            walkableMatrix.push(row);
+        }
+        this.gameGrid = new PF.Grid(walkableMatrix);
+        let gridEl = document.createElement('a-entity');
+        gridEl.setAttribute('id', 'tdar-game-grid');
+        gridEl.setAttribute('grid', {
+            width: globalVar.gridConfig.width,
+            depth: globalVar.gridConfig.depth
+        });
+        gridEl.object3D.scale.set(globalVar.sceneScale, globalVar.sceneScale, globalVar.sceneScale);
+        sceneEl.appendChild(gridEl);
 
 
-		// add initial content to dynamic scene.
-		for (let i = 0; i < this.configs.dynamicScene.width; i++) {
-			for (let k = 0; k < 10; k++) {
-				if (!(i == 1 && k == 1) && !(i == 18 && k == 8)) {
-					let baseEl = document.createElement('a-entity');
-					baseEl.setAttribute('geometry', this.settings.towerBase.geometry);
-					baseEl.setAttribute('material', this.settings.towerBase.material);
-					baseEl.setAttribute('position', {
-						x: i + 0.5,
-						y: 0,
-						z: k + 0.5
-					});
-					baseEl.setAttribute('data-raycastable', '');
-					baseEl.setAttribute('tower-base', {
-						faction: this.configs.dynamicScene.factions[1].name
-					});
-					dynamicScene.appendChild(baseEl);
-				}
-			}
-			for (let k = 11; k < this.configs.dynamicScene.depth; k++) {
-				if (!(i == 1 && k == 12) && !(i == 18 && k == 19)) {
-					let baseEl = document.createElement('a-entity');
-					baseEl.setAttribute('geometry', this.settings.towerBase.geometry);
-					baseEl.setAttribute('material', this.settings.towerBase.material);
-					baseEl.setAttribute('position', {
-						x: i + 0.5,
-						y: 0,
-						z: k + 0.5
-					});
-					baseEl.setAttribute('data-raycastable', '');
-					baseEl.setAttribute('tower-base', {
-						faction: this.configs.dynamicScene.factions[0].name
-					});
-					dynamicScene.appendChild(baseEl);
-				}
-			}
-		}
-		this.configs.dynamicScene.factions.forEach(faction => {
-			// load wave spawner.
-			let waveSpawnerEl = document.createElement('a-entity');
-			waveSpawnerEl.setAttribute('wave-spawner', faction.waveSpawner.schema);
-			waveSpawnerEl.setAttribute('position', {
-				x: faction.waveSpawner.position[0] + 0.5,
-				y: faction.waveSpawner.position[1],
-				z: faction.waveSpawner.position[2] + 0.5
-			});
-			dynamicScene.appendChild(waveSpawnerEl);
-
-			// load castle
-			let castleEl = document.createElement('a-entity');
-			castleEl.setAttribute('castle', faction.castle.schema);
-			castleEl.setAttribute('geometry', this.settings.castle.geometry);
-			castleEl.setAttribute('position', {
-				x: faction.castle.position[0] + 0.5,
-				y: faction.castle.position[1],
-				z: faction.castle.position[2] + 0.5
-			});
-			dynamicScene.appendChild(castleEl);
-		});
-
-		// Init path.
-		this.calculatePath('A');
-		this.calculatePath('B');
+        // add static scene.
+        let staticScene = document.createElement('a-entity');
+        staticScene.setAttribute('id', 'tdar-static-scene');
+        jQuery.each(this.configs.staticScene, function(name, values) {
+            if (name != 'abstractName') {
+                if (self.object3DPrototypes[name] === undefined)
+                    console.warn('Static scene config receive unknown model name: ', name);
+                values.forEach(value => {
+                    let objectEl = document.createElement('a-entity');
+                    objectEl.setAttribute('gltf-model', '#' + name);
+                    /*
+                    let object3D = self.object3DPrototypes[name].model.clone();
+                    */
+                    let scePos = self.gamegridToScene(value.position);
+                    objectEl.object3D.position.set(scePos.x, scePos.y, scePos.z);
+                    // object3D.position.set(scePos.x, scePos.y, scePos.z);
+                    if (value.rotation)
+                        objectEl.object3D.rotation.set(value.rotation.x, value.rotation.y, value.rotation.z);
+                    // object3D.rotation.set(value.rotation.x, value.rotation.y, value.rotation.z);
+                    if (value.scalar)
+                        objectEl.object3D.scale.copy(self.object3DPrototypes[name].model.scale).multiplyScalar(value.scalar);
+                    // object3D.scale.multiplyScalar(value.scalar);
+                    staticScene.appendChild(objectEl);
+                    self.updateGameGridByModel(
+                        objectEl.object3D.position,
+                        name,
+                        false,
+                        value.scalar
+                    );
+                    /*
+                    staticScene.object3D.add(object3D);
+                    self.updateGameGridByModel(
+                        object3D.position,
+                        name,
+                        false,
+                        value.scalar
+                    );
+                    */
+                });
+            }
+        });
+        staticScene.object3D.scale.set(globalVar.sceneScale, globalVar.sceneScale, globalVar.sceneScale);
+        sceneEl.appendChild(staticScene);
+        this.staticScene = staticScene;
 
 
-		if (mode == 'ar') {
-			// TODO: NEED UPDATE ALL SCRIPT HERE.
-			sceneEl.addEventListener('loaded', function() {
-				this.object3D.visible = false;
+        // add dynamic scene.
+        let dynamicScene = document.createElement('a-entity');
+        dynamicScene.setAttribute('id', 'tdar-dynamic-scene');
+        /*
+        dynamicScene.addEventListener('loaded', function() {
+            console.log('Dynamic scene pause.');
+            self.dynamicScene.pause();
+            self.dynamicScene.removeEventListener('loaded', this);
+        }); // Pause game after init.
+        */
+        /*
+        dynamicScene.setAttribute('shadow', {
+            cast: true,
+            receive: false
+        });
+		*/
+        let idCounter;
+        jQuery.each(this.configs.dynamicScene, function(name, values) {
+            switch (name) {
+                case 'wave-spawner':
+                    // Assign id "wave-spawner-A-{id}" for each entity.
+                    idCounter = 0;
+                    jQuery.each(values, function(faction, arr) {
+                        arr.forEach(el => {
+                            let entity = document.createElement('a-entity');
+                            entity.setAttribute('id', name + '-' + faction + '-' + idCounter.toString());
+                            idCounter++;
+                            entity.setAttribute(name, {
+                                faction: faction
+                            });
+                            let scePos = self.gamegridToScene(el.position);
+                            entity.object3D.position.set(scePos.x, scePos.y, scePos.z);
+                            dynamicScene.appendChild(entity);
+                        });
+                    });
+                    break;
+                case 'castle':
+                    // Assign id "castle-A" for each entity.
+                    jQuery.each(values, function(faction, el) {
+                        let entity = document.createElement('a-entity');
+                        entity.setAttribute('id', name + '-' + faction);
+                        entity.setAttribute(name, {
+                            faction: faction,
+                            healthPoint: self.settings[name].common.healthPoint
+                        });
+                        let scePos = self.gamegridToScene(el.position);
+                        entity.object3D.position.set(scePos.x, scePos.y, scePos.z);
+                        dynamicScene.appendChild(entity);
+                    });
+                    break;
+                default:
+                    console.warn('Dynamic scene config received unknown name: ', name);
+            }
+        });
+        // Init towerBases. (Assume gameGrid has updated to init state.)
+        this.towerBases = [];
+        for (let i = 0; i < globalVar.gridConfig.width; i++) {
+            let column = [];
+            for (let k = 0; k < globalVar.gridConfig.depth; k++) {
+                if (this.gameGrid.isWalkableAt(i, k)) {
+                    let towerBaseEl = document.createElement('a-entity');
+                    let scePos = this.gamegridToScene({
+                        x: i,
+                        y: 0,
+                        z: k
+                    });
+                    towerBaseEl.object3D.position.set(scePos.x, scePos.y, scePos.z);
+                    towerBaseEl.setAttribute('id', 'tower-base-' + i.toString() + '-' + k.toString());
+                    towerBaseEl.setAttribute('tower-base', {});
+                    column.push(towerBaseEl.components['tower-base']);
+                    dynamicScene.appendChild(towerBaseEl);
+                } else {
+                    column.push(null);
+                }
+            }
+            this.towerBases.push(column);
+        }
+        dynamicScene.object3D.scale.set(globalVar.sceneScale, globalVar.sceneScale, globalVar.sceneScale);
+        sceneEl.appendChild(dynamicScene);
+        this.dynamicScene = dynamicScene;
 
-				let reticle = document.createElement('a-entity');
-				// Affect base scene object scale.
-				reticle.setAttribute('reticle', {
-					targetEl: '#' + this.id,
-					scaleFactor: self.configs.staticScene.scaleFactor
-				});
-				this.sceneEl.appendChild(reticle);
-			});
-		} else {
-			this.sceneEl.systems['tdar-game'].networkManager.emit('nonPlayingEvent', {
-				event_name: 'model_ready'
-			});
-		}
-	}
-	updateGameGrid(x, z, walkable, callback) {
-		/*
-		 * SPEC
-		 *   (int) x: x coord on walkable map.
-		 *   (int) z: z coord on walkable map.
-		 *   (boolen) walkable: walkable or not.
-		 *   (function) callback: callback function.
-		 */
-		this.gameGrid.setWalkableAt(x, z, walkable);
-		if (callback)
-			callback();
-	}
-	updateGameGridArea(min, max, walkable, callback) {
-		/*
-		 * SPEC
-		 *   (Vec3 like) min: min coord in scene coord.
-		 *   (Vec3 like) max: max coord in scene coord.
-		 *   (boolen) walkable: walkable or not.
-		 *   (function) callback: callback function.
-		 */
-		let gridMin = this.sceneToGamegrid(min);
-		let gridMax = this.sceneToGamegrid(max);
 
-		for (let i = gridMin.x; i <= gridMax.x; i++) {
-			if (i < 0 || i >= this.configs.globalVar.gridConfig.width)
-				continue;
+        // Init path.
+        //this.calculatePath('A');
+        //this.calculatePath('B');
 
-			for (let k = gridMin.z; k <= gridMax.z; k++) {
-				if (k < 0 || k >= this.configs.globalVar.gridConfig.depth)
-					continue;
 
-				this.updateGameGrid(i, k, walkable);
-			}
-		}
+        if (mode == 'ar') {
+            // TODO: NEED UPDATE ALL SCRIPT HERE.
+            console.warn('Old AR script has been executed.');
 
-		if (callback)
-			callback();
-	}
-	calculatePath(faction) {
-		/*
-		 * SPEC
-		 *   (string) faction: one of ['A', 'B'].
-		 */
-		console.warn('Depracted function calculatePath has been called.');
-		return;
+            sceneEl.addEventListener('loaded', function() {
+                this.object3D.visible = false;
 
-		let grid = this.gameGrid.clone();
-		let path;
+                let reticle = document.createElement('a-entity');
+                // Affect base scene object scale.
+                reticle.setAttribute('reticle', {
+                    targetEl: '#' + this.id,
+                    scaleFactor: self.configs.staticScene.scaleFactor
+                });
+                this.sceneEl.appendChild(reticle);
+            });
+        } else {
+            this.sceneEl.systems['tdar-game'].networkManager.emit('nonPlayingEvent', {
+                event_name: 'model_ready'
+            });
+        }
+    }
+    updateGameGrid(x, z, walkable, callback) {
+        /*
+         * SPEC
+         *   (int) x: x coord on walkable map.
+         *   (int) z: z coord on walkable map.
+         *   (boolen) walkable: walkable or not.
+         *   (function) callback: callback function.
+         */
+        this.gameGrid.setWalkableAt(x, z, walkable);
+        if (callback)
+            callback();
+    }
+    updateGameGridArea(min, max, walkable, callback) {
+        /*
+         * SPEC
+         *   (Vec3 like) min: min coord in scene coord.
+         *   (Vec3 like) max: max coord in scene coord.
+         *   (boolen) walkable: walkable or not.
+         *   (function) callback: callback function.
+         */
+        let gridMin = this.sceneToGamegrid(min);
+        let gridMax = this.sceneToGamegrid(max);
 
-		if (faction == 'A') {
-			path = this.pathFinder.findPath(
-				this.configs.dynamicScene.factions[0].waveSpawner.position[0],
-				this.configs.dynamicScene.factions[0].waveSpawner.position[2],
-				this.configs.dynamicScene.factions[1].castle.position[0],
-				this.configs.dynamicScene.factions[1].castle.position[2],
-				grid
-			);
-		} else {
-			path = this.pathFinder.findPath(
-				this.configs.dynamicScene.factions[1].waveSpawner.position[0],
-				this.configs.dynamicScene.factions[1].waveSpawner.position[2],
-				this.configs.dynamicScene.factions[0].castle.position[0],
-				this.configs.dynamicScene.factions[0].castle.position[2],
-				grid
-			);
-		}
+        for (let i = gridMin.x; i <= gridMax.x; i++) {
+            if (i < 0 || i >= this.configs.globalVar.gridConfig.width)
+                continue;
 
-		path = path.map(point => {
-			return new THREE.Vector3(point[0] + 0.5, 0, point[1] + 0.5);
-		});
-		delete this.enemyPath[faction];
-		this.enemyPath[faction] = path;
+            for (let k = gridMin.z; k <= gridMax.z; k++) {
+                if (k < 0 || k >= this.configs.globalVar.gridConfig.depth)
+                    continue;
 
-		return path;
-	}
-	getNewPath(pos, faction) {
-		/*
-		 * Calculate the shortest path from given position to castle.
-		 *
-		 * SPEC
-		 *	(Vec3) startPos
-		 *  (string) faction: one of ['A', 'B'].
-		 */
-		const startPos = pos;
-		let transPos = this.sceneToGamegrid(startPos);
-		let grid = this.gameGrid.clone();
-		let path;
-		let self = this;
+                this.updateGameGrid(i, k, walkable);
+            }
+        }
 
-		if (faction == 'A') {
-			path = this.pathFinder.findPath(
-				transPos.x,
-				transPos.z,
-				this.configs.dynamicScene.factions[1].castle.position[0],
-				this.configs.dynamicScene.factions[1].castle.position[2],
-				grid
-			);
-		} else {
-			path = this.pathFinder.findPath(
-				transPos.x,
-				transPos.z,
-				this.configs.dynamicScene.factions[0].castle.position[0],
-				this.configs.dynamicScene.factions[0].castle.position[2],
-				grid
-			);
-		}
+        if (callback)
+            callback();
+    }
+    updateGameGridByModel(pos, modelName, walkable, scalar) {
+        /*
+         * SPEC
+         *   (Vec3 like) pos: scene position of the object.
+         *   (string) modelName: model name in config file.
+         *   (boolen) walkable: walkable or not.
+         *   (number) scalar: (Optional) scalar of this model.
+         */
+        const scenePos = pos;
 
-		path = path.map(point => {
-			return new THREE.Vector3(self.gamegridToScene({
-				x: point[0],
-				y: 0,
-				z: point[1]
-			}));
-		});
-		path.splice(0, 1, startPos.clone());
+        if (scalar === undefined)
+            scalar = 1;
 
-		return new THREE['CatmullRomCurve3'](path);
-	}
-	sceneToGamegrid(position) {
-		return {
-			x: Math.floor(position.x + (this.configs.globalVar.gridConfig.width / 2)),
-			y: position.y,
-			z: Math.floor(position.z + (this.configs.globalVar.gridConfig.depth / 2))
-		}
-	}
-	gamegridToScene(position) {
-		return {
-			x: position.x + 0.5 - (this.configs.globalVar.gridConfig.width / 2),
-			y: position.y,
-			z: position.z + 0.5 - (this.configs.globalVar.gridConfig.depth / 2)
-		}
-	}
-	async loadObject3D() {
-		console.log('ENTER LOAD OBJECT3D.');
+        let info = this.object3DPrototypes[modelName];
+        let min = {
+            x: scenePos.x - (info.width / 2) * scalar,
+            y: 0,
+            z: scenePos.z - (info.depth / 2) * scalar
+        };
+        let max = {
+            x: scenePos.x + (info.width / 2) * scalar,
+            y: 0,
+            z: scenePos.z + (info.depth / 2) * scalar
+        };
+        this.updateGameGridArea(min, max, walkable);
+    }
+    calculatePath(faction) {
+        /*
+         * SPEC
+         *   (string) faction: one of ['A', 'B'].
+         */
+        console.warn('Depracted function calculatePath has been called.');
+        return;
 
-		let assets = [];
-		jQuery.each(this.configs.assets, function(key, value) {
-			assets.push({ key: key, src: value.src, scalar: value.scalar });
-		});
+        let grid = this.gameGrid.clone();
+        let path;
 
-		const loaderPromises = assets.map(async asset => {
-			const loader = promisifyLoader(new THREE.GLTFLoader());
-			const gltfModel = await loader.load(asset.src);
-			let model = gltfModel.scene || gltfModel.scenes[0];
+        if (faction == 'A') {
+            path = this.pathFinder.findPath(
+                this.configs.dynamicScene.factions[0].waveSpawner.position[0],
+                this.configs.dynamicScene.factions[0].waveSpawner.position[2],
+                this.configs.dynamicScene.factions[1].castle.position[0],
+                this.configs.dynamicScene.factions[1].castle.position[2],
+                grid
+            );
+        } else {
+            path = this.pathFinder.findPath(
+                this.configs.dynamicScene.factions[1].waveSpawner.position[0],
+                this.configs.dynamicScene.factions[1].waveSpawner.position[2],
+                this.configs.dynamicScene.factions[0].castle.position[0],
+                this.configs.dynamicScene.factions[0].castle.position[2],
+                grid
+            );
+        }
 
-			// normalize size.
-			let bbox = new THREE.Box3().setFromObject(model);
-			let width = bbox.max.x - bbox.min.x;
-			let height = bbox.max.y - bbox.min.y;
-			let depth = bbox.max.z - bbox.min.z;
+        path = path.map(point => {
+            return new THREE.Vector3(point[0] + 0.5, 0, point[1] + 0.5);
+        });
+        delete this.enemyPath[faction];
+        this.enemyPath[faction] = path;
 
-			if (width < depth)
-				model.scale.set(1 / depth, 1 / depth, 1 / depth);
-			else
-				model.scale.set(1 / width, 1 / width, 1 / width);
-			model.scale.multiplyScalar(asset.scalar);
+        return path;
+    }
+    getNewPath(pos, faction) {
+        /*
+         * Calculate the shortest path from given position to castle.
+         *
+         * SPEC
+         *	(Vec3) startPos
+         *  (string) faction: one of ['A', 'B'].
+         */
+        const startPos = pos;
+        let transPos = this.sceneToGamegrid(startPos);
+        let grid = this.gameGrid.clone();
+        let path;
+        let self = this;
 
-			bbox = new THREE.Box3().setFromObject(model);
-			width = bbox.max.x - bbox.min.x;
-			height = bbox.max.y - bbox.min.y;
-			depth = bbox.max.z - bbox.min.z;
+        if (faction == 'A') {
+            path = this.pathFinder.findPath(
+                transPos.x,
+                transPos.z,
+                this.configs.dynamicScene.castle['B'].position.x,
+                this.configs.dynamicScene.castle['B'].position.z,
+                grid
+            );
+        } else {
+            path = this.pathFinder.findPath(
+                transPos.x,
+                transPos.z,
+                this.configs.dynamicScene.castle['A'].position.x,
+                this.configs.dynamicScene.castle['A'].position.z,
+                grid
+            );
+        }
 
-			return { key: asset.key, model: model, width: width, height: height, depth: depth };
-		});
+        path = path.map(point => {
+            let scePos = self.gamegridToScene({
+                x: point[0],
+                y: 0,
+                z: point[1]
+            });
+            return new THREE.Vector3(scePos.x, scePos.y, scePos.z);
+        });
+        path.splice(0, 1, startPos.clone());
 
-		for (const loaderPromise of loaderPromises) {
-			const result = await loaderPromise;
-			this.object3DPrototypes[result.key] = result;
-			console.log('LOAD ASSET.');
-		}
+        return new THREE['CatmullRomCurve3'](path);
+    }
+    sceneToGamegrid(position) {
+        let p = {
+            x: Math.floor(position.x + (this.configs.globalVar.gridConfig.width / 2)),
+            y: position.y,
+            z: Math.floor(position.z + (this.configs.globalVar.gridConfig.depth / 2))
+        }
+        if (p.x < 0 || p.x >= this.configs.globalVar.gridConfig.width || p.z < 0 || p.z >= this.configs.globalVar.gridConfig.depth)
+            console.warn('Function sceneToGamegrid return position out of grid range: ', p);
 
-		console.log('FINISHED PARLLEL LOADING ASSETS.');
-		this.loadScene();
-	}
+        return p;
+    }
+    gamegridToScene(position) {
+        if (position.x < 0 || position.x >= this.configs.globalVar.gridConfig.width || position.z < 0 || position.z >= this.configs.globalVar.gridConfig.depth)
+            console.warn('Function gamegridToScene receive position out of grid range: ', position);
+
+        return {
+            x: position.x + 0.5 - (this.configs.globalVar.gridConfig.width / 2),
+            y: position.y,
+            z: position.z + 0.5 - (this.configs.globalVar.gridConfig.depth / 2)
+        }
+    }
+    async loadObject3D() {
+        console.log('ENTER LOAD OBJECT3D.');
+
+        console.log('THREE have bug in cloning gltf model, object3DPrototypes is not implement. Currently use aframe gltf-model, this would cause some drop in performance.');
+
+        let assets = [];
+        jQuery.each(this.configs.assets, function(key, value) {
+            assets.push({
+                key: key,
+                src: value.src,
+                scalar: value.scalar
+            });
+        });
+
+        const loaderPromises = assets.map(async asset => {
+            const loader = promisifyLoader(new THREE.GLTFLoader());
+            const gltfModel = await loader.load(asset.src);
+            let model = gltfModel.scene || gltfModel.scenes[0];
+            model.animations = gltfModel.animations;
+
+            // normalize size.
+            let bbox = new THREE.Box3().setFromObject(model);
+            let width = bbox.max.x - bbox.min.x;
+            let height = bbox.max.y - bbox.min.y;
+            let depth = bbox.max.z - bbox.min.z;
+
+            if (width < depth)
+                model.scale.set(1 / depth, 1 / depth, 1 / depth);
+            else
+                model.scale.set(1 / width, 1 / width, 1 / width);
+            model.scale.multiplyScalar(asset.scalar);
+
+            bbox = new THREE.Box3().setFromObject(model);
+            width = bbox.max.x - bbox.min.x;
+            height = bbox.max.y - bbox.min.y;
+            depth = bbox.max.z - bbox.min.z;
+
+            return {
+                key: asset.key,
+                model: model,
+                width: width,
+                height: height,
+                depth: depth
+            };
+        });
+
+        for (const loaderPromise of loaderPromises) {
+            const result = await loaderPromise;
+            this.object3DPrototypes[result.key] = result;
+            console.log('LOAD ASSET.');
+        }
+
+        console.log('FINISHED PARLLEL LOADING ASSETS.');
+        this.loadScene();
+    }
 }
 
 function promisifyLoader(loader, onProgress) {
-	function promiseLoader(url) {
-		return new Promise((resolve, reject) => {
-			loader.load(url, resolve, onProgress, reject);
-		});
-	}
+    function promiseLoader(url) {
+        return new Promise((resolve, reject) => {
+            loader.load(url, resolve, onProgress, reject);
+        });
+    }
 
-	return {
-		originalLoader: loader,
-		load: promiseLoader,
-	};
+    return {
+        originalLoader: loader,
+        load: promiseLoader,
+    };
 }

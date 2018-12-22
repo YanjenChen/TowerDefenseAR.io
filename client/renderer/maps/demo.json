@@ -6,7 +6,7 @@
         },
         "fort": {
             "src": "renderer/assets/fort.gltf",
-            "scalar": 1.5
+            "scalar": 1
         },
         "tree": {
             "src": "renderer/assets/tree01/model.gltf",
@@ -23,10 +23,10 @@
     },
     "globalVar": {
         "gridConfig": {
-            "width": 40,
-            "depth": 40
+            "width": 20,
+            "depth": 20
         },
-        "sceneScale": 0.5
+        "sceneScale": 1
     },
     "staticScene": {
         "abstractName": [{
@@ -40,59 +40,49 @@
                 "y": 0,
                 "z": 0
             },
-            "scale": {
-                "x": 0,
-                "y": 0,
-                "z": 0
-            }
+            "scalar": 1,
+            "walkable": false
         }]
     },
     "dynamicScene": {
         "wave-spawner": {
             "A": [{
                 "position": {
-                    "x": 0,
+                    "x": 2,
                     "y": 0,
-                    "z": 0
+                    "z": 2
                 }
             }],
             "B": [{
                 "position": {
-                    "x": 0,
+                    "x": 2,
                     "y": 0,
-                    "z": 0
+                    "z": 18
                 }
             }]
         },
         "castle": {
             "A": {
                 "position": {
-                    "x": 0,
+                    "x": 18,
                     "y": 0,
-                    "z": 0
+                    "z": 2
                 }
             },
             "B": {
                 "position": {
-                    "x": 0,
+                    "x": 18,
                     "y": 0,
-                    "z": 0
+                    "z": 18
                 }
             }
-        },
-        "obstacle": [{
-            "position": {
-                "x": 0,
-                "y": 0,
-                "z": 0
-            }
-        }]
+        }
     },
     "settings": {
         "tower": {
             "common": {
                 "animation_timeScale": 0.8,
-                "mesh": "knight"
+                "mesh": "fort"
             },
             "laser": [{
                 "restDuration": 1000,
