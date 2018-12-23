@@ -68,7 +68,8 @@
             this.updateUI = this.updateUI.bind(this);
             this.onTowerEndProcess = this.onTowerEndProcess.bind(this);
         },
-        tick: function(time, timeDelta) {
+        // WARNING: Using async function to modify aframe API is an UNSTABLE trick.
+        tick: async function(time, timeDelta) {
             if (time - this.prevCheckTime > this.data.interval) {
                 // console.log(this.el.is('cursor-hovered'));
                 if (this.el.is('cursor-hovered')) {
@@ -93,7 +94,7 @@
                             this.updateUI();
                         }
 
-                        if (this.gameManager.areaIsPlaceable(this.reticle.position, HOVER_REGION, HOVER_REGION, true)) {
+                        if (await this.gameManager.areaIsPlaceable(this.reticle.position, HOVER_REGION, HOVER_REGION, true)) {
                             this.reticle.material.color.set(0x6a787f);
                             this.reticle.material.needsUpdate = true;
                         } else {
@@ -129,18 +130,19 @@
         onRaycasterIntersected: function(evt) {
             this.getIntersection = evt.detail.getIntersection;
         },
-        updateUI: function() {
+        updateUI: async function() {
             let x = Math.floor(this.intersectedPoint.x + 0.5 + (this.data.width / 2));
             let z = Math.floor(this.intersectedPoint.z + 0.5 + (this.data.depth / 2));
             let selectedBase = this.hoveringBase = this.gameManager.towerBases[x][z];
             if (selectedBase === undefined)
                 console.warn('TowerBases have undefined element or access wrong idex: ', x, z);
-            let placeable = this.gameManager.areaIsPlaceable(this.reticle.position, HOVER_REGION, HOVER_REGION, true);
-            let isEmpty = selectedBase.el.is('empty');
+            let placeable = await this.gameManager.areaIsPlaceable(this.reticle.position, HOVER_REGION, HOVER_REGION, true);
 
-            if (placeable) {
+            if (selectedBase === null) {
+                this.uiManager.updateObjectControl([]);
+            } else if (placeable) {
                 this.uiManager.updateObjectControl(selectedBase.getUIsets());
-            } else if (!isEmpty) {
+            } else if (!selectedBase.el.is('empty')) {
                 this.uiManager.updateObjectControl(selectedBase.getUIsets());
             } else {
                 this.uiManager.updateObjectControl([]);

@@ -76,7 +76,7 @@ class GameManager {
             self.sceneEl.appendChild(assetsEl);
         });
     }
-    loadScene() {
+    async loadScene() {
         let self = this;
         let mode = this.mode;
         let sceneEl = this.sceneEl;
@@ -252,7 +252,7 @@ class GameManager {
                     y: 0,
                     z: k
                 };
-                if (this.areaIsPlaceable(p, 2, 2, true)) {
+                if (await this.areaIsPlaceable(p, 2, 2, true)) {
                     let towerBaseEl = document.createElement('a-entity');
                     towerBaseEl.object3D.position.set(i, 0, k);
                     towerBaseEl.setAttribute('id', 'tower-base-' + i.toString() + '-' + k.toString());
@@ -268,11 +268,6 @@ class GameManager {
         dynamicScene.object3D.scale.set(globalVar.sceneScale, globalVar.sceneScale, globalVar.sceneScale);
         sceneEl.appendChild(dynamicScene);
         this.dynamicScene = dynamicScene;
-
-
-        // Init path.
-        //this.calculatePath('A');
-        //this.calculatePath('B');
 
 
         if (mode == 'ar') {
@@ -367,7 +362,7 @@ class GameManager {
         };
         this.updateGameGridArea(min, max, walkable);
     }
-    areaIsPlaceable(pos, width, depth, mute) {
+    async areaIsPlaceable(pos, width, depth, mute) {
         /*
          *  EXPLAIN:
          *      Check area on game grid is placeable.
@@ -379,6 +374,8 @@ class GameManager {
          */
 
         const scenePos = pos;
+        let grid = this.gameGrid.clone();
+
         let min = {
             x: scenePos.x - (width / 2) + (this.configs.globalVar.gridConfig.width / 2),
             y: 0,
@@ -412,9 +409,41 @@ class GameManager {
 
                 if (!this.gameGrid.isWalkableAt(i, k))
                     return false;
+
+                grid.setWalkableAt(i, k, false);
             }
         }
+
+        let self = this;
+        let passables = [];
+        jQuery.each(this.configs.dynamicScene['wave-spawner'], function(faction, arr) {
+            arr.forEach(el => {
+                passables.push(isPathPassable(el, faction));
+            });
+        });
+
+        for (const passable of passables) {
+            const _passable = await passable;
+            if (!_passable)
+                return false;
+        }
+
         return true;
+
+        async function isPathPassable(el, faction) {
+            let g = grid.clone();
+            let path = self.pathFinder.findPath(
+                el.gridPosition.x,
+                el.gridPosition.z,
+                self.configs.dynamicScene.castle[faction == 'A' ? 'B' : 'A'].gridPosition.x,
+                self.configs.dynamicScene.castle[faction == 'A' ? 'B' : 'A'].gridPosition.z,
+                g
+            );
+            if (path.length == 0)
+                return false;
+            else
+                return true;
+        }
     }
     calculatePath(faction) {
         /*
