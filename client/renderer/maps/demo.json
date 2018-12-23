@@ -128,7 +128,7 @@
         },
         "castle": {
             "common": {
-                "healthPoint": 200
+                "healthPoint": 20
             }
         },
         "enemy": {

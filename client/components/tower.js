@@ -48,22 +48,22 @@
             // this.el.setObject3D('mesh', this.gameManager.object3DPrototypes[this.setting.common.mesh].model.clone());
 
             let self = this;
-            this.el.addEventListener('model-loaded', () => {
+            this.el.addEventListener('model-loaded', function _listener() {
                 self.roter = self.el.getObject3D('mesh').children.find(x => x.name == 'roter');
                 self.muzzle = self.roter.children.find(x => x.name == 'muzzle');
                 self.el.setAttribute('animation-mixer', {
                     timeScale: self.setting.common.animation_timeScale,
                     loop: 'once'
                 });
-                self.el.removeEventListener('model-loaded', this);
+                self.el.removeEventListener('model-loaded', _listener);
             });
 
 
             // play create animation.
             this.el.addState('initializing');
-            this.el.addEventListener('animation-finished', function() {
+            this.el.addEventListener('animation-finished', function _listener() {
                 self.el.removeState('initializing');
-                self.el.removeEventListener('animation-finished', this);
+                self.el.removeEventListener('animation-finished', _listener);
             });
 
 
@@ -84,7 +84,7 @@
             this.tmpVec = new THREE.Vector3();
 
 
-            this.el.addEventListener('fire', this.onFire);
+            // this.el.addEventListener('fire', this.onFire);
         },
         update: function() {
             let currentSetting = this.setting[this.data.type][this.data.tier];
@@ -134,15 +134,16 @@
                             this.laserLine.visible = true;
                     }
 
-                    if (this.el.is('attacking'))
-                        this.el.emit('fire');
-
                     if (this.timeCounter >= this.activateDuration && this.el.is('attacking')) {
                         this.el.removeState('attacking');
                         this.timeCounter = 0;
                         if (this.data.type == 'laser')
                             this.laserLine.visible = false;
                     }
+
+                    if (this.el.is('attacking'))
+                        this.onFire();
+                    //this.el.emit('fire');
                 } else {
                     this.el.removeState('activate');
                     this.el.removeState('attacking');
@@ -183,7 +184,7 @@
             delete this.laserLine;
             delete this.tmpVec;
 
-            this.el.removeEventListener('fire', this.onFire);
+            // this.el.removeEventListener('fire', this.onFire);
         },
         checkTargetDistance: function() {
             if (this.system.faction[this.targetFac].enemies.indexOf(this.targetEl) < 0) // Prevent target doesn't exist cause null error.

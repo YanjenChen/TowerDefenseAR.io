@@ -192,10 +192,10 @@ class GameManager {
         let dynamicScene = document.createElement('a-entity');
         dynamicScene.setAttribute('id', 'tdar-dynamic-scene');
         /*
-        dynamicScene.addEventListener('loaded', function() {
+        dynamicScene.addEventListener('loaded', function _listener() {
             console.log('Dynamic scene pause.');
             self.dynamicScene.pause();
-            self.dynamicScene.removeEventListener('loaded', this);
+            self.dynamicScene.removeEventListener('loaded', _listener);
         }); // Pause game after init.
         */
         /*
@@ -453,7 +453,7 @@ class GameManager {
 
         return path;
     }
-    getNewPath(pos, faction) {
+    async getNewPath(pos, faction) {
         /*
          * Calculate the shortest path from given position to castle.
          *
@@ -485,6 +485,9 @@ class GameManager {
             );
         }
 
+        if (path.length == 0)
+            console.warn('Pathfind result in no route avaliable.');
+
         path = path.map(point => {
             let scePos = self.gamegridToScene({
                 x: point[0],
@@ -493,7 +496,10 @@ class GameManager {
             });
             return new THREE.Vector3(scePos.x, scePos.y, scePos.z);
         });
-        path.splice(0, 1, startPos.clone());
+        if (path.length == 1)
+            path.splice(0, 0, startPos.clone());
+        else
+            path.splice(0, 1, startPos.clone());
 
         return new THREE['CatmullRomCurve3'](path);
     }

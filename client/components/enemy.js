@@ -23,8 +23,19 @@
             }
         },
         onPathUpdated: function(evt) {
+            /*
+            // Use for reduce calculation.
             this.faction[evt.detail.faction == 'A' ? 'B' : 'A'].enemies.forEach(enemy => {
-                enemy.emit('pathupdate');
+                enemy.addState('needupdatepath');
+            });
+            */
+            this.faction.A.enemies.forEach(enemy => {
+                enemy.addState('needupdatepath');
+                enemy.components['enemy'].updatePath();
+            });
+            this.faction.B.enemies.forEach(enemy => {
+                enemy.addState('needupdatepath');
+                enemy.components['enemy'].updatePath();
             });
         }
     });
@@ -89,21 +100,25 @@
 
             this.onBeAttacked = this.onBeAttacked.bind(this);
             this.onArrived = this.onArrived.bind(this);
-            this.onPathUpdated = this.onPathUpdated.bind(this);
+            this.updatePath = this.updatePath.bind(this);
 
             this.speed = this.setting[this.data.type].speed;
             this.currentHP = this.data.healthPoint;
             this.line = null;
             this.lineLength = null;
             this.completeDist = 0;
-            this.onPathUpdated();
+
+            this.el.addState('needupdatepath');
+            this.updatePath();
 
 
             this.el.addEventListener('be-attacked', this.onBeAttacked);
             this.el.addEventListener('movingended', this.onArrived);
-            this.el.addEventListener('pathupdate', this.onPathUpdated);
         },
         tick: function(time, timeDelta) {
+            if (this.el.is('needupdatepath'))
+                return;
+
             if (!this.el.is('endofpath')) {
                 this.completeDist += this.speed * timeDelta * this.data.timeRatio;
 
@@ -137,7 +152,6 @@
             // this.el.removeObject3D('mesh');
             this.el.removeEventListener('be-attacked', this.onBeAttacked);
             this.el.removeEventListener('movingended', this.onArrived);
-            this.el.removeEventListener('pathupdate', this.onPathUpdated);
         },
         onArrived: function() {
             this.data.targetCastle.emit('enemy-arrived', {
@@ -164,14 +178,12 @@
                 this.el.parentNode.removeChild(this.el);
             }
         },
-        onPathUpdated: function() {
+        updatePath: async function() {
             delete this.line;
-            this.line = this.gameManager.getNewPath(this.el.object3D.position, this.data.faction);
-
-            //console.log(this.line);
-
+            this.line = await this.gameManager.getNewPath(this.el.object3D.position, this.data.faction);
             this.lineLength = this.line.getLength();
             this.completeDist = 0;
+            this.el.removeState('needupdatepath');
         }
     });
 })();
