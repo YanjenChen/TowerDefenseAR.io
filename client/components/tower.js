@@ -43,23 +43,23 @@
             this.setting = this.gameManager.settings.tower;
 
 
-            this.el.setAttribute('gltf-model', '#' + this.setting.common.mesh);
-            this.el.object3D.scale.copy(this.gameManager.object3DPrototypes[this.setting.common.mesh].model.scale);
-            // this.el.setObject3D('mesh', this.gameManager.object3DPrototypes[this.setting.common.mesh].model.clone());
+            // this.el.setAttribute('gltf-model', '#' + this.setting.common.mesh);
+            // this.el.object3D.scale.copy(this.gameManager.object3DPrototypes[this.setting.common.mesh].model.scale);
+            let model = THREE.AnimationUtils.clone(this.gameManager.object3DPrototypes[this.setting.common.mesh].model);
+            model.animations = this.gameManager.object3DPrototypes[this.setting.common.mesh].model.animations;
+            this.el.setObject3D('mesh', model);
 
-            let self = this;
-            this.el.addEventListener('model-loaded', function _listener() {
-                self.roter = self.el.getObject3D('mesh').children.find(x => x.name == 'roter');
-                self.muzzle = self.roter.children.find(x => x.name == 'muzzle');
-                self.el.setAttribute('animation-mixer', {
-                    timeScale: self.setting.common.animation_timeScale,
-                    loop: 'once'
-                });
-                self.el.removeEventListener('model-loaded', _listener);
+
+            this.roter = model.children.find(x => x.name == 'roter');
+            this.muzzle = this.roter.children.find(x => x.name == 'muzzle');
+            this.el.setAttribute('animation-mixer', {
+                timeScale: this.setting.common.animation_timeScale,
+                loop: 'once'
             });
 
 
             // play create animation.
+            let self = this;
             this.el.addState('initializing');
             this.el.addEventListener('animation-finished', function _listener() {
                 self.el.removeState('initializing');
@@ -167,9 +167,9 @@
 
             this.el.removeObject3D('laser');
 
-            this.el.removeAttribute('gltf-model');
+            // this.el.removeAttribute('gltf-model');
             this.el.removeAttribute('animation-mixer');
-            // this.el.removeObject3D('mesh');
+            this.el.removeObject3D('mesh');
 
             delete this.roter;
             delete this.muzzle;

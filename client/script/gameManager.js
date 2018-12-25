@@ -614,6 +614,7 @@ class GameManager {
         }
 
         console.log('FINISHED PARLLEL LOADING ASSETS.');
+        this.sceneEl.emit('gamemodelloaded');
         this.loadScene();
     }
 }

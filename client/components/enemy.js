@@ -1,4 +1,6 @@
 (() => {
+    const ANIMATION_GROUP_NUM = 1;
+
     AFRAME.registerSystem('enemy', {
         init: function() {
             this.faction = {
@@ -8,19 +10,57 @@
             this.faction.A.enemies = [];
             this.faction.B.enemies = [];
             this.el.addEventListener('systemupdatepath', this.onPathUpdated.bind(this));
+
+            // Set animation object groups.
+            // REMIND: THREE.AnimationObjectGroup has a method called .uncache() to Deallocates all memory resources for the passed objects of this AnimationObjectGroup.
+            this.animationGroups = [];
+            this.animationMixers = [];
+            this.animationActions = [];
+            let self = this;
+            this.el.addEventListener('gamemodelloaded', function _setAnimation() {
+                let gameManager = self.el.systems['tdar-game'].gameManager;
+                for (let i = 0; i < ANIMATION_GROUP_NUM; i++) {
+                    let group = new THREE.AnimationObjectGroup();
+                    let mixer = new THREE.AnimationMixer(group);
+                    let action = mixer.clipAction(gameManager.object3DPrototypes[gameManager.settings.enemy.common.mesh].model.animations[0]);
+                    action.setEffectiveTimeScale(gameManager.settings.enemy.common.animation_timeScale);
+                    action.play();
+                    mixer.update((1 / 60) / ANIMATION_GROUP_NUM * i); // provide time offset to different group.
+
+                    self.animationGroups.push(group);
+                    self.animationMixers.push(mixer);
+                    self.animationActions.push(action);
+                }
+
+                self.el.removeEventListener('gamemodelloaded', _setAnimation);
+            });
         },
-        registerEnemy: function(el) {
+        tick: function(time, timeDelta) {
+            if (this.animationMixers.length !== ANIMATION_GROUP_NUM)
+                return;
+
+            for (let i = 0; i < ANIMATION_GROUP_NUM; i++) {
+                this.animationMixers[i].update(timeDelta / 1000);
+            }
+        },
+        registerEnemy: function(el, id) {
             var fac = el.components.enemy.data.faction;
             this.faction[fac].enemies.push(el);
             this.el.systems['tower'].updateEnemies(fac);
+
+            // Add to animation group.
+            this.animationGroups[id % ANIMATION_GROUP_NUM].add(el.getObject3D('mesh'));
         },
-        unregisterEnemy: function(el) {
+        unregisterEnemy: function(el, id) {
             var fac = el.components.enemy.data.faction;
             var index = this.faction[fac].enemies.indexOf(el);
             if (index > -1) {
                 this.faction[fac].enemies.splice(index, 1);
                 this.el.systems['tower'].updateEnemies(fac);
             }
+
+            // Remove from animation group.
+            this.animationGroups[id % ANIMATION_GROUP_NUM].remove(el.getObject3D('mesh'));
         },
         onPathUpdated: function(evt) {
             /*
@@ -54,8 +94,8 @@
             },
             id: {
                 // Receive from server.
-                type: 'string',
-                default: ''
+                type: 'number',
+                default: 0
             },
             reward: {
                 // Receive from server.
@@ -88,14 +128,19 @@
             this.setting = this.gameManager.settings.enemy;
 
 
-            this.el.setAttribute('gltf-model', '#' + this.setting.common.mesh);
-            this.el.object3D.scale.copy(this.gameManager.object3DPrototypes[this.setting.common.mesh].model.scale);
-            // this.el.setObject3D('mesh', this.gameManager.object3DPrototypes[this.setting.common.mesh].model.clone());
-            this.el.setAttribute('id', this.data.id);
+            // this.el.setAttribute('gltf-model', '#' + this.setting.common.mesh);
+            // this.el.object3D.scale.copy(this.gameManager.object3DPrototypes[this.setting.common.mesh].model.scale);
+            let model = THREE.AnimationUtils.clone(this.gameManager.object3DPrototypes[this.setting.common.mesh].model);
+            // model.animations = this.gameManager.object3DPrototypes[this.setting.common.mesh].model.animations;
+            this.el.setObject3D('mesh', model);
+
+            this.el.setAttribute('id', 'enemy-' + this.data.id.toString());
+            /*
             this.el.setAttribute('animation-mixer', {
                 timeScale: this.setting.common.animation_timeScale
             });
-            this.system.registerEnemy(this.el);
+            */
+            this.system.registerEnemy(this.el, this.data.id);
 
 
             this.onBeAttacked = this.onBeAttacked.bind(this);
@@ -134,6 +179,8 @@
             }
         },
         remove: function() {
+            this.system.unregisterEnemy(this.el, this.data.id);
+
             delete this.gameManager;
             delete this.networkManager;
             delete this.uiManager;
@@ -146,10 +193,9 @@
             delete this.lineLength;
             delete this.completeDist;
 
-            this.system.unregisterEnemy(this.el);
-            this.el.removeAttribute('gltf-model');
-            this.el.removeAttribute('animation-mixer');
-            // this.el.removeObject3D('mesh');
+            // this.el.removeAttribute('gltf-model');
+            // this.el.removeAttribute('animation-mixer');
+            this.el.removeObject3D('mesh');
             this.el.removeEventListener('be-attacked', this.onBeAttacked);
             this.el.removeEventListener('movingended', this.onArrived);
         },
