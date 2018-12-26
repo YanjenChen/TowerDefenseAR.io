@@ -21,6 +21,10 @@ class GameManager {
          *  settings: Contain all components' static params.
          *  staticScene: <a-entity> which indicate game static scene, all static object3D should be contained under this entity.
          *  towerBases: Two dimensional array of <a-entity>.components['tower-base'], use to quick access UI content.
+         *  tileMap: Two dimensional map of {towerInRange: [], enemyInRange: []}, use to optimize performance.
+         *  tileSize: width and depth of one time relative to one grid.
+         *  tileWidth: width of tileMap.
+         *  tileDepth: depth of tileMap.
          */
         this.anchorEl = null;
         this.configs = null;
@@ -39,12 +43,20 @@ class GameManager {
         this.settings = null;
         this.staticScene = null;
         this.towerBases = null;
+        this.tileMap = null;
+        this.tileSize = null;
+        this.tileWidth = 0;
+        this.tileDepth = 0;
 
         this.loadConfig = this.loadConfig.bind(this);
         this.loadScene = this.loadScene.bind(this);
         this.updateGameGrid = this.updateGameGrid.bind(this);
         this.updateGameGridArea = this.updateGameGridArea.bind(this);
         this.updateGameGridByModel = this.updateGameGridByModel.bind(this);
+        this.sceneToTile = this.sceneToTile.bind(this);
+        this.updateTowerToTileMap = this.updateTowerToTileMap.bind(this);
+        this.updateEnemyToTileMap = this.updateEnemyToTileMap.bind(this);
+        this.removeEnemyFromTileMap = this.removeEnemyFromTileMap.bind(this);
         this.areaIsPlaceable = this.areaIsPlaceable.bind(this);
         //this.calculatePath = this.calculatePath.bind(this);
         this.getNewPath = this.getNewPath.bind(this);
@@ -152,6 +164,23 @@ class GameManager {
         gridEl.object3D.scale.set(globalVar.sceneScale, globalVar.sceneScale, globalVar.sceneScale);
         sceneEl.appendChild(gridEl);
         this.gridEl = gridEl;
+
+
+        // Init tile system.
+        this.tileMap = [];
+        this.tileSize = globalVar.tileSize;
+        this.tileWidth = Math.floor(globalVar.gridConfig.width / globalVar.tileSize);
+        this.tileDepth = Math.floor(globalVar.gridConfig.depth / globalVar.tileSize);
+        for (let i = 0; i < this.tileWidth; i++) {
+            let column = [];
+            for (let k = 0; k < this.tileDepth; k++) {
+                column.push({
+                    towerInRange: [],
+                    enemyInRange: []
+                });
+            }
+            this.tileMap.push(column);
+        }
 
 
         // add static scene.
@@ -361,6 +390,91 @@ class GameManager {
             z: scenePos.z + (info.depth / 2) * scalar
         };
         this.updateGameGridArea(min, max, walkable);
+    }
+    sceneToTile(position, isMax) {
+        /*
+         *  EXPLAIN:
+         *      Transform dynamicScene position (real number space) to game tile position (one block on tile).
+         */
+        let p = {
+            x: Math.floor((position.x + (this.configs.globalVar.gridConfig.width / 2)) / this.tileSize),
+            y: position.y,
+            z: Math.floor((position.z + (this.configs.globalVar.gridConfig.depth / 2)) / this.tileSize)
+        }
+        if (isMax) {
+            if ((position.x + (this.configs.globalVar.gridConfig.width / 2)) % this.tileSize == 0) p.x -= 1;
+            if ((position.z + (this.configs.globalVar.gridConfig.depth / 2)) % this.tileSize == 0) p.z -= 1;
+        }
+
+        return p;
+    }
+    updateTowerToTileMap(pos, range, el, remove) {
+        /*
+         *  SPEC
+         *      (Vec3 like) pos: position in dynamicScene of the object.
+         *      (Number) range: attack range of the tower.
+         *      (DOM node) el: <a-entity> of the
+         *      (boolen) remove: (Optional) set to true to remove tower form tile map.
+         */
+        const scenePos = pos;
+        let tileMin = this.sceneToTile({
+            x: scenePos.x - range,
+            z: scenePos.z - range
+        });
+        let tileMax = this.sceneToTile({
+            x: scenePos.x + range,
+            z: scenePos.z + range
+        }, true);
+
+        for (let i = tileMin.x; i <= tileMax.x; i++) {
+            if (i < 0 || i >= this.tileWidth)
+                continue;
+
+            for (let k = tileMin.z; k <= tileMax.z; k++) {
+                if (k < 0 || k >= this.tileDepth)
+                    continue;
+
+                let index = this.tileMap[i][k].towerInRange.indexOf(el);
+                if (!(remove === true) && index == -1)
+                    this.tileMap[i][k].towerInRange.push(el);
+                else if (remove === true && index > -1)
+                    this.tileMap[i][k].towerInRange.splice(index, 1);
+
+            }
+        }
+    }
+    updateEnemyToTileMap(pos, el) {
+        /*
+         *  SPEC
+         *      (Vec3 like) pos: position in dynamicScene of the object.
+         *      (DOM node) el: <a-entity> of the enemy.
+         */
+        const scenePos = pos;
+        let tilePos = this.sceneToTile(scenePos);
+        let index = this.tileMap[tilePos.x][tilePos.z].enemyInRange.indexOf(el);
+        if (index === -1) {
+            this.tileMap[tilePos.x][tilePos.z].enemyInRange.push(el);
+            this.tileMap[tilePos.x][tilePos.z].towerInRange.forEach(towerEl => {
+                if (towerEl.components['tower'].enemiesInRange.indexOf(el) === -1 && towerEl.components['tower'].data.faction !== el.components['enemy'].data.faction)
+                    towerEl.components['tower'].enemiesInRange.push(el);
+            });
+        }
+
+
+        // console.log(this.tileMap);
+    }
+    removeEnemyFromTileMap(tilePos, el) {
+        let index = this.tileMap[tilePos.x][tilePos.z].enemyInRange.indexOf(el);
+        if (index > -1) {
+            this.tileMap[tilePos.x][tilePos.z].enemyInRange.splice(index, 1);
+            this.tileMap[tilePos.x][tilePos.z].towerInRange.forEach(towerEl => {
+                index = towerEl.components['tower'].enemiesInRange.indexOf(el)
+                if (index > -1)
+                    towerEl.components['tower'].enemiesInRange.splice(index, 1);
+            });
+        }
+
+        // console.log(this.tileMap);
     }
     async areaIsPlaceable(pos, width, depth, mute) {
         /*

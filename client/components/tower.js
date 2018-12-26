@@ -2,19 +2,75 @@
     const MAX_TIER = 3;
 
     AFRAME.registerSystem('tower', {
-        init: function() {
-            this.faction = {
-                A: {},
-                B: {}
-            };
-            this.faction.A.enemies = [];
-            this.faction.B.enemies = [];
-        },
-        updateEnemies: function(fac) {
-            //if (this.faction[fac].enemies === this.el.systems['enemy'].faction[fac].enemies)
-            //	console.warn('Redundent operation between tower and enemy.');
+        init: function() {},
+        getNearestEnemy: function(component) {
 
-            this.faction[fac].enemies = this.el.systems['enemy'].faction[fac].enemies;
+            //console.log(component.enemiesInRange);
+
+            if (component.enemiesInRange.length === 0)
+                return undefined;
+
+            let minDistance = Infinity;
+            let distance;
+            let targetEl;
+            component.enemiesInRange.forEach(enemyEl => {
+
+                distance = enemyEl.object3D.position.distanceToSquared(component.el.object3D.position);
+                if (distance < component.rangeSquare && distance < minDistance) {
+
+                    minDistance = distance;
+                    targetEl = enemyEl;
+
+                }
+
+            });
+
+            return targetEl;
+
+        },
+        isTargetInRange: function(component) {
+
+            if (component.targetEl.components['enemy'] === undefined || component.targetEl.components['enemy'].currentHP <= 0)
+                return false;
+
+            return (component.targetEl.object3D.position.distanceToSquared(component.el.object3D.position) < component.rangeSquare);
+
+        },
+        onFire: function(component) {
+
+            switch (component.data.type) {
+
+                case 'missile':
+                    let missileEl = document.createElement('a-entity');
+                    component.muzzle.getWorldPosition(component.tmpVec);
+                    missileEl.object3D.position.copy(component.gameManager.dynamicScene.object3D.worldToLocal(component.tmpVec));
+                    missileEl.setAttribute('missile', {
+                        damagePoint: component.damagePoint,
+                        attackRange: component.setting[component.data.type][component.data.tier].attackRange,
+                        speed: component.setting[component.data.type][component.data.tier].speed,
+                        targetPos: component.targetEl.object3D.position
+                    });
+                    component.gameManager.dynamicScene.appendChild(missileEl);
+                    break;
+
+                case 'laser':
+                    component.muzzle.getWorldPosition(component.tmpVec);
+                    component.laserLine.geometry.vertices[0].copy(component.laserLine.parent.worldToLocal(component.tmpVec));
+
+                    component.targetEl.object3D.getWorldPosition(component.tmpVec);
+                    component.laserLine.geometry.vertices[1].copy(component.laserLine.parent.worldToLocal(component.tmpVec));
+
+                    component.laserLine.geometry.verticesNeedUpdate = true;
+                    component.networkManager.emit('playingEvent', {
+                        event_name: 'enemy_be_attacked',
+                        id: component.targetEl.id,
+                        damage: component.damagePoint,
+                        type: component.data.type
+                    });
+                    break;
+
+            }
+
         }
     });
 
@@ -36,6 +92,7 @@
             }
         },
         init: function() {
+
             this.gameManager = this.el.sceneEl.systems['tdar-game'].gameManager;
             this.networkManager = this.el.sceneEl.systems['tdar-game'].networkManager;
 
@@ -69,29 +126,33 @@
 
             this.upgradeTier = this.upgradeTier.bind(this);
             this.isMaxTier = this.isMaxTier.bind(this);
-            this.onFire = this.onFire.bind(this);
 
 
             // initialize tower parameters.
-            this.targetEl = null;
+            this.targetEl = undefined;
             this.targetFac = (this.data.faction == 'A') ? 'B' : 'A';
             this.timeCounter = 0;
             this.restDuration = null;
             this.activateDuration = null;
             this.range = null;
+            this.rangeSquare = null;
             this.damagePoint = null;
             this.laserLine = null;
             this.tmpVec = new THREE.Vector3();
+            this.enemiesInRange = [];
 
-
-            // this.el.addEventListener('fire', this.onFire);
         },
         update: function() {
+
             let currentSetting = this.setting[this.data.type][this.data.tier];
             this.restDuration = currentSetting.restDuration;
             this.activateDuration = currentSetting.activateDuration;
             this.range = currentSetting.range;
+            this.rangeSquare = this.range * this.range;
             this.damagePoint = currentSetting.damagePoint;
+
+
+            this.gameManager.updateTowerToTileMap(this.el.object3D.position, this.range, this.el);
 
 
             // Initial laser object.
@@ -115,13 +176,15 @@
                     this.laserLine.material.needsUpdate = true;
                 }
             }
+
         },
         tick: function(time, timeDelta) {
+
             if (this.el.is('initializing'))
                 return;
 
             if (this.el.is('activate')) {
-                if (this.checkTargetDistance()) {
+                if (this.system.isTargetInRange(this)) {
                     this.timeCounter += timeDelta;
                     this.targetEl.object3D.getWorldPosition(this.tmpVec);
                     this.roter.lookAt(this.tmpVec);
@@ -142,24 +205,29 @@
                     }
 
                     if (this.el.is('attacking'))
-                        this.onFire();
+                        this.system.onFire(this);
                     //this.el.emit('fire');
                 } else {
                     this.el.removeState('activate');
                     this.el.removeState('attacking');
                     this.timeCounter = 0;
-                    this.targetEl = null;
+                    this.targetEl = undefined;
                     if (this.data.type == 'laser')
                         this.laserLine.visible = false;
                 }
             } else {
-                if (this.getNearestEnemy()) {
+                this.targetEl = this.system.getNearestEnemy(this);
+                if (this.targetEl !== undefined) {
                     this.el.addState('activate');
                     this.timeCounter = 0;
                 }
             }
+
         },
         remove: function() {
+
+            this.gameManager.updateTowerToTileMap(this.el.object3D.position, this.range, this.el, true);
+
             delete this.gameManager;
             delete this.networkManager;
 
@@ -183,69 +251,21 @@
             delete this.damagePoint;
             delete this.laserLine;
             delete this.tmpVec;
+            delete this.enemiesInRange;
 
-            // this.el.removeEventListener('fire', this.onFire);
-        },
-        checkTargetDistance: function() {
-            if (this.system.faction[this.targetFac].enemies.indexOf(this.targetEl) < 0) // Prevent target doesn't exist cause null error.
-                return false;
-            return (this.targetEl.object3D.position.distanceTo(this.el.object3D.position) < this.range);
-        },
-        getNearestEnemy: function() {
-            if (this.system.faction[this.targetFac].enemies.length <= 0) // Prevent empty array cause error.
-                return false;
-
-            let minDistance = Infinity;
-            this.system.faction[this.targetFac].enemies.forEach(enemyEl => {
-                let distance = enemyEl.object3D.position.distanceTo(this.el.object3D.position);
-                if (distance < minDistance) {
-                    minDistance = distance;
-                    this.targetEl = enemyEl;
-                }
-            });
-            return (minDistance < this.range);
-        },
-        onFire: function() {
-            if (this.gameManager.dynamicScene.querySelector('#' + this.targetEl.id)) {
-                switch (this.data.type) {
-                    case 'missile':
-                        let missileEl = document.createElement('a-entity');
-                        this.muzzle.getWorldPosition(this.tmpVec);
-                        missileEl.object3D.position.copy(this.gameManager.dynamicScene.object3D.worldToLocal(this.tmpVec));
-                        missileEl.setAttribute('missile', {
-                            damagePoint: this.damagePoint,
-                            attackRange: this.setting[this.data.type][this.data.tier].attackRange,
-                            speed: this.setting[this.data.type][this.data.tier].speed,
-                            targetPos: this.targetEl.object3D.position
-                        });
-                        this.gameManager.dynamicScene.appendChild(missileEl);
-                        break;
-                    case 'laser':
-                        this.muzzle.getWorldPosition(this.tmpVec);
-                        this.laserLine.geometry.vertices[0].copy(this.laserLine.parent.worldToLocal(this.tmpVec));
-
-                        this.targetEl.object3D.getWorldPosition(this.tmpVec);
-                        this.laserLine.geometry.vertices[1].copy(this.laserLine.parent.worldToLocal(this.tmpVec));
-
-                        this.laserLine.geometry.verticesNeedUpdate = true;
-                        this.networkManager.emit('playingEvent', {
-                            event_name: 'enemy_be_attacked',
-                            id: this.targetEl.id,
-                            damage: this.damagePoint,
-                            type: this.data.type
-                        });
-                        break;
-                }
-            }
         },
         upgradeTier: function() {
+
             if (this.data.tier < MAX_TIER)
                 this.el.setAttribute('tower', {
                     tier: this.data.tier + 1
                 });
+
         },
         isMaxTier: function() {
+
             return this.data.tier >= MAX_TIER - 1;
+
         }
     });
 })();

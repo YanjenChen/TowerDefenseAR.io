@@ -26,7 +26,8 @@
             "width": 20,
             "depth": 20
         },
-        "sceneScale": 1
+        "sceneScale": 1,
+        "tileSize": 4
     },
     "staticScene": {
         "abstractName": [{

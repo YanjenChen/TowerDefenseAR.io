@@ -46,7 +46,6 @@
         registerEnemy: function(el, id) {
             var fac = el.components.enemy.data.faction;
             this.faction[fac].enemies.push(el);
-            this.el.systems['tower'].updateEnemies(fac);
 
             // Add to animation group.
             this.animationGroups[id % ANIMATION_GROUP_NUM].add(el.getObject3D('mesh'));
@@ -56,7 +55,6 @@
             var index = this.faction[fac].enemies.indexOf(el);
             if (index > -1) {
                 this.faction[fac].enemies.splice(index, 1);
-                this.el.systems['tower'].updateEnemies(fac);
             }
 
             // Remove from animation group.
@@ -146,12 +144,14 @@
             this.onBeAttacked = this.onBeAttacked.bind(this);
             this.onArrived = this.onArrived.bind(this);
             this.updatePath = this.updatePath.bind(this);
+            this.updateToTile = this.updateToTile.bind(this);
 
             this.speed = this.setting[this.data.type].speed;
             this.currentHP = this.data.healthPoint;
             this.line = null;
             this.lineLength = null;
             this.completeDist = 0;
+            this.prevTile = this.gameManager.sceneToTile(this.el.object3D.position);
 
             this.el.addState('needupdatepath');
             this.updatePath();
@@ -175,10 +175,13 @@
                     let d = this.el.parentNode.object3D.localToWorld(p.clone());
                     this.el.object3D.lookAt(d);
                     this.el.object3D.position.copy(p);
+
+                    this.updateToTile();
                 }
             }
         },
         remove: function() {
+            this.gameManager.removeEnemyFromTileMap(this.prevTile, this.el);
             this.system.unregisterEnemy(this.el, this.data.id);
 
             delete this.gameManager;
@@ -230,6 +233,14 @@
             this.lineLength = this.line.getLength();
             this.completeDist = 0;
             this.el.removeState('needupdatepath');
+        },
+        updateToTile: function() {
+            let p = this.gameManager.sceneToTile(this.el.object3D.position);
+            if (p.x != this.prevTile.x || p.z != this.prevTile.z) {
+                this.gameManager.removeEnemyFromTileMap(this.prevTile, this.el);
+                this.gameManager.updateEnemyToTileMap(this.el.object3D.position, this.el);
+                this.prevTile = p;
+            }
         }
     });
 })();
