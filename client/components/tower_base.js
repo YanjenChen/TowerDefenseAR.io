@@ -136,18 +136,11 @@
             this.el.addState('processing');
 
 
-            let info = this.gameManager.object3DPrototypes[this.gameManager.settings.tower.common.mesh];
-            let min = {
-                x: this.el.object3D.position.x - (info.width / 2),
-                y: 0,
-                z: this.el.object3D.position.z - (info.depth / 2)
-            };
-            let max = {
-                x: this.el.object3D.position.x + (info.width / 2),
-                y: 0,
-                z: this.el.object3D.position.z + (info.depth / 2)
-            };
-            this.gameManager.updateGameGridArea(min, max, true);
+            this.gameManager.updateGameGridByModel(
+                this.el.object3D.position,
+                this.gameManager.settings.tower.common.mesh,
+                true
+            );
 
 
             this.el.sceneEl.emit('systemupdatepath', {

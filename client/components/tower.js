@@ -1,11 +1,12 @@
 (() => {
     const MAX_TIER = 3;
+    const LASER_EMIT_THRESHOLD = 20;
 
     AFRAME.registerSystem('tower', {
         init: function() {},
         getNearestEnemy: function(component) {
 
-            //console.log(component.enemiesInRange);
+            // console.log(component.enemiesInRange);
 
             if (component.enemiesInRange.length === 0)
                 return undefined;
@@ -30,7 +31,7 @@
         },
         isTargetInRange: function(component) {
 
-            if (component.targetEl.components['enemy'] === undefined || component.targetEl.components['enemy'].currentHP <= 0)
+            if (component.targetEl === undefined || component.targetEl.components['enemy'] === undefined || component.targetEl.components['enemy'].currentHP <= 0)
                 return false;
 
             return (component.targetEl.object3D.position.distanceToSquared(component.el.object3D.position) < component.rangeSquare);
@@ -61,12 +62,19 @@
                     component.laserLine.geometry.vertices[1].copy(component.laserLine.parent.worldToLocal(component.tmpVec));
 
                     component.laserLine.geometry.verticesNeedUpdate = true;
-                    component.networkManager.emit('playingEvent', {
-                        event_name: 'enemy_be_attacked',
-                        id: component.targetEl.id,
-                        damage: component.damagePoint,
-                        type: component.data.type
-                    });
+
+                    component.laserAttackCount++;
+                    if (component.laserAttackCount >= LASER_EMIT_THRESHOLD) {
+
+                        component.networkManager.emit('playingEvent', {
+                            event_name: 'enemy_be_attacked',
+                            id: component.targetEl.id,
+                            damage: component.damagePoint * component.laserAttackCount,
+                            type: component.data.type
+                        });
+                        component.laserAttackCount = 0;
+
+                    }
                     break;
 
             }
@@ -100,8 +108,6 @@
             this.setting = this.gameManager.settings.tower;
 
 
-            // this.el.setAttribute('gltf-model', '#' + this.setting.common.mesh);
-            // this.el.object3D.scale.copy(this.gameManager.object3DPrototypes[this.setting.common.mesh].model.scale);
             let model = THREE.AnimationUtils.clone(this.gameManager.object3DPrototypes[this.setting.common.mesh].model);
             model.animations = this.gameManager.object3DPrototypes[this.setting.common.mesh].model.animations;
             this.el.setObject3D('mesh', model);
@@ -140,6 +146,7 @@
             this.laserLine = null;
             this.tmpVec = new THREE.Vector3();
             this.enemiesInRange = [];
+            this.laserAttackCount = 0;
 
         },
         update: function() {
@@ -206,7 +213,7 @@
 
                     if (this.el.is('attacking'))
                         this.system.onFire(this);
-                    //this.el.emit('fire');
+
                 } else {
                     this.el.removeState('activate');
                     this.el.removeState('attacking');
@@ -252,6 +259,7 @@
             delete this.laserLine;
             delete this.tmpVec;
             delete this.enemiesInRange;
+            delete this.laserAttackCount;
 
         },
         upgradeTier: function() {

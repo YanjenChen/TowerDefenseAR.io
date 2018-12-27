@@ -1,5 +1,7 @@
 (() => {
-    const ANIMATION_GROUP_NUM = 1;
+    const ANIMATION_GROUP_NUM = 4;
+    const BAR_COLOR_GREEN = 0x4ecdc4;
+    const BAR_COLOR_RED = 0xff6b6b;
 
     AFRAME.registerSystem('enemy', {
         init: function() {
@@ -59,6 +61,8 @@
 
             // Remove from animation group.
             this.animationGroups[id % ANIMATION_GROUP_NUM].remove(el.getObject3D('mesh'));
+
+            console.log(this.animationGroups);
         },
         onPathUpdated: function(evt) {
             /*
@@ -126,18 +130,23 @@
             this.setting = this.gameManager.settings.enemy;
 
 
-            // this.el.setAttribute('gltf-model', '#' + this.setting.common.mesh);
-            // this.el.object3D.scale.copy(this.gameManager.object3DPrototypes[this.setting.common.mesh].model.scale);
             let model = THREE.AnimationUtils.clone(this.gameManager.object3DPrototypes[this.setting.common.mesh].model);
-            // model.animations = this.gameManager.object3DPrototypes[this.setting.common.mesh].model.animations;
             this.el.setObject3D('mesh', model);
+            let geometry = new THREE.PlaneGeometry(this.gameManager.object3DPrototypes[this.setting.common.mesh].width, 0.1);
+            geometry.vertices.forEach(point => {
+                point.x += this.gameManager.object3DPrototypes[this.setting.common.mesh].width / 2;
+                point.y += 0.05;
+            });
+            let material = new THREE.MeshBasicMaterial({
+                color: BAR_COLOR_GREEN,
+                side: THREE.DoubleSide
+            });
+            let lifeBar = new THREE.Mesh(geometry, material);
+            lifeBar.position.setX(-this.gameManager.object3DPrototypes[this.setting.common.mesh].width / 2);
+            lifeBar.position.setY(this.gameManager.object3DPrototypes[this.setting.common.mesh].height + 0.05);
+            this.el.setObject3D('lifebar', lifeBar);
 
             this.el.setAttribute('id', 'enemy-' + this.data.id.toString());
-            /*
-            this.el.setAttribute('animation-mixer', {
-                timeScale: this.setting.common.animation_timeScale
-            });
-            */
             this.system.registerEnemy(this.el, this.data.id);
 
 
@@ -151,7 +160,8 @@
             this.line = null;
             this.lineLength = null;
             this.completeDist = 0;
-            this.prevTile = this.gameManager.sceneToTile(this.el.object3D.position);
+            this.prevTile = this.gameManager.Utils.sceneToTile(this.el.object3D.position);
+            this.lifeBar = lifeBar;
 
             this.el.addState('needupdatepath');
             this.updatePath();
@@ -195,10 +205,14 @@
             delete this.line;
             delete this.lineLength;
             delete this.completeDist;
+            delete this.prevTile;
+            delete this.lifeBar;
+
 
             // this.el.removeAttribute('gltf-model');
             // this.el.removeAttribute('animation-mixer');
             this.el.removeObject3D('mesh');
+            this.el.removeObject3D('lifebar');
             this.el.removeEventListener('be-attacked', this.onBeAttacked);
             this.el.removeEventListener('movingended', this.onArrived);
         },
@@ -225,6 +239,13 @@
                     this.data.faction == 'A' ? 'B' : 'A'
                 );
                 this.el.parentNode.removeChild(this.el);
+            } else {
+                let scaleX = this.currentHP / this.data.healthPoint;
+                this.lifeBar.scale.setX(scaleX);
+                if (scaleX <= 0.2) {
+                    this.lifeBar.material.color.set(BAR_COLOR_RED);
+                    this.lifeBar.material.needsUpdate = true;
+                }
             }
         },
         updatePath: async function() {
@@ -235,10 +256,10 @@
             this.el.removeState('needupdatepath');
         },
         updateToTile: function() {
-            let p = this.gameManager.sceneToTile(this.el.object3D.position);
+            let p = this.gameManager.Utils.sceneToTile(this.el.object3D.position);
             if (p.x != this.prevTile.x || p.z != this.prevTile.z) {
                 this.gameManager.removeEnemyFromTileMap(this.prevTile, this.el);
-                this.gameManager.updateEnemyToTileMap(this.el.object3D.position, this.el);
+                this.gameManager.addEnemyToTileMap(this.el.object3D.position, this.el);
                 this.prevTile = p;
             }
         }
