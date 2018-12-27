@@ -45,14 +45,14 @@
                 this.animationMixers[i].update(timeDelta / 1000);
             }
         },
-        registerEnemy: function(el, id) {
+        registerEnemy: function(el, obj, id) {
             var fac = el.components.enemy.data.faction;
             this.faction[fac].enemies.push(el);
 
             // Add to animation group.
-            this.animationGroups[id % ANIMATION_GROUP_NUM].add(el.getObject3D('mesh'));
+            this.animationGroups[Math.round(id % ANIMATION_GROUP_NUM)].add(obj);
         },
-        unregisterEnemy: function(el, id) {
+        unregisterEnemy: function(el, obj, id) {
             var fac = el.components.enemy.data.faction;
             var index = this.faction[fac].enemies.indexOf(el);
             if (index > -1) {
@@ -60,9 +60,17 @@
             }
 
             // Remove from animation group.
-            this.animationGroups[id % ANIMATION_GROUP_NUM].remove(el.getObject3D('mesh'));
+            this.animationGroups[Math.round(id % ANIMATION_GROUP_NUM)].remove(obj);
+            this.animationGroups[Math.round(id % ANIMATION_GROUP_NUM)].uncache(obj);
 
-            console.log(this.animationGroups);
+            /*
+            let objingroup = 0;
+            for (let i = 0; i < ANIMATION_GROUP_NUM; i++) {
+                objingroup += this.animationGroups[i]._objects.length;
+            }
+            console.log('Obj3D in group: ', objingroup);
+            console.log('Obj3D on field: ', this.faction.A.enemies.length + this.faction.B.enemies.length);
+            */
         },
         onPathUpdated: function(evt) {
             /*
@@ -147,7 +155,7 @@
             this.el.setObject3D('lifebar', lifeBar);
 
             this.el.setAttribute('id', 'enemy-' + this.data.id.toString());
-            this.system.registerEnemy(this.el, this.data.id);
+            this.system.registerEnemy(this.el, this.el.getObject3D('mesh'), this.data.id);
 
 
             this.onBeAttacked = this.onBeAttacked.bind(this);
@@ -192,7 +200,7 @@
         },
         remove: function() {
             this.gameManager.removeEnemyFromTileMap(this.prevTile, this.el);
-            this.system.unregisterEnemy(this.el, this.data.id);
+            this.system.unregisterEnemy(this.el, this.el.getObject3D('mesh'), this.data.id);
 
             delete this.gameManager;
             delete this.networkManager;

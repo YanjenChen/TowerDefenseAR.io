@@ -3,11 +3,11 @@
         schema: {
             amount: {
                 type: 'number',
-                default: 1
+                default: 10
             },
             duration: {
                 type: 'number',
-                default: 20000
+                default: 5000
             },
             faction: {
                 type: 'string',
