@@ -3,7 +3,7 @@
         schema: {
             amount: {
                 type: 'number',
-                default: 10
+                default: 1
             },
             duration: {
                 type: 'number',

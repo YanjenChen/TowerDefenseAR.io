@@ -3,15 +3,19 @@ h1, h3 {
     color: white;
     font-family: Arial, Helvetica, sans-serif;
 }
+
 h1 {
     font-size: 1.75em;
 }
+
 h3 {
     font-size: 1em;
 }
+
 h1.primary {
     margin: 0 auto 10px auto;
 }
+
 h1.inverted, h3.inverted {
     background-color: rgba(34, 116, 165, 30%);
     border-radius: 1em;
@@ -24,22 +28,32 @@ h1.inverted, h3.inverted {
     max-width: 300px;
     max-height: 20%;
 }
+
 .tdar-ui-container.top {
     top: 30px;
 }
+
 .tdar-ui-container.left {
     left: 30px;
 }
+
 .tdar-ui-container.bottom {
     bottom: 15px;
 }
+
 .tdar-ui-container.right {
     right: 30px;
 }
 
-.tdar-ui-container > .wrapper {
+.tdar-ui-container.center {
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.tdar-ui-container>.wrapper {
     padding: 10px;
 }
+
 .wrapper {
     position: relative;
     margin: 0;
@@ -47,12 +61,15 @@ h1.inverted, h3.inverted {
     display: flex;
     justify-content: space-between;
 }
+
 .wrapper.verticle-grid {
     flex-direction: column;
 }
+
 .wrapper.horizontal-grid {
     flex-direction: row;
 }
+
 .wrapper.stripe {
     background-color: rgba(4, 167, 119, 30%);
     border-style: solid;
@@ -67,16 +84,20 @@ h1.inverted, h3.inverted {
     max-width: 100%;
     overflow: hidden;
 }
+
 .content.primary {
     margin-bottom: 10px;
 }
+
 .content.text-center {
     text-align: center;
 }
+
 .content.block {
     padding: 5px;
     background-color: rgba(34, 116, 165, 30%);
 }
+
 .content.long {
     min-width: none;
     overflow: visible;
@@ -87,10 +108,12 @@ h1.inverted, h3.inverted {
     height: 1.75em;
     margin: 2px;
 }
-.wrapper > .icon {
+
+.wrapper>.icon {
     border: solid white 2px;
 }
-.wrapper > .icon.attacking {
+
+.wrapper>.icon.attacking {
     border: solid rgb(247, 92, 3) 2px;
     background-color: rgb(247, 92, 3);
 }
@@ -100,6 +123,7 @@ h1.inverted, h3.inverted {
     margin: 0 5px 0 0;
     vertical-align: middle;
 }
+
 .icon-header h1 {
     display: inline-block;
     vertical-align: middle;
@@ -115,14 +139,16 @@ h1.inverted, h3.inverted {
     overflow: hidden;
     border: rgba(4, 167, 119, 70%) solid;
     border-radius: 5px;
-    background-color: rgba(4, 167, 119, 30%) ;
+    background-color: rgba(4, 167, 119, 30%);
 }
+
 .tdar-button.primary {
     width: 60px;
     height: 60px;
     margin: 10px;
 }
-.tdar-button > .button-icon {
+
+.tdar-button>.button-icon {
     margin: 0 auto 5px auto;
     width: 1.75em;
     height: 1.75em;
@@ -130,75 +156,76 @@ h1.inverted, h3.inverted {
     background-position: center;
     background-size: 100% 100%;
 }
-.tdar-button > .header {
+
+.tdar-button>.header {
     text-align: center;
     margin: 0 auto 3px auto;
 }
-.tdar-button > .icon-header {
+
+.tdar-button>.icon-header {
+    text-align: center;
     margin: 0 auto;
 }
-.tdar-button > .icon-header .icon {
+
+.tdar-button>.icon-header .icon {
     margin: 0 3px 0 0;
     width: 1em;
     height: 1em;
     margin: 1px;
 }
-.tdar-button > .icon-header h3 {
+
+.tdar-button>.icon-header h3 {
     display: inline-block;
     vertical-align: middle;
     min-width: 60%;
     text-align: center;
 }
+
 .tdar-button.disable {
     border: rgba(35, 53, 65, 70%) solid;
-    background-color: rgba(35, 53, 65, 30%) ;
+    background-color: rgba(35, 53, 65, 30%);
 }
-.tdar-button.disable > .icon-header h3 {
+
+.tdar-button.disable>.icon-header h3 {
     color: rgb(220, 0, 0);
 }
 
 .tdar-button.hammer .button-icon {
     background-image: url(../renderer/assets/ui/hammer-nails.svg);
 }
+
 .tdar-button.beam .button-icon {
     background-image: url(../renderer/assets/ui/bubbling-beam.svg);
 }
+
 .tdar-button.bullets .button-icon {
     background-image: url(../renderer/assets/ui/bullets.svg);
 }
+
 .tdar-button.rocket .button-icon {
     background-image: url(../renderer/assets/ui/rocket.svg);
 }
+
 .tdar-button.upgrade .button-icon {
     background-image: url(../renderer/assets/ui/upgrade.svg);
 }
+
 .tdar-button.demolish .button-icon {
     background-image: url(../renderer/assets/ui/demolish.svg);
 }
+
+.tdar-button.anchor .button-icon {
+    background-image: url(../renderer/assets/ui/anchor.svg);
+}
+
 .icon.barbute, .tdar-button.barbute .button-icon {
     background-image: url(../renderer/assets/ui/barbute.svg);
 }
+
 .icon.life-bar {
     background-image: url(../renderer/assets/ui/life-bar.svg);
 }
+
 .icon.two-coins {
     background-image: url(../renderer/assets/ui/two-coins.svg);
-}
-
-@media (orientation: portrait) {
-    .tdar-ui-container {
-        transform: scale(1.7, 1.7);
-    }
-    .tdar-ui-container.left.top {
-        transform-origin: left top;
-    }
-    .tdar-ui-container.right.top {
-        transform-origin: right top;
-    }
-    .tdar-ui-container.left.bottom {
-        transform-origin: left bottom;
-    }
-    .tdar-ui-container.right.bottom {
-        transform-origin: right bottom;
-    }
 }
