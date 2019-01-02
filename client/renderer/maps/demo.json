@@ -24,9 +24,10 @@
     "globalVar": {
         "gridConfig": {
             "width": 20,
-            "depth": 20
+            "depth": 30
         },
-        "sceneScale": 1
+        "sceneScale": 1,
+        "tileSize": 4
     },
     "staticScene": {
         "abstractName": [{
@@ -41,6 +42,20 @@
                 "z": 0
             },
             "scalar": 1,
+            "walkable": false
+        }],
+        "stone": [{
+            "scenePosition": {
+                "x": 0,
+                "y": 0,
+                "z": 0
+            },
+            "rotation": {
+                "x": 0,
+                "y": 90,
+                "z": 0
+            },
+            "scalar": 2,
             "walkable": false
         }]
     },

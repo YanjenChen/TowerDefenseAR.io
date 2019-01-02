@@ -93,14 +93,6 @@
                             this.prevCoord.z = z;
                             this.updateUI();
                         }
-
-                        if (await this.gameManager.areaIsPlaceable(this.reticle.position, HOVER_REGION, HOVER_REGION, true)) {
-                            this.reticle.material.color.set(0x6a787f);
-                            this.reticle.material.needsUpdate = true;
-                        } else {
-                            this.reticle.material.color.set(0x83787F);
-                            this.reticle.material.needsUpdate = true;
-                        }
                     } else {
                         this.reticle.visible = false;
                     }
@@ -136,7 +128,15 @@
             let selectedBase = this.hoveringBase = this.gameManager.towerBases[x][z];
             if (selectedBase === undefined)
                 console.warn('TowerBases have undefined element or access wrong idex: ', x, z);
-            let placeable = await this.gameManager.areaIsPlaceable(this.reticle.position, HOVER_REGION, HOVER_REGION, true);
+            let placeable = await this.gameManager.areaIsPlaceable(this.reticle.position, HOVER_REGION, HOVER_REGION);
+
+            if (placeable) {
+                this.reticle.material.color.set(0x6a787f);
+                this.reticle.material.needsUpdate = true;
+            } else {
+                this.reticle.material.color.set(0x83787F);
+                this.reticle.material.needsUpdate = true;
+            }
 
             if (selectedBase === null) {
                 this.uiManager.updateObjectControl([]);
@@ -150,7 +150,7 @@
         },
         onTowerEndProcess: function(base) {
             if (base === this.hoveringBase)
-                this.uiManager.updateObjectControl(base.getUIsets());
+                this.updateUI();
         }
     });
 })();
