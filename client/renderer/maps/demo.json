@@ -89,19 +89,25 @@
                 "activateDuration": 1000,
                 "range": 5,
                 "damagePoint": 1,
-                "laserColor": "rgb(68,170,68)"
+                "laserColor": "rgb(68,170,68)",
+                "amplifyAmount":0,
+                "cost": -50
             }, {
                 "restDuration": 500,
                 "activateDuration": 2000,
                 "range": 5,
                 "damagePoint": 2,
-                "laserColor": "rgb(68,68,170)"
+                "laserColor": "rgb(68,68,170)",
+                "amplifyAmount":0,
+                "cost": -50
             }, {
                 "restDuration": 0,
                 "activateDuration": 1000,
                 "range": 5,
                 "damagePoint": 3,
-                "laserColor": "rgb(170,68,68)"
+                "laserColor": "rgb(170,68,68)",
+                "amplifyAmount":0,
+                "cost": -50
             }],
             "missile": [{
                 "restDuration": 4000,
@@ -109,21 +115,31 @@
                 "range": 10,
                 "damagePoint": 50,
                 "attackRange": 1.5,
-                "speed": 10
+                "speed": 10,
+                "amplifyAmount":0,
+                "cost": -50
             }, {
                 "restDuration": 3000,
                 "activateDuration": 1,
                 "range": 11,
                 "damagePoint": 70,
                 "attackRange": 1.6,
-                "speed": 10
+                "speed": 10,
+                "amplifyAmount":0,
+                "cost": -50
             }, {
                 "restDuration": 1500,
                 "activateDuration": 1,
                 "range": 12,
                 "damagePoint": 100,
                 "attackRange": 1.6,
-                "speed": 12
+                "speed": 12,
+                "amplifyAmount":0,
+                "cost": -50
+            }],
+            "goldmine": [{
+                "amplifyAmount":5,
+                "cost": -100
             }]
         },
         "castle": {

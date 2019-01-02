@@ -28,7 +28,7 @@
             type: {
                 type: "string",
                 default: "laser",
-                oneOf: ['laser', 'missile']
+                oneOf: ['laser', 'missile','goldmine']
             },
             tier: {
                 type: "number",
@@ -117,6 +117,8 @@
             }
         },
         tick: function(time, timeDelta) {
+            if(this.data.type=='goldmine')
+            return;
             if (this.el.is('initializing'))
                 return;
 
@@ -245,7 +247,8 @@
                 });
         },
         isMaxTier: function() {
-            return this.data.tier >= MAX_TIER - 1;
+            return this.data.tier >= this.setting[this.data.type].length - 1;
         }
     });
 })();
+// add cash to line 31

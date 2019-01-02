@@ -6,6 +6,7 @@
             // Notice: Tower base do not own by faction.
         },
         init: function() {
+
             this.gameManager = this.el.sceneEl.systems['tdar-game'].gameManager;
             this.networkManager = this.el.sceneEl.systems['tdar-game'].networkManager;
             this.uiManager = this.el.sceneEl.systems['tdar-game'].uiManager;
@@ -18,6 +19,7 @@
             this.requestTower = this.requestTower.bind(this);
             this.requestLaser = this.requestLaser.bind(this);
             this.requestMissile = this.requestMissile.bind(this);
+            this.requestGoldmine=this.requestGoldmine.bind(this);
             this.createTower = this.createTower.bind(this);
             this.requestUpgrade = this.requestUpgrade.bind(this);
             this.upgradeTower = this.upgradeTower.bind(this);
@@ -32,6 +34,7 @@
             this.el.addEventListener('create-tower', this.createTower);
             this.el.addEventListener('upgrade-tower', this.upgradeTower);
             this.el.addEventListener('remove-tower', this.removeTower);
+
         },
         tick: function(time, timeDelta) {
             if (this.el.is('processing')) {
@@ -56,7 +59,7 @@
             this.el.removeEventListener('remove-tower', this.removeTower);
         },
         requestTower: function(type) {
-            if (!(type == 'laser' || type == 'missile')) {
+            if (!(type == 'laser' || type == 'missile'|| type=='goldmine')) {
                 console.warn('Request tower receive unknown type: ', type);
                 return;
             }
@@ -64,12 +67,14 @@
                 console.warn('Towerbase does not have id.');
                 return;
             }
-
+            
             this.networkManager.emit('playingEvent', {
                 event_name: 'request_create_tower',
                 id: this.el.id,
                 faction: this.el.sceneEl.systems['tdar-game'].data.userFaction,
-                type: type
+                type: type,
+                amount:this.gameManager.settings.tower[type][0].cost,
+                ampamount:this.gameManager.settings.tower[type][0].amplifyAmount
             });
 
             this.uiManager.updateObjectControl([]);
@@ -79,6 +84,9 @@
         },
         requestMissile: function() {
             this.requestTower('missile');
+        },
+        requestGoldmine:function(){
+          this.requestTower('goldmine');
         },
         createTower: function(evt) {
             this.el.setAttribute('tower', {
@@ -107,7 +115,9 @@
 
             this.networkManager.emit('playingEvent', {
                 event_name: 'request_upgrade_tower',
-                id: this.el.id
+                id: this.el.id,
+                faction:this.el.sceneEl.systems['tdar-game'].data.userFaction,
+                amount:this.gameManager.settings.tower[this.el.components['tower'].data.type][0].cost
             });
 
             this.uiManager.updateObjectControl([]);
@@ -158,35 +168,57 @@
             if (this.el.is('processing'))
                 return [];
 
+            let currentMoney = this.cashManager.currentMoney[this.el.sceneEl.systems['tdar-game'].data.userFaction];
             let uisets;
             if (this.el.is('empty')) {
+              let lasercost= this.gameManager.settings.tower['laser'][0].cost*-1;
+              let missilecost= this.gameManager.settings.tower['missile'][0].cost*-1;
+              let goldminecost= this.gameManager.settings.tower['goldmine'][0].cost*-1;
                 uisets = [{
-                    callback: this.requestLaser,
+                    callback: currentMoney >= lasercost ? this.requestLaser : null,
                     icon: 'beam',
-                    header: 'Beam'
+                    header: 'Beam',
+                    cost:lasercost,
+                    disable:currentMoney >= lasercost ? false : true
                 }, {
-                    callback: this.requestMissile,
+                    callback: currentMoney >= missilecost ? this.requestMissile : null,
                     icon: 'rocket',
-                    header: 'Missile'
+                    header: 'Missile',
+                    cost:missilecost,
+                    disable:currentMoney >= missilecost ? false : true
+
+                }, {
+                    callback: currentMoney >= goldminecost ?this.requestGoldmine : null,
+                    icon: 'gold',
+                    header: 'Goldmine',
+                    cost:goldminecost,
+                    disable:currentMoney >= goldminecost ? false : true
+
                 }];
             } else if (this.el.components['tower'].isMaxTier()) {
                 uisets = [{
                     callback: this.requestRemove,
                     icon: 'demolish',
-                    header: 'Remove'
+                    header: 'Remove',
+                    cost:0
                 }];
             } else {
+              let upgradecost=this.gameManager.settings.tower[this.el.components['tower'].data.type][this.el.components['tower'].data.tier +1].cost*-1;
                 uisets = [{
                     callback: this.requestRemove,
                     icon: 'demolish',
-                    header: 'Remove'
+                    header: 'Remove',
+                    cost:0
                 }, {
-                    callback: this.requestUpgrade,
+                    callback: currentMoney >= upgradecost? this.requestUpgrade : null,
                     icon: 'upgrade',
-                    header: 'Upgrade'
+                    header: 'Upgrade',
+                    cost:upgradecost,
+                    disable:currentMoney >= upgradecost ? false : true
                 }];
             }
             return uisets;
         }
     });
 })();
+//line 72 add cost 84, 175

@@ -157,7 +157,7 @@ class UIManager {
 		 *       (array of object) settings: settings of buttons.
 		 *          (object) = {icon: (string), header: (string), cost: (number), disable: {boolen}, callback: (function)}
 		 */
-		if (settings.length >= MAX_UI) {
+		if (settings.length > MAX_UI) {
 			console.warn('UI AMOUNT MUST LOWER THEN ', MAX_UI);
 			return;
 		}
@@ -169,17 +169,17 @@ class UIManager {
 				let setting = settings[i];
 				let buttonEl = buttonEls[i];
 
-				if (setting.disable) {
+				if (setting.disable)
 					buttonEl.classList.add('disable');
-				} else {
-					if (setting.icon)
+				if (setting.icon)
 						buttonEl.classList.add(setting.icon);
-					if (setting.header)
+				if (setting.header)
 						buttonEl.querySelector('.header').innerHTML = setting.header;
-					if (setting.cost)
+				if (setting.cost !== undefined)
 						buttonEl.querySelector('.cost').innerHTML = setting.cost;
-					buttonEl.addEventListener('click', setting.callback);
-					self.objectControlCallbacks[i] = setting.callback;
+				if(setting.callback !== null) {
+						buttonEl.addEventListener('click', setting.callback);
+						self.objectControlCallbacks[i] = setting.callback;
 				}
 			}
 		});
