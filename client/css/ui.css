@@ -198,6 +198,10 @@ h1.inverted, h3.inverted {
     background-image: url(../renderer/assets/ui/bubbling-beam.svg);
 }
 
+.tdar-button.gold .button-icon {
+    background-image: url(../renderer/assets/ui/gold-mine.svg);
+}
+
 .tdar-button.bullets .button-icon {
     background-image: url(../renderer/assets/ui/bullets.svg);
 }

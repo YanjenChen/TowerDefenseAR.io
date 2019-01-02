@@ -23,38 +23,38 @@ class UIManager {
         this.arControlEl = this.createARControl();
 
         for (let i = 0; i < MAX_UI; i++) {
-            // this.waveSpawnerControlCallbacks.push(null);
+            //this.waveSpawnerControlCallbacks.push(null);
             this.objectControlCallbacks.push(null);
         }
     }
     /*
-    createWaveMonitor() {
-    	let wrapper = document.createElement('div');
-    	wrapper.classList.add('tdar-ui-container', 'top', 'left');
+	createWaveMonitor() {
+		let wrapper = document.createElement('div');
+		wrapper.classList.add('tdar-ui-container', 'top', 'left');
 
-    	let waveMonitor = document.createElement('div');
-    	waveMonitor.classList.add('wrapper', 'verticle-grid', 'stripe');
-    	waveMonitor.setAttribute('id', 'wave-monitor');
-    	waveMonitor.insertAdjacentHTML('beforeend', '<div class="content text-center"><h1 class="primary">NEXT WAVE: <span id="wave-timer">00:00</span></h1></div>');
+		let waveMonitor = document.createElement('div');
+		waveMonitor.classList.add('wrapper', 'verticle-grid', 'stripe');
+		waveMonitor.setAttribute('id', 'wave-monitor');
+		waveMonitor.insertAdjacentHTML('beforeend', '<div class="content text-center"><h1 class="primary">NEXT WAVE: <span id="wave-timer">00:00</span></h1></div>');
 
-    	let waveContentWrapper = document.createElement('div');
-    	waveContentWrapper.classList.add('content', 'block');
-    	let waveContent = document.createElement('div');
-    	waveContent.classList.add('wrapper', 'horizontal-grid');
-    	waveContent.setAttribute('id', 'wave-content');
-    	for (i = 0; i < MAX_WAVE_DISPLAY; i++) {
-    		let item = document.createElement('div');
-    		item.classList.add('icon');
-    		waveContent.appendChild(item);
-    	}
+		let waveContentWrapper = document.createElement('div');
+		waveContentWrapper.classList.add('content', 'block');
+		let waveContent = document.createElement('div');
+		waveContent.classList.add('wrapper', 'horizontal-grid');
+		waveContent.setAttribute('id', 'wave-content');
+		for (i = 0; i < MAX_WAVE_DISPLAY; i++) {
+			let item = document.createElement('div');
+			item.classList.add('icon');
+			waveContent.appendChild(item);
+		}
 
-    	waveContentWrapper.appendChild(waveContent);
-    	waveMonitor.appendChild(waveContentWrapper);
-    	wrapper.appendChild(waveMonitor);
-    	this.sceneEl.appendChild(wrapper);
+		waveContentWrapper.appendChild(waveContent);
+		waveMonitor.appendChild(waveContentWrapper);
+		wrapper.appendChild(waveMonitor);
+		this.sceneEl.appendChild(wrapper);
 
-    	return waveMonitor;
-    }
+		return waveMonitor;
+	}
     */
     createStatusMonitor() {
         let wrapper = document.createElement('div');
@@ -71,23 +71,23 @@ class UIManager {
         return statusMonitor;
     }
     /*
-    createWaveSpawnerControl() {
-    	let wrapper = document.createElement('div');
-    	wrapper.classList.add('tdar-ui-container', 'bottom', 'left');
+	createWaveSpawnerControl() {
+		let wrapper = document.createElement('div');
+		wrapper.classList.add('tdar-ui-container', 'bottom', 'left');
 
-    	let waveSpawnerControl = document.createElement('div');
-    	waveSpawnerControl.classList.add('wrapper', 'horizontal-grid');
-    	waveSpawnerControl.setAttribute('id', 'wavespawner-control');
+		let waveSpawnerControl = document.createElement('div');
+		waveSpawnerControl.classList.add('wrapper', 'horizontal-grid');
+		waveSpawnerControl.setAttribute('id', 'wavespawner-control');
 
-    	for (i = 0; i < MAX_UI; i++) {
-    		waveSpawnerControl.insertAdjacentHTML('beforeend', '<div class="tdar-button"><div class="button-icon"></div><h3 class="header">-</h3><div class="content icon-header"><div class="icon two-coins"></div><h3 class="inverted"><span class="cost">-</span></h3></div></div>');
-    	}
+		for (i = 0; i < MAX_UI; i++) {
+			waveSpawnerControl.insertAdjacentHTML('beforeend', '<div class="tdar-button"><div class="button-icon"></div><h3 class="header">-</h3><div class="content icon-header"><div class="icon two-coins"></div><h3 class="inverted"><span class="cost">-</span></h3></div></div>');
+		}
 
-    	wrapper.appendChild(waveSpawnerControl);
-    	this.sceneEl.appendChild(wrapper);
+		wrapper.appendChild(waveSpawnerControl);
+		this.sceneEl.appendChild(wrapper);
 
-    	return waveSpawnerControl;
-    }
+		return waveSpawnerControl;
+	}
     */
     createObjectControl() {
         let wrapper = document.createElement('div');
@@ -177,7 +177,7 @@ class UIManager {
          *       (array of object) settings: settings of buttons.
          *          (object) = {icon: (string), header: (string), cost: (number), disable: {boolen}, callback: (function)}
          */
-        if (settings.length >= MAX_UI) {
+        if (settings.length > MAX_UI) {
             console.warn('UI AMOUNT MUST LOWER THEN ', MAX_UI);
             return;
         }
@@ -189,15 +189,15 @@ class UIManager {
                 let setting = settings[i];
                 let buttonEl = buttonEls[i];
 
-                if (setting.disable) {
+                if (setting.disable)
                     buttonEl.classList.add('disable');
-                } else {
-                    if (setting.icon)
-                        buttonEl.classList.add(setting.icon);
-                    if (setting.header)
-                        buttonEl.querySelector('.header').innerHTML = setting.header;
-                    if (setting.cost)
-                        buttonEl.querySelector('.cost').innerHTML = setting.cost;
+                if (setting.icon)
+                    buttonEl.classList.add(setting.icon);
+                if (setting.header)
+                    buttonEl.querySelector('.header').innerHTML = setting.header;
+                if (setting.cost !== undefined)
+                    buttonEl.querySelector('.cost').innerHTML = setting.cost;
+                if (setting.callback !== null) {
                     buttonEl.addEventListener('click', setting.callback);
                     self.objectControlCallbacks[i] = setting.callback;
                 }

@@ -64,5 +64,8 @@ class CashManager {
         if (faction == this.userFaction) {
             this.uiManager.updateMoneyPoint(this.currentMoney[faction]);
         }
+      }
+    moneytowerbuild(ampAmount,faction){
+      this.moneyAmplifer[faction]+=ampAmount;
     }
 }
