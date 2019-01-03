@@ -1,8 +1,16 @@
 (() => {
-    const MAX_TIER = 3;
+    'use strict';
+
     const LASER_EMIT_THRESHOLD = 20;
 
-    AFRAME.registerSystem('tower', {
+    const COMPONENT_NAME = 'tower';
+    const COMPONENT_PREFIX = 'tower-'
+    const FACTION_RED_PREFIX = 'RED-';
+    const FACTION_BLACK_PREFIX = 'BLACK-';
+    const GAME_SYS_NAME = 'tdar-game';
+
+    AFRAME.registerSystem(COMPONENT_NAME, {
+
         init: function() {},
         getNearestEnemy: function(component) {
 
@@ -265,7 +273,7 @@
         },
         upgradeTier: function() {
 
-            if (this.data.tier < MAX_TIER)
+            if (this.data.tier < this.setting[this.data.type].length)
                 this.el.setAttribute('tower', {
                     tier: this.data.tier + 1
                 });

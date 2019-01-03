@@ -39,17 +39,11 @@
 
     <a-scene stats background="color: grey" vr-mode-ui="enabled: false">
         <a-assets>
-            <a-asset-item id="knight" src="renderer/assets/knight.gltf"></a-asset-item>
-            <a-asset-item id="fort" src="renderer/assets/catapult.gltf"></a-asset-item>
-            <a-asset-item id="tree" src="renderer/assets/tree01/model.gltf"></a-asset-item>
-            <a-asset-item id="stone" src="renderer/assets/stone/model.gltf"></a-asset-item>
-            <a-asset-item id="mill" src="renderer/assets/mill/model.gltf"></a-asset-item>
-            <a-asset-item id="corn_field" src="renderer/assets/corn_field/model.gltf"></a-asset-item>
-            <a-asset-item id="grass" src="renderer/assets/grass/model.gltf"></a-asset-item>
+            <a-asset-item id="knight" src="renderer/assets/models/general/tower-catapult.gltf"></a-asset-item>
         </a-assets>
 
         <a-entity grid="width: 40; depth: 40" scale="0.5 0.5 0.5"></a-entity>
-        <a-entity gltf-model="#fort" scale="0.5 0.5 0.5"></a-entity>
+        <a-entity gltf-model="#knight" scale="0.25 0.25 0.25"></a-entity>
         <a-entity id="target" scale="0.5 0.5 0.5" position="3 0 3"></a-entity>
 
         <a-entity position="0 10 0" rotation="-70 0 0" camera wasd-controls>

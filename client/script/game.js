@@ -22,8 +22,8 @@
             },
             userFaction: {
                 type: 'string',
-                default: 'A',
-                oneOf: ['A', 'B']
+                default: 'RED',
+                oneOf: ['RED', 'BLACK']
             }
         },
         init: function() {

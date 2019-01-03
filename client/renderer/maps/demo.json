@@ -1,30 +1,76 @@
 {
     "assets": {
-        "knight": {
-            "src": "renderer/assets/knight.gltf",
-            "scalar": 0.6
+        "RED": {
+            "castle": {
+                "src": "renderer/assets/models/red/castle.gltf",
+                "scalar": 2.7
+            },
+            "spawner": {
+                "src": "renderer/assets/models/red/spawner.gltf",
+                "scalar": 2.5
+            },
+            "tower-catapult": {
+                "src": "renderer/assets/models/general/tower-catapult.gltf",
+                "scalar": 1.4
+            },
+            "tower-goldMine": {
+                "src": "renderer/assets/models/general/tower-goldMine.gltf",
+                "scalar": 1.4
+            },
+            "tower-laser": {
+                "src": "renderer/assets/models/red/tower-laser.gltf",
+                "scalar": 1.4
+            },
+            "unit-cavalry": {
+                "src": "renderer/assets/models/general/unit-cavalry.gltf",
+                "scalar": 0.6
+            },
+            "unit-infantry": {
+                "src": "renderer/assets/models/general/unit-infantry.gltf",
+                "scalar": 0.6
+            }
         },
-        "fort": {
-            "src": "renderer/assets/fort.gltf",
-            "scalar": 1.4
+        "BLACK": {
+            "castle": {
+                "src": "renderer/assets/models/black/castle.gltf",
+                "scalar": 2.7
+            },
+            "spawner": {
+                "src": "renderer/assets/models/black/spawner.gltf",
+                "scalar": 2.5
+            },
+            "tower-catapult": {
+                "src": "renderer/assets/models/general/tower-catapult.gltf",
+                "scalar": 1.4
+            },
+            "tower-goldMine": {
+                "src": "renderer/assets/models/general/tower-goldMine.gltf",
+                "scalar": 1.4
+            },
+            "tower-laser": {
+                "src": "renderer/assets/models/black/tower-laser.gltf",
+                "scalar": 1.4
+            },
+            "unit-cavalry": {
+                "src": "renderer/assets/models/general/unit-cavalry.gltf",
+                "scalar": 0.6
+            },
+            "unit-infantry": {
+                "src": "renderer/assets/models/general/unit-infantry.gltf",
+                "scalar": 0.6
+            }
         },
-        "tree": {
-            "src": "renderer/assets/tree01/model.gltf",
-            "scalar": 2
-        },
-        "stone": {
-            "src": "renderer/assets/stone/model.gltf",
-            "scalar": 1
-        },
-        "mill": {
-            "src": "renderer/assets/mill/model.gltf",
-            "scalar": 3
+        "static": {
+            "stone": {
+                "src": "renderer/assets/models/general/stone/model.gltf",
+                "scalar": 1
+            }
         }
     },
     "globalVar": {
         "gridConfig": {
             "width": 20,
-            "depth": 30
+            "depth": 20
         },
         "sceneScale": 1,
         "tileSize": 4
@@ -60,15 +106,15 @@
         }]
     },
     "dynamicScene": {
-        "wave-spawner": {
-            "A": [{
+        "spawner": {
+            "RED": [{
                 "gridPosition": {
                     "x": 2,
                     "y": 0,
                     "z": 2
                 }
             }],
-            "B": [{
+            "BLACK": [{
                 "gridPosition": {
                     "x": 2,
                     "y": 0,
@@ -77,14 +123,14 @@
             }]
         },
         "castle": {
-            "A": {
+            "RED": {
                 "gridPosition": {
                     "x": 18,
                     "y": 0,
                     "z": 2
                 }
             },
-            "B": {
+            "BLACK": {
                 "gridPosition": {
                     "x": 18,
                     "y": 0,
@@ -105,7 +151,7 @@
                 "range": 5,
                 "damagePoint": 1,
                 "laserColor": "rgb(68,170,68)",
-                "amplifyAmount":0,
+                "amplifyAmount": 0,
                 "cost": -50
             }, {
                 "restDuration": 500,
@@ -113,7 +159,7 @@
                 "range": 5,
                 "damagePoint": 2,
                 "laserColor": "rgb(68,68,170)",
-                "amplifyAmount":0,
+                "amplifyAmount": 0,
                 "cost": -50
             }, {
                 "restDuration": 0,
@@ -121,7 +167,7 @@
                 "range": 5,
                 "damagePoint": 3,
                 "laserColor": "rgb(170,68,68)",
-                "amplifyAmount":0,
+                "amplifyAmount": 0,
                 "cost": -50
             }],
             "missile": [{
@@ -131,7 +177,7 @@
                 "damagePoint": 50,
                 "attackRange": 1.5,
                 "speed": 10,
-                "amplifyAmount":0,
+                "amplifyAmount": 0,
                 "cost": -50
             }, {
                 "restDuration": 3000,
@@ -140,7 +186,7 @@
                 "damagePoint": 70,
                 "attackRange": 1.6,
                 "speed": 10,
-                "amplifyAmount":0,
+                "amplifyAmount": 0,
                 "cost": -50
             }, {
                 "restDuration": 1500,
@@ -149,11 +195,11 @@
                 "damagePoint": 100,
                 "attackRange": 1.6,
                 "speed": 12,
-                "amplifyAmount":0,
+                "amplifyAmount": 0,
                 "cost": -50
             }],
             "goldmine": [{
-                "amplifyAmount":5,
+                "amplifyAmount": 5,
                 "cost": -100
             }]
         },
@@ -162,28 +208,27 @@
                 "healthPoint": 20
             }
         },
-        "enemy": {
+        "spawner": {
             "common": {
-                "animation_timeScale": 1.4,
-                "mesh": "knight"
-            },
-            "normal": {
+                "mesh": "spawner"
+            }
+        },
+        "unit": {
+            "infantry": {
                 "damage": 1,
                 "speed": 0.8,
-                "laserEffectiveness": 1,
-                "missileEffectiveness": 1
-            },
-            "resistLaser": {
-                "damage": 2,
-                "speed": 0.5,
                 "laserEffectiveness": 0.5,
-                "missileEffectiveness": 1.2
+                "missileEffectiveness": 1,
+                "animation_timeScale": 1.4,
+                "mesh": "infantry"
             },
-            "resistMissile": {
-                "damage": 2,
-                "speed": 0.5,
-                "laserEffectiveness": 1.2,
-                "missileEffectiveness": 0.5
+            "cavalry": {
+                "damage": 1,
+                "speed": 1.9,
+                "laserEffectiveness": 1,
+                "missileEffectiveness": 0.5,
+                "animation_timeScale": 1.4,
+                "mesh": "cavalry"
             }
         },
         "cash": {
