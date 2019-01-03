@@ -67,7 +67,7 @@
                 console.warn('Towerbase does not have id.');
                 return;
             }
-            
+
             this.networkManager.emit('playingEvent', {
                 event_name: 'request_create_tower',
                 id: this.el.id,
@@ -135,7 +135,8 @@
             this.networkManager.emit('playingEvent', {
                 event_name: 'request_remove_tower',
                 faction: this.el.sceneEl.systems['tdar-game'].data.userFaction,
-                id: this.el.id
+                id: this.el.id,
+                ampamount:this.gameManager.settings.tower[this.el.components['tower'].data.type][0].amplifyAmount
             });
 
             this.uiManager.updateObjectControl([]);
