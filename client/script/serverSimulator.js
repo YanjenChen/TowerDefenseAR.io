@@ -48,7 +48,7 @@ class ServerSimulator {
                         detail.healthPoint = Math.ceil(detail.time / 60000) * 100;
                         detail.enemy_id = this.enemyCounter;
                         detail.reward = Math.ceil(detail.time / 60000) * 5;
-                        detail.targetCastle = detail.ws_faction == 'A' ? '#castle-B' : '#castle-A';
+                        detail.targetCastle = detail.ws_faction == 'RED' ? '#BLACK-castle' : '#RED-castle';
                         this.enemyCounter++;
                         break;
                     case 'request_update_cash':

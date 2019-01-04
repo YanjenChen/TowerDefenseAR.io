@@ -90,7 +90,7 @@
             },
             duration: {
                 type: 'number',
-                default: 5000
+                default: 1000
             },
             faction: {
                 type: 'string',
@@ -110,7 +110,7 @@
 
             this.timeCounter = 0;
             this.spawnCounter = 0;
-            this.toggle = false; // only for testing.
+            this.toggle = true; // only for testing.
 
             this.el.addState('activate');
             this.el.addEventListener('spawn_enemy', this.onSpawnEnemy);
@@ -128,7 +128,7 @@
 
                 }
 
-                this.networkManager.emit('playingEvent', {
+                this.system.networkManager.emit('playingEvent', {
                     event_name: 'wave_spawner_request_spawn_enemy',
                     id: this.el.id,
                     ws_faction: this.data.faction,
@@ -136,8 +136,7 @@
                     time: time
                 });
 
-                this.toggle = !this.toggle; // only for testing.
-                this.timeCounter = 0
+                this.timeCounter = 0;
 
             } else if (this.timeCounter > this.data.duration) {
 
@@ -170,6 +169,8 @@
                 return true;
 
             }
+
+            this.toggle = !this.toggle; // only for testing.
 
             let enemyEl = document.createElement('a-entity');
             this.system.gameManager.dynamicScene.appendChild(enemyEl);

@@ -109,7 +109,7 @@
 
             }
 
-            this.networkManager.emit('playingEvent', {
+            this.system.networkManager.emit('playingEvent', {
                 event_name: 'request_create_tower',
                 id: this.el.id,
                 faction: this.el.sceneEl.systems[GAME_SYS_NAME].data.userFaction,
@@ -169,14 +169,14 @@
             let type = this.el.components['tower'].data.type;
             let tier = this.el.components['tower'].data.tier + 1;
 
-            this.networkManager.emit('playingEvent', {
+            this.system.networkManager.emit('playingEvent', {
                 event_name: 'request_upgrade_tower',
                 id: this.el.id,
                 faction: this.el.sceneEl.systems['tdar-game'].data.userFaction,
                 amount: this.system.gameManager.settings.tower[type][tier].cost
             });
 
-            this.uiManager.updateObjectControl([]);
+            this.system.uiManager.updateObjectControl([]);
 
         },
         upgradeTower: function() {
@@ -194,26 +194,26 @@
 
             }
 
-            this.networkManager.emit('playingEvent', {
+            this.system.networkManager.emit('playingEvent', {
                 event_name: 'request_remove_tower',
                 faction: this.el.sceneEl.systems['tdar-game'].data.userFaction,
                 id: this.el.id
             });
 
-            this.uiManager.updateObjectControl([]);
+            this.system.uiManager.updateObjectControl([]);
 
         },
         removeTower: function(evt) {
 
-            this.el.removeAttribute('tower');
-            this.el.addState('empty');
-            this.el.addState('processing');
-
-            this.gameManager.updateGameGridByModel(
+            this.system.gameManager.updateGameGridByModel(
                 this.el.object3D.position,
                 evt.detail.faction + '-tower-' + this.el.components.tower.data.type,
                 true
             );
+
+            this.el.removeAttribute('tower');
+            this.el.addState('empty');
+            this.el.addState('processing');
 
             this.el.sceneEl.emit('systemupdatepath', {
                 faction: evt.detail.faction

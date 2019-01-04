@@ -67,6 +67,12 @@
             const key = component.data.faction + '-' + component.data.type;
             let mesh;
 
+            if (this.cacheList[key] === undefined) {
+
+                console.warn('Tower getMesh received unknown key: ', key);
+
+            }
+
             if (this.cacheList[key].length !== 0) {
 
                 mesh = this.cacheList[key].pop();
@@ -147,7 +153,7 @@
                     component.muzzle.getWorldPosition(component.tmpVec);
                     missileEl.object3D.position.copy(this.gameManager.dynamicScene.object3D.worldToLocal(component.tmpVec));
 
-                    missileEl.setAttribute('missile', {
+                    missileEl.setAttribute('cannonball', {
                         damagePoint: component.damagePoint,
                         attackRange: component.setting[component.data.tier].attackRange,
                         speed: component.setting[component.data.tier].speed,

@@ -84,8 +84,8 @@
         schema: {
             faction: {
                 type: 'string',
-                default: 'A',
-                oneOf: ['A', 'B']
+                default: 'RED',
+                oneOf: ['RED', 'BLACK']
             },
             healthPoint: {
                 type: "number",
@@ -141,7 +141,7 @@
         onGetDamage: function(evt) {
 
             this.currentHP -= evt.detail.damage;
-            if (this.data.faction == this.el.sceneEl.systems[GAME_SYS_NAME].data.userFaction) {
+            if (this.data.faction === this.el.sceneEl.systems[GAME_SYS_NAME].data.userFaction) {
 
                 this.system.uiManager.updateHealthPoint(this.currentHP);
 

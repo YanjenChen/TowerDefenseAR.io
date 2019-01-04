@@ -15,12 +15,12 @@
     <script src="components/core/explosion.js"></script>
     <script src="components/core/grid.js"></script>
     <script src="components/core/swipeControl.js"></script>
+    <script src="components/cannonball.js"></script>
     <script src="components/castle.js"></script>
-    <script src="components/enemy.js"></script>
-    <script src="components/missile.js"></script>
+    <script src="components/spawner.js"></script>
     <script src="components/tower_base.js"></script>
     <script src="components/tower.js"></script>
-    <script src="components/wave_spawner.js"></script>
+    <script src="components/unit.js"></script>
 
     <link rel="stylesheet" type="text/css" href="css/ui.css">
 
@@ -34,8 +34,8 @@
 </head>
 
 <body>
-    <a-scene background="color: grey" tdar-game="mode: single-player; ar: false; userFaction: A" vr-mode-ui="enabled: false">
-        <a-entity position="0 10 8" rotation="-70 0 0" camera swipe-control wasd-controls></a-entity>
+    <a-scene background="color: grey" tdar-game="mode: single-player; ar: false;" vr-mode-ui="enabled: false">
+        <a-entity position="0 20 8" rotation="-70 0 0" camera swipe-control wasd-controls></a-entity>
     </a-scene>
 
     <script>

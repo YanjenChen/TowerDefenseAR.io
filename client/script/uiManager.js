@@ -1,4 +1,4 @@
-const MAX_UI = 3;
+const MAX_UI = 4;
 const MAX_WAVE_DISPLAY = 6;
 
 class UIManager {
@@ -189,6 +189,8 @@ class UIManager {
                 let setting = settings[i];
                 let buttonEl = buttonEls[i];
 
+                buttonEl.classList.remove('hide');
+
                 if (setting.disable)
                     buttonEl.classList.add('disable');
                 if (setting.icon)
@@ -210,6 +212,7 @@ class UIManager {
             let buttonEl = buttonEls[i];
             buttonEl.className = '';
             buttonEl.classList.add('tdar-button');
+            buttonEl.classList.add('hide');
             buttonEl.querySelector('.header').innerHTML = '-';
             buttonEl.querySelector('.cost').innerHTML = '-';
             buttonEl.removeEventListener('click', this.objectControlCallbacks[i]);

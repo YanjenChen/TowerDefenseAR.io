@@ -80,30 +80,33 @@ class GameManager {
         }
 
         let self = this;
+
         jQuery.getJSON(this.configDir, configs => {
 
             self.configs = configs;
             self.settings = configs.settings;
             self.Utils = new Utils(configs.globalVar);
-
+            self.sceneEl.systems['tdar-game'].cashManager = new CashManager(self.sceneEl); // Init cash manager.
 
             // Pre-load model by assets management system.
             let assetsEl = document.createElement('a-assets');
+
             jQuery.each(configs.assets, function(faction, contents) {
+
                 jQuery.each(contents, function(name, value) {
+
                     let assetEl = document.createElement('a-asset-item');
-                    assetEl.setAttribute('id', faction + '-' + name);
+
+                    assetEl.setAttribute('id', faction + '-' + name + '-asset');
                     assetEl.setAttribute('src', value.src);
                     assetsEl.appendChild(assetEl);
-                });
-            });
 
+                });
+
+            });
 
             assetsEl.addEventListener('loaded', self.loadObject3D);
             self.sceneEl.appendChild(assetsEl);
-
-            // Init cash manager.
-            self.sceneEl.systems['tdar-game'].cashManager = new CashManager(sceneEl);
 
         });
 
@@ -115,6 +118,7 @@ class GameManager {
         console.log('ENTER LOAD OBJECT3D.');
 
         let assets = [];
+
         jQuery.each(this.configs.assets, function(faction, contents) {
 
             jQuery.each(contents, function(key, value) {
@@ -129,14 +133,13 @@ class GameManager {
 
         });
 
-
         const loaderPromises = assets.map(async asset => {
 
             const loader = promisifyLoader(new THREE.GLTFLoader());
             const gltfModel = await loader.load(asset.src);
             let model = gltfModel.scene || gltfModel.scenes[0];
-            model.animations = gltfModel.animations;
 
+            model.animations = gltfModel.animations;
 
             // normalize size.
             let bbox = new THREE.Box3().setFromObject(model);
@@ -144,19 +147,21 @@ class GameManager {
             let height = bbox.max.y - bbox.min.y;
             let depth = bbox.max.z - bbox.min.z;
 
+            if (width < depth) {
 
-            if (width < depth)
                 model.scale.set(1 / depth, 1 / depth, 1 / depth);
-            else
-                model.scale.set(1 / width, 1 / width, 1 / width);
-            model.scale.multiplyScalar(asset.scalar);
 
+            } else {
+
+                model.scale.set(1 / width, 1 / width, 1 / width);
+
+            }
+            model.scale.multiplyScalar(asset.scalar);
 
             bbox = new THREE.Box3().setFromObject(model);
             width = bbox.max.x - bbox.min.x;
             height = bbox.max.y - bbox.min.y;
             depth = bbox.max.z - bbox.min.z;
-
 
             return {
                 key: asset.key,
@@ -168,15 +173,14 @@ class GameManager {
 
         });
 
-
         for (const loaderPromise of loaderPromises) {
 
             const result = await loaderPromise;
+
             this.object3DPrototypes[result.key] = result;
-            console.log('LOAD ASSET.');
+            console.log('LOAD ASSET: ', result.key);
 
         }
-
 
         console.log('FINISHED PARLLEL LOADING ASSETS.');
         this.sceneEl.emit('gamemodelloaded');
@@ -293,14 +297,16 @@ class GameManager {
 
             if (name != 'abstractName') {
 
-                if (self.object3DPrototypes['static-' + name] === undefined)
+                name = 'static-' + name; // Add prefix.
+                if (self.object3DPrototypes[name] === undefined) {
+
                     console.warn('Static scene config receive unknown model name: ', name);
 
-                name = 'static-' + name; // Add prefix.
+                }
 
                 values.forEach(value => {
 
-                    let object3D = THREE.AnimationUtils.clone(this.object3DPrototypes[name].model);
+                    let object3D = THREE.AnimationUtils.clone(self.object3DPrototypes[name].model);
                     object3D.position.set(value.scenePosition.x, value.scenePosition.y, value.scenePosition.z);
                     if (value.rotation)
                         object3D.rotation.set(value.rotation.x, value.rotation.y, value.rotation.z);
@@ -465,21 +471,30 @@ class GameManager {
             });
         }
     }
-    updateGameGridByModel(pos, modelName, walkable, scalar) {
-        /*
-         *  SPEC
-         *      (Vec3 like) pos: position in dynamicScene of the object.
-         *      (string) modelName: model name in config file.
-         *      (boolen) walkable: walkable or not.
-         *      (number) scalar: (Optional) scalar of this model.
+    updateGameGridByModel(pos, key, walkable, scalar) {
+        /**
+         *  @param {THREE.Vector3 like} pos - position in dynamicScene of the object.
+         *  @param {string} key - property of this.object3DPrototypes.
+         *  @param {boolen} walkable - set to true to allow walkable on grid coordinate.
+         *  @param {number} scalar - (Optional) scalar of this model.
          */
 
-        this.updatePlaceableGridByModel(pos, modelName, walkable, scalar);
+        this.updatePlaceableGridByModel(pos, key, walkable, scalar);
 
-        if (scalar === undefined)
+        if (scalar === undefined) {
+
             scalar = 1;
 
-        let info = this.object3DPrototypes[modelName];
+        }
+
+        let info = this.object3DPrototypes[key];
+
+        if (info === undefined) {
+
+            console.warn('updateGameGridByModel received unknown key: ', key);
+
+        }
+
         let min = {
             x: pos.x - (info.width / 2) * scalar,
             y: 0,
@@ -490,13 +505,32 @@ class GameManager {
             y: 0,
             z: pos.z + (info.depth / 2) * scalar
         };
+
         this.Utils.updateGameGridArea(min, max, walkable, this.gameGrid);
+
     }
-    updatePlaceableGridByModel(pos, modelName, walkable, scalar) {
-        if (scalar === undefined)
+    updatePlaceableGridByModel(pos, key, walkable, scalar) {
+        /**
+         *  @param {THREE.Vector3 like} pos - position in dynamicScene of the object.
+         *  @param {string} key - property of this.object3DPrototypes.
+         *  @param {boolen} walkable - set to true to allow walkable on grid coordinate.
+         *  @param {number} scalar - (Optional) scalar of this model.
+         */
+
+        if (scalar === undefined) {
+
             scalar = 1;
 
-        let info = this.object3DPrototypes[modelName];
+        }
+
+        let info = this.object3DPrototypes[key];
+
+        if (info === undefined) {
+
+            console.warn('updatePlaceableGridByModel received unknown key: ', key);
+
+        }
+
         let min = {
             x: pos.x - (info.width / 2) * scalar,
             y: 0,
@@ -507,7 +541,9 @@ class GameManager {
             y: 0,
             z: pos.z + (info.depth / 2) * scalar
         };
+
         this.Utils.updateGameGridArea(min, max, walkable, this.placeableGrid);
+
     }
     updateTowerToTileMap(pos, range, el, remove) {
         /*
@@ -554,7 +590,7 @@ class GameManager {
         if (index === -1) {
             this.tileMap[tilePos.x][tilePos.z].enemyInRange.push(el);
             this.tileMap[tilePos.x][tilePos.z].towerInRange.forEach(towerEl => {
-                if (towerEl.components['tower'].data.faction !== el.components['enemy'].data.faction && towerEl.components['tower'].enemiesInRange.indexOf(el) === -1)
+                if (towerEl.components['tower'].data.faction !== el.components['unit'].data.faction && towerEl.components['tower'].enemiesInRange.indexOf(el) === -1)
                     towerEl.components['tower'].enemiesInRange.push(el);
             });
         }
@@ -566,7 +602,7 @@ class GameManager {
         if (index > -1) {
             this.tileMap[tilePos.x][tilePos.z].enemyInRange.splice(index, 1);
             this.tileMap[tilePos.x][tilePos.z].towerInRange.forEach(towerEl => {
-                if (towerEl.components['tower'].data.faction === el.components['enemy'].data.faction)
+                if (towerEl.components['tower'].data.faction === el.components['unit'].data.faction)
                     return;
 
                 index = towerEl.components['tower'].enemiesInRange.indexOf(el)
@@ -587,7 +623,7 @@ class GameManager {
          *      (number) depth: depth of the area.
          */
 
-        let grid = this.placeableGrid.clone();
+        let grid = this.gameGrid.clone();
 
         let gridMin = this.Utils.sceneToGamegrid({
             x: pos.x - (width / 2),
@@ -608,7 +644,7 @@ class GameManager {
                 if (k < 0 || k >= this.configs.globalVar.gridConfig.depth)
                     return false;
 
-                if (!grid.isWalkableAt(i, k))
+                if (!this.placeableGrid.isWalkableAt(i, k)) // prevent set on spawner or castle.
                     return false;
 
                 grid.setWalkableAt(i, k, false);
@@ -636,11 +672,11 @@ class GameManager {
             let path = self.pathFinder.findPath(
                 el.gridPosition.x,
                 el.gridPosition.z,
-                self.configs.dynamicScene.castle[faction == 'RED' ? 'BLACK' : 'RED'].gridPosition.x,
-                self.configs.dynamicScene.castle[faction == 'RED' ? 'BLACK' : 'RED'].gridPosition.z,
+                self.configs.dynamicScene.castle[faction === 'RED' ? 'BLACK' : 'RED'].gridPosition.x,
+                self.configs.dynamicScene.castle[faction === 'RED' ? 'BLACK' : 'RED'].gridPosition.z,
                 g
             );
-            if (path.length == 0)
+            if (path.length === 0)
                 return false;
             else
                 return true;

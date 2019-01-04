@@ -15,7 +15,7 @@ class CashManager {
          *  prevCheckTime: (number)
          *  sceneEl: DOM node point to <a-scene> element.
          *  uiManager:
-         *  userFaction: One of ['A', 'B'].
+         *  userFaction: One of ['RED', 'BLACK'].
          */
 
         this.sceneEl = sceneEl;
@@ -26,13 +26,13 @@ class CashManager {
         this.amplifyAmount = this.gameManager.settings.cash.amplifyAmount;
         this.basicIncreaseAmount = this.gameManager.settings.cash.basicIncreaseAmount;
         this.currentMoney = {
-            A: 100,
-            B: 100
+            RED: 100,
+            BLACK: 100
         };
         this.incrementalDuration = this.gameManager.settings.cash.incrementalDuration;
         this.moneyAmplifer = {
-            A: 0,
-            B: 0
+            RED: 0,
+            BLACK: 0
         };
         this.prevCheckTime = 0;
         this.userFaction = sceneEl.systems['tdar-game'].data.userFaction;
@@ -42,12 +42,12 @@ class CashManager {
     tick(time, timeDelta) {
         if (time - this.prevCheckTime > this.incrementalDuration) {
             this.requestUpdateCash(
-                this.basicIncreaseAmount + this.moneyAmplifer.A * this.amplifyAmount,
-                'A'
+                this.basicIncreaseAmount + this.moneyAmplifer.RED * this.amplifyAmount,
+                'RED'
             )
             this.requestUpdateCash(
-                this.basicIncreaseAmount + this.moneyAmplifer.B * this.amplifyAmount,
-                'B'
+                this.basicIncreaseAmount + this.moneyAmplifer.BLACK * this.amplifyAmount,
+                'BLACK'
             )
             this.prevCheckTime = time;
         }

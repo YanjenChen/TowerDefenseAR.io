@@ -147,7 +147,7 @@
                     let distance = self.el.object3D.position.distanceToSquared(unit.el.object3D.position);
                     if (distance < self.attackRangeSquare) {
 
-                        self.networkManager.emit('playingEvent', {
+                        self.system.networkManager.emit('playingEvent', {
                             event_name: 'enemy_be_attacked',
                             id: unit.el.id,
                             damage: self.data.damagePoint,

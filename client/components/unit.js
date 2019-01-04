@@ -1,7 +1,7 @@
 (() => {
     'use strict';
 
-    const ANIMATION_GROUP_NUM = 2;
+    const ANIMATION_GROUP_NUM = 1;
     const TIME_RATIO = 0.001;
 
     const BAR_COLOR_GREEN = 0x4ecdc4;
@@ -222,9 +222,22 @@
             let mesh = component.el.getObject3D('mesh');
 
             this.animationGroups[key][Math.round(component.data.id % ANIMATION_GROUP_NUM)].remove(mesh);
-            this.animationGroups[key][Math.round(component.data.id % ANIMATION_GROUP_NUM)].uncache(mesh);
-            this.cacheList[key].push(mesh)
+            // this.animationGroups[key][Math.round(component.data.id % ANIMATION_GROUP_NUM)].uncache(mesh);
+            this.cacheList[key].push(mesh);
 
+
+            // TEST
+            /*
+            for (let key in this.animationGroups) {
+
+                for (let i = 0; i < ANIMATION_GROUP_NUM; i++) {
+
+                    console.log(key, ', total: ', this.animationGroups[key][i].stats.objects.total, ', inUse: ', this.animationGroups[key][i].stats.objects.inUse);
+
+                }
+
+            }
+            */
         }
 
     });
