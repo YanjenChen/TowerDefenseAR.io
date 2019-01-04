@@ -63,9 +63,12 @@ class CashManager {
         this.currentMoney[faction] += amount;
         if (faction == this.userFaction) {
             this.uiManager.updateMoneyPoint(this.currentMoney[faction]);
+
+            if (this.gameManager.gridEl)
+                this.gameManager.gridEl.components['grid'].updateUI();
         }
-      }
-    moneytowerbuild(ampAmount,faction){
-      this.moneyAmplifer[faction]+=ampAmount;
+    }
+    moneytowerbuild(ampAmount, faction) {
+        this.moneyAmplifer[faction] += ampAmount;
     }
 }

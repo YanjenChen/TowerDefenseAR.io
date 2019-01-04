@@ -115,7 +115,7 @@
 
             this.onRaycasterIntersected = this.onRaycasterIntersected.bind(this);
             this.updateUI = this.updateUI.bind(this);
-            this.onTowerEndProcess = this.onTowerEndProcess.bind(this);
+            this.onEndProcess = this.onEndProcess.bind(this);
 
             this.reticle = this.el.getObject3D('reticle');
             this.getIntersection = null;
@@ -205,7 +205,7 @@
 
             let x = Math.floor(this.intersectedPoint.x + 0.5 + (this.data.width / 2));
             let z = Math.floor(this.intersectedPoint.z + 0.5 + (this.data.depth / 2));
-            let selectedBase = this.hoveringBase = this.system.gameManager.towerBases[x][z];
+            let selectedBase = this.hoveringBase = this.system.gameManager.interactiveComponents[x][z];
 
             if (selectedBase === undefined) {
 
@@ -227,26 +227,18 @@
 
             }
 
-            if (selectedBase === null) {
+            if (selectedBase === null || selectedBase.getUIsets === undefined) {
 
                 this.system.uiManager.updateObjectControl([]);
-
-            } else if (placeable) {
-
-                this.system.uiManager.updateObjectControl(selectedBase.getUIsets());
-
-            } else if (!selectedBase.el.is('empty')) {
-
-                this.system.uiManager.updateObjectControl(selectedBase.getUIsets());
 
             } else {
 
-                this.system.uiManager.updateObjectControl([]);
+                this.system.uiManager.updateObjectControl(selectedBase.getUIsets());
 
             }
 
         },
-        onTowerEndProcess: function(base) {
+        onEndProcess: function(base) {
 
             if (base === this.hoveringBase) {
 

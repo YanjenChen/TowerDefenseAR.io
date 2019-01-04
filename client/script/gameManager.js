@@ -23,7 +23,7 @@ class GameManager {
          *  sceneEl: DOM node which point to <a-scene> element.
          *  settings: Contain all components' static params.
          *  staticScene: <a-entity> which indicate game static scene, all static object3D should be contained under this entity.
-         *  towerBases: Two dimensional array of <a-entity>.components['tower-base'], use to quick access UI content.
+         *  interactiveComponents: Two dimensional array of <a-entity>.components['tower-base' or 'spawner'], use to quick access UI content.
          *  tileMap: Two dimensional map of {towerInRange: [], enemyInRange: []}, use to optimize performance.
          *  tileSize: width and depth of one time relative to one grid.
          *  tileWidth: width of tileMap.
@@ -47,7 +47,7 @@ class GameManager {
         this.sceneEl = sceneEl;
         this.settings = null;
         this.staticScene = null;
-        this.towerBases = null;
+        this.interactiveComponents = null;
         this.tileMap = null;
         this.tileSize = null;
         this.tileWidth = 0;
@@ -346,6 +346,20 @@ class GameManager {
         this.staticScene = staticScene;
 
 
+        // Init interactiveComponents;
+        this.interactiveComponents = [];
+        for (let i = -globalVar.gridConfig.width / 2; i <= globalVar.gridConfig.width / 2; i += 1) {
+
+            let column = [];
+
+            for (let k = -globalVar.gridConfig.depth / 2; k <= globalVar.gridConfig.depth / 2; k += 1) {
+
+                column.push(null);
+
+            }
+            this.interactiveComponents.push(column);
+
+        }
         // add dynamic scene.
         let dynamicScene = document.createElement('a-entity');
         dynamicScene.setAttribute('id', 'tdar-dynamic-scene');
@@ -388,6 +402,10 @@ class GameManager {
                                 faction + '-' + name, // Add prefix.
                                 false
                             );
+                            self.interactiveComponents[el.gridPosition.x][el.gridPosition.z] = entityEl.components[name];
+                            self.interactiveComponents[el.gridPosition.x + 1][el.gridPosition.z] = entityEl.components[name];
+                            self.interactiveComponents[el.gridPosition.x][el.gridPosition.z + 1] = entityEl.components[name];
+                            self.interactiveComponents[el.gridPosition.x + 1][el.gridPosition.z + 1] = entityEl.components[name];
 
                         });
 
@@ -422,28 +440,30 @@ class GameManager {
             }
 
         });
-        // Init towerBases. (Assume gameGrid has updated to init state.)
-        this.towerBases = [];
-        for (let i = -globalVar.gridConfig.width / 2; i <= globalVar.gridConfig.width / 2; i += 1) {
-            let column = [];
-            for (let k = -globalVar.gridConfig.depth / 2; k <= globalVar.gridConfig.depth / 2; k += 1) {
+        // update interactiveComponents. (Assume gameGrid has updated to init state.)
+        for (let i = 0; i <= globalVar.gridConfig.width; i += 1) {
+
+            for (let k = 0; k <= globalVar.gridConfig.depth; k += 1) {
+
                 let p = {
-                    x: i,
+                    x: i - globalVar.gridConfig.width / 2,
                     y: 0,
-                    z: k
+                    z: k - globalVar.gridConfig.depth / 2
                 };
+
                 if (await this.areaIsPlaceable(p, 2, 2, true)) {
+
                     let towerBaseEl = document.createElement('a-entity');
-                    towerBaseEl.object3D.position.set(i, 0, k);
+                    towerBaseEl.object3D.position.set(p.x, 0, p.z);
                     towerBaseEl.setAttribute('id', 'tower-base-' + i.toString() + '-' + k.toString());
                     towerBaseEl.setAttribute('tower-base', {});
-                    column.push(towerBaseEl.components['tower-base']);
+                    this.interactiveComponents[i][k] = towerBaseEl.components['tower-base'];
                     dynamicScene.appendChild(towerBaseEl);
-                } else {
-                    column.push(null);
+
                 }
+
             }
-            this.towerBases.push(column);
+
         }
         dynamicScene.object3D.scale.set(globalVar.sceneScale, globalVar.sceneScale, globalVar.sceneScale);
         sceneEl.appendChild(dynamicScene);

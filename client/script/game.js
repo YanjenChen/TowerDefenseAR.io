@@ -36,6 +36,7 @@
             networkManager.addEventListener('client_start_game', this.onStartGame.bind(this));
             networkManager.addEventListener('playingEvent', this.onExecute.bind(this));
 
+            this.el.pause();
             gameManager.loadConfig();
         },
         tick: function(time, timedelta) {
@@ -55,7 +56,8 @@
             document.querySelector('[camera]').appendChild(cursor);
 
             //console.log('Dynamic scene play.');
-            this.gameManager.dynamicScene.play();
+            this.el.play();
+            //this.gameManager.dynamicScene.play();
         },
         onExecute: function(content) {
             //console.warn('Receive event from server, name: ' + content['event_name']);

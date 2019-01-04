@@ -10,6 +10,10 @@
     const UNIT_CAVALRY_NAME = 'cavalry';
     const UNIT_INFANTRY_NAME = 'infantry';
 
+    const UNIT_TYPE = [
+        UNIT_CAVALRY_NAME,
+        UNIT_INFANTRY_NAME
+    ];
     const KEYS = [
         FACTION_RED_PREFIX + COMPONENT_NAME,
         FACTION_BLACK_PREFIX + COMPONENT_NAME
@@ -90,7 +94,7 @@
             },
             duration: {
                 type: 'number',
-                default: 1000
+                default: 10000
             },
             faction: {
                 type: 'string',
@@ -107,12 +111,20 @@
             this.el.setObject3D('mesh', this.system.getMesh(this));
 
             this.onSpawnEnemy = this.onSpawnEnemy.bind(this);
+            this.setAutoSpawn = this.setAutoSpawn.bind(this);
+            this.removeAutoSpawn = this.removeAutoSpawn.bind(this);
+            this.addToSpawnBuffer = this.addToSpawnBuffer.bind(this);
+            this.addInfantryToSpawnBuffer = this.addInfantryToSpawnBuffer.bind(this);
+            this.addCavalryToSpawnBuffer = this.addCavalryToSpawnBuffer.bind(this);
+            this.updateUI = this.updateUI.bind(this);
+            this.getUIsets = this.getUIsets.bind(this);
 
             this.timeCounter = 0;
             this.spawnCounter = 0;
-            this.toggle = true; // only for testing.
+            this.spawnBuffer = []; // store type of unit.
 
             this.el.addState('activate');
+            this.el.addState('autospawn');
             this.el.addEventListener('spawn_enemy', this.onSpawnEnemy);
 
         },
@@ -128,13 +140,21 @@
 
                 }
 
-                this.system.networkManager.emit('playingEvent', {
-                    event_name: 'wave_spawner_request_spawn_enemy',
-                    id: this.el.id,
-                    ws_faction: this.data.faction,
-                    type: this.toggle ? UNIT_CAVALRY_NAME : UNIT_INFANTRY_NAME,
-                    time: time
-                });
+                if (this.el.is('autospawn') && this.spawnBuffer.length === 0) {
+
+                    this.addToSpawnBuffer(UNIT_TYPE[Math.floor(Math.random() * 2)]);
+
+                }
+
+                if (this.spawnBuffer.length > 0) {
+                    this.system.networkManager.emit('playingEvent', {
+                        event_name: 'wave_spawner_request_spawn_enemy',
+                        id: this.el.id,
+                        ws_faction: this.data.faction,
+                        type: this.spawnBuffer.pop(),
+                        time: time
+                    });
+                }
 
                 this.timeCounter = 0;
 
@@ -151,7 +171,6 @@
 
             delete this.timeCounter;
             delete this.spawnCounter;
-            delete this.toggle; // only for testing.
 
             this.el.removeEventListener('spawn_enemy', this.onSpawnEnemy);
             this.el.removeObject3D('mesh');
@@ -170,12 +189,85 @@
 
             }
 
-            this.toggle = !this.toggle; // only for testing.
-
             let enemyEl = document.createElement('a-entity');
             this.system.gameManager.dynamicScene.appendChild(enemyEl);
             enemyEl.object3D.position.copy(this.el.object3D.position);
             enemyEl.setAttribute('unit', evt.detail);
+
+        },
+        setAutoSpawn: function() {
+
+            this.el.addState('autospawn');
+            this.updateUI();
+
+        },
+        removeAutoSpawn: function() {
+
+            this.el.removeState('autospawn');
+            this.updateUI();
+
+        },
+        addToSpawnBuffer: function(type) {
+
+            this.spawnBuffer.unshift(type);
+
+        },
+        addInfantryToSpawnBuffer: function() {
+
+            this.addToSpawnBuffer(UNIT_INFANTRY_NAME);
+            this.updateUI();
+
+        },
+        addCavalryToSpawnBuffer: function() {
+
+            this.addToSpawnBuffer(UNIT_CAVALRY_NAME);
+            this.updateUI();
+
+        },
+        updateUI: function() {
+
+            this.system.gameManager.gridEl.components['grid'].onEndProcess(this);
+
+        },
+        getUIsets: function() {
+
+            let currentMoney = this.system.cashManager.currentMoney[this.el.sceneEl.systems['tdar-game'].data.userFaction];
+            let uisets;
+
+            if (this.el.is('autospawn')) {
+
+                uisets = [{
+                    callback: this.removeAutoSpawn,
+                    icon: undefined,
+                    header: 'AutoOff',
+                    cost: 0,
+                    disable: false
+                }];
+
+            } else {
+
+                uisets = [{
+                    callback: this.addInfantryToSpawnBuffer,
+                    icon: undefined,
+                    header: 'Infantry',
+                    cost: 0,
+                    disable: false
+                }, {
+                    callback: this.addCavalryToSpawnBuffer,
+                    icon: undefined,
+                    header: 'Cavalry',
+                    cost: 0,
+                    disable: false
+                }, {
+                    callback: this.setAutoSpawn,
+                    icon: undefined,
+                    header: 'AutoOn',
+                    cost: 0,
+                    disable: false
+                }];
+
+            }
+            return uisets;
 
         }
 

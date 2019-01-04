@@ -113,12 +113,24 @@
                     "y": 0,
                     "z": 1
                 }
+            }, {
+                "gridPosition": {
+                    "x": 10,
+                    "y": 0,
+                    "z": 10
+                }
             }],
             "BLACK": [{
                 "gridPosition": {
                     "x": 1,
                     "y": 0,
                     "z": 38
+                }
+            }, {
+                "gridPosition": {
+                    "x": 10,
+                    "y": 0,
+                    "z": 28
                 }
             }]
         },

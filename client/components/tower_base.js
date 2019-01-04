@@ -76,7 +76,7 @@
                 if (this.timeCounter >= PROCESS_TIME) {
 
                     this.el.removeState('processing');
-                    this.system.gameManager.gridEl.components['grid'].onTowerEndProcess(this);
+                    this.system.gameManager.gridEl.components['grid'].onEndProcess(this);
                     this.timeCounter = 0;
 
                 }
@@ -252,7 +252,7 @@
                 }, {
                     callback: currentMoney >= goldminecost ? this.requestGoldmine : null,
                     icon: 'gold',
-                    header: 'Goldmine',
+                    header: 'GoldMine',
                     cost: goldminecost,
                     disable: currentMoney >= goldminecost ? false : true
                 }];
