@@ -141,10 +141,6 @@
     },
     "settings": {
         "tower": {
-            "common": {
-                "animation_timeScale": 0.8,
-                "mesh": "fort"
-            },
             "laser": [{
                 "restDuration": 1000,
                 "activateDuration": 1000,
@@ -170,7 +166,7 @@
                 "amplifyAmount": 0,
                 "cost": -50
             }],
-            "missile": [{
+            "catapult": [{
                 "restDuration": 4000,
                 "activateDuration": 1,
                 "range": 10,

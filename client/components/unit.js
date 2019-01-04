@@ -15,46 +15,36 @@
     const UNIT_CAVALRY_NAME = 'cavalry';
     const UNIT_INFANTRY_NAME = 'infantry';
 
+    const KEYS = [
+        FACTION_RED_PREFIX + UNIT_CAVALRY_NAME,
+        FACTION_RED_PREFIX + UNIT_INFANTRY_NAME,
+        FACTION_BLACK_PREFIX + UNIT_CAVALRY_NAME,
+        FACTION_BLACK_PREFIX + UNIT_INFANTRY_NAME
+    ];
+
     AFRAME.registerSystem(COMPONENT_NAME, {
 
         init: function() {
 
             this.animationActions = {};
-            this.animationActions[FACTION_RED_PREFIX + UNIT_CAVALRY_NAME] = [];
-            this.animationActions[FACTION_RED_PREFIX + UNIT_INFANTRY_NAME] = [];
-            this.animationActions[FACTION_BLACK_PREFIX + UNIT_CAVALRY_NAME] = [];
-            this.animationActions[FACTION_BLACK_PREFIX + UNIT_INFANTRY_NAME] = [];
-
             this.animationGroups = {};
-            this.animationGroups[FACTION_RED_PREFIX + UNIT_CAVALRY_NAME] = [];
-            this.animationGroups[FACTION_RED_PREFIX + UNIT_INFANTRY_NAME] = [];
-            this.animationGroups[FACTION_BLACK_PREFIX + UNIT_CAVALRY_NAME] = [];
-            this.animationGroups[FACTION_BLACK_PREFIX + UNIT_INFANTRY_NAME] = [];
-
             this.animationMixers = {};
-            this.animationMixers[FACTION_RED_PREFIX + UNIT_CAVALRY_NAME] = [];
-            this.animationMixers[FACTION_RED_PREFIX + UNIT_INFANTRY_NAME] = [];
-            this.animationMixers[FACTION_BLACK_PREFIX + UNIT_CAVALRY_NAME] = [];
-            this.animationMixers[FACTION_BLACK_PREFIX + UNIT_INFANTRY_NAME] = [];
-
             this.cacheList = {};
-            this.cacheList[FACTION_RED_PREFIX + UNIT_CAVALRY_NAME] = [];
-            this.cacheList[FACTION_RED_PREFIX + UNIT_INFANTRY_NAME] = [];
-            this.cacheList[FACTION_BLACK_PREFIX + UNIT_CAVALRY_NAME] = [];
-            this.cacheList[FACTION_BLACK_PREFIX + UNIT_INFANTRY_NAME] = [];
-
-            this.unitList = {};
-            this.unitList[FACTION_RED_PREFIX + UNIT_CAVALRY_NAME] = [];
-            this.unitList[FACTION_RED_PREFIX + UNIT_INFANTRY_NAME] = [];
-            this.unitList[FACTION_BLACK_PREFIX + UNIT_CAVALRY_NAME] = [];
-            this.unitList[FACTION_BLACK_PREFIX + UNIT_INFANTRY_NAME] = [];
-
             this.hasInitialized = false;
+            this.unitList = {};
 
             let self = this;
 
-            // Set animation object groups.
-            // REMIND: THREE.AnimationObjectGroup has a method called .uncache() to Deallocates all memory resources for the passed objects of this AnimationObjectGroup.
+            KEYS.forEach(KEY => {
+
+                self.animationActions[KEY] = [];
+                self.animationGroups[KEY] = [];
+                self.animationMixers[KEY] = [];
+                self.cacheList[KEY] = [];
+                self.unitList[KEY] = [];
+
+            });
+
             this.el.addEventListener('gamemodelloaded', function _init() {
 
                 self.cashManager = self.el.systems[GAME_SYS_NAME].cashManager;
@@ -66,13 +56,15 @@
                 self.cavalrySetting = self.gameManager.settings[COMPONENT_NAME][UNIT_CAVALRY_NAME];
                 self.infantrySetting = self.gameManager.settings[COMPONENT_NAME][UNIT_INFANTRY_NAME];
                 self.models = {};
-                self.models[FACTION_RED_PREFIX + UNIT_CAVALRY_NAME] = self.gameManager.object3DPrototypes[FACTION_RED_PREFIX + COMPONENT_PREFIX + UNIT_CAVALRY_NAME];
-                self.models[FACTION_RED_PREFIX + UNIT_INFANTRY_NAME] = self.gameManager.object3DPrototypes[FACTION_RED_PREFIX + COMPONENT_PREFIX + UNIT_INFANTRY_NAME];
-                self.models[FACTION_BLACK_PREFIX + UNIT_CAVALRY_NAME] = self.gameManager.object3DPrototypes[FACTION_BLACK_PREFIX + COMPONENT_PREFIX + UNIT_CAVALRY_NAME];
-                self.models[FACTION_BLACK_PREFIX + UNIT_INFANTRY_NAME] = self.gameManager.object3DPrototypes[FACTION_BLACK_PREFIX + COMPONENT_PREFIX + UNIT_INFANTRY_NAME];
+                self.models[KEYS[0]] = self.gameManager.object3DPrototypes[FACTION_RED_PREFIX + COMPONENT_PREFIX + UNIT_CAVALRY_NAME];
+                self.models[KEYS[1]] = self.gameManager.object3DPrototypes[FACTION_RED_PREFIX + COMPONENT_PREFIX + UNIT_INFANTRY_NAME];
+                self.models[KEYS[2]] = self.gameManager.object3DPrototypes[FACTION_BLACK_PREFIX + COMPONENT_PREFIX + UNIT_CAVALRY_NAME];
+                self.models[KEYS[3]] = self.gameManager.object3DPrototypes[FACTION_BLACK_PREFIX + COMPONENT_PREFIX + UNIT_INFANTRY_NAME];
 
                 const models = self.models;
 
+                // Set animation object groups.
+                // REMIND: THREE.AnimationObjectGroup has a method called .uncache() to Deallocates all memory resources for the passed objects of this AnimationObjectGroup.
                 for (let key in models) {
 
                     for (let i = 0; i < ANIMATION_GROUP_NUM; i++) {
@@ -121,8 +113,7 @@
 
             }
 
-
-            for (let key in this.models) {
+            for (let key in this.animationMixers) {
 
                 for (let i = 0; i < ANIMATION_GROUP_NUM; i++) {
 
