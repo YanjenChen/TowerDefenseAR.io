@@ -1,0 +1,64 @@
+/*手機*/
+@media (max-width: 1000px) {
+    #hacker_guide_area{
+        position:absolute;
+        top:5%;
+        width:90%;
+        height:85%;
+        overflow-y: scroll;
+    }
+    #guide_title{
+        font-size:30px;position:relative;text-align:center;top:20px;
+    }
+    #input{
+        font-size:30px;position:relative;text-align:left;top:20px;left:20px;
+    }
+
+    .hacker_button{
+        position:relative;left:20px;top:10px;
+    }
+    
+    #requset_url table,td,tr,th{
+        border:1px solid green;rule:"all";padding:'0';
+    }
+    /*
+    font-size:30px;position:relative;text-align:left;top:20px;left:20px;
+    */
+    #friendly_talks_area_title{
+        font-size:30px;position:relative;text-align:left;top:20px;left:20px;
+    }
+    #friendly_talks_area_list{
+        color:black;font-size:20px;
+    }
+}
+/*其他寬螢幕*/
+@media (min-width: 1000px) {
+    #hacker_guide_area{
+        position:absolute;
+        top:50px;
+        width:35%;
+        height:90%;
+        overflow-y: scroll;
+    }
+    #guide_title{
+        font-size:50px;position:relative;text-align:center;top:20px;
+    }
+    #input{
+        font-size:40px;position:relative;text-align:left;top:20px;left:20px;
+    }
+    .hacker_button{
+        position:relative;left:20px;top:10px;
+        width:100px;height:60px;
+        font-size:50px;/*無效，放棄*/
+    }
+    #friendly_talks_area_title{
+        font-size:40px;position:relative;text-align:left;top:20px;left:20px;
+    }
+    #friendly_talks_area_list{
+        color:black;font-size:30px;
+    }
+
+}
+
+
+

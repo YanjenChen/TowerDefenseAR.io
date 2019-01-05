@@ -1,0 +1,60 @@
+.book {
+  width: 50vw;
+  height: 95vh;
+  background:#1a1a1a;
+  position: relative;
+  
+  left:50%;
+  
+  top:50%;
+
+  transform: translate(-50%, -50%);
+  perspective: 1000px;
+}
+
+#cover {
+  width:24vw;
+  height:96%;
+  position: absolute;
+  top:2%;
+  right:50%;
+  background: red;
+  background-repeat: no-repeat;
+  transform-origin: left;
+  /*transform: perspective(1200px) rotateY(-180deg);
+  transition: all .5s ease-in*/
+}
+
+
+#cover2 {
+  width:24vw;
+  height:96%;
+  position: absolute;
+  top:2%;
+  left:50%;
+  background: blue;
+  background-repeat: no-repeat;
+  transform-origin: left;
+  /*transform: perspective(1200px) rotateY(-180deg);
+  transition: all .5s ease-in*/
+}
+
+#cover .flip{
+  /*transform: perspective(1200px) rotateY(-180deg);*/
+}
+
+figure {
+  display:block;
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  backface-visibility: hidden;
+}
+
+figure.page1{
+  margin:0;
+}
+figure.page2{
+  margin:0;
+  transform: rotateY(180deg);
+}

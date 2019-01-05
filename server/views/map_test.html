@@ -1,0 +1,134 @@
+<!DOCTYPE HTML>
+<html>
+
+<head>
+     <input id='room_id' value="<%=inobj['room_id']%>" type='hidden'>
+    <input id='user' value="<%=inobj['user']%>" type='hidden'>
+    <input id='user_faction' value="<%=inobj['user_faction']%>" type='hidden'>
+
+    <script src="/socket.io/socket.io.js"></script> 
+    <title>Bridge inspired map</title>
+    <!--
+    LIBRARY EXPLAINATION
+        aframe.min.js: main renderer library.
+        aframe-extras.min.js: 3d module animation, loader and other supporting functions.
+        aframe-ar.js: marker-based AR library for aframe.
+    -->
+    <!--
+  <meta name="aframe-enable-ar-scene">
+  -->
+    <script src="lib/aframe.js"></script>
+
+    <script src="https://cdn.rawgit.com/donmccurdy/aframe-extras/v5.0.0/dist/aframe-extras.min.js"></script>
+
+    <!-- DISABLE AR.js WHEN USING AFRAME TEST -->
+    <!--
+    <script src="https://cdn.rawgit.com/jeromeetienne/AR.js/1.5.0/aframe/build/aframe-ar.js"></script>
+-->
+    <!-- ONLY USED IN DEMO.JS -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+
+    <!--
+    LOAD COMPONENTS
+    -->
+    <!--script src="https://unpkg.com/aframe-curve-component/dist/aframe-curve-component.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@ripter/aframe-alongpath-component@1.1.4/index.js"></script-->
+    <script src="components/core/glow.js"></script>
+    <script src="components/core/path.js"></script>
+    <script src="components/core/trace.js"></script>
+    <script src="components/enemy.js"></script>
+    <script src="components/wave_spawner.js"></script>
+    <script src="components/bullet.js"></script>
+    <script src="components/tower.js"></script>
+    <script src="components/tower_base.js"></script>
+    <script src="components/castle.js"></script>
+
+    <script src="script/network.js"></script>
+
+    <!--
+    <script src="script/ui.js"></script>    
+    -->
+    <script src="script/game.js"></script>
+</head>
+
+<body>
+
+    <!--
+    ENABLE THE FOLLOWING SECTION TO RUN AFRAME TEST
+        This part demos how you can test the scense you created without AR.
+        Aframe is VR library, we use it as the 3d renderer.
+        For more information, google "aframe" and read it's tutorial.
+    -->
+
+    <!--a-scene stats background="color: grey" tdar-game="mode: multi-player"-->
+    <a-scene stats="" background="color: grey" inspector="" keyboard-shortcuts="" screenshot="" vr-mode-ui="" tdar-game="mode: multi-player; ar: false">
+              <a-assets>
+                  <a-asset-item id="knight" src="renderer/assets/knight.gltf"></a-asset-item>
+                  <a-asset-item id="fort" src="renderer/assets/fort.gltf"></a-asset-item>
+                  <a-asset-item id="table" src="renderer/assets/table/model.gltf"></a-asset-item>
+                  <a-asset-item id="tree" src="renderer/assets/tree01/model.gltf"></a-asset-item>
+                  <a-asset-item id="stone" src="renderer/assets/stone/model.gltf"></a-asset-item>
+                  <a-asset-item id="mill" src="renderer/assets/mill/model.gltf"></a-asset-item>
+                  <a-asset-item id="corn_field" src="renderer/assets/corn_field/model.gltf"></a-asset-item>
+                  <a-asset-item id="grass" src="renderer/assets/grass/model.gltf"></a-asset-item>
+              </a-assets>
+
+              <a-entity color="white" position="0.157 0 0" visible="" geometry="primitive: plane">
+                                <a-entity position="11 0 11" visible="" geometry="height: 0.5; width: 0.5; depth: 0.5">
+                                </a-entity><a-entity position="-11 0 11" visible="" geometry="depth: 0.5; height: 0.5; width: 0.5">
+                                </a-entity><a-entity position="-11 0 -11" visible="" geometry="depth: 0.5; height: 0.5; width: 0.5">
+                                </a-entity><a-entity position="11 0 -11" visible="" geometry="depth: 0.5; height: 0.5; width: 0.5">
+                                </a-entity><a-entity position="0 0 11" visible="" geometry="depth: 0.5; height: 0.5; width: 0.5">
+                                </a-entity><a-entity position="0 0 -11" visible="" geometry="depth: 0.5; height: 0.5; width: 0.5">
+                                </a-entity><a-entity position="0 0 -6" visible="" geometry="depth: 0.5; height: 0.5; width: 0.5">
+                                </a-entity><a-entity position="0 0 -3" visible="" geometry="depth: 0.5; height: 0.5; width: 0.5">
+                                </a-entity><a-entity position="0 0 3" visible="" geometry="depth: 0.5; height: 0.5; width: 0.5">
+                                </a-entity><a-entity position="0 0 6" visible="" geometry="depth: 0.5; height: 0.5; width: 0.5">
+                                </a-entity><a-entity position="3 0 0" visible="" geometry="depth: 0.5; height: 0.5; width: 0.5">
+                                </a-entity><a-entity position="6 0 0" visible="" geometry="depth: 0.5; height: 0.5; width: 0.5">
+                                </a-entity><a-entity position="-3 0 0" visible="" geometry="depth: 0.5; height: 0.5; width: 0.5">
+                                </a-entity><a-entity position="-6 0 0" visible="" geometry="depth: 0.5; height: 0.5; width: 0.5">
+                                </a-entity><a-entity gltf-model="renderer/assets/tree01/model.gltf" position="-10.054 0 -5.003" scale="0.0045 0.0055 0.0034" rotation="">
+                                </a-entity><a-entity gltf-model="renderer/assets/tree01/model.gltf" position="4.84 0 -7.039" scale="0.0045 0.0055 0.0034">
+                                </a-entity><a-entity gltf-model="renderer/assets/tree01/model.gltf" position="-4.258 0 -8.705" scale="-0.005 0.005 0.005">
+                                </a-entity><a-entity gltf-model="renderer/assets/tree01/model.gltf" position="-7.546 0 -4.768" scale="0.004 0.004 0.004">
+                                </a-entity><a-entity gltf-model="renderer/assets/tree01/model.gltf" position="7.437 0 3.865" scale="0.004 0.004 0.004">
+                                </a-entity><a-entity gltf-model="renderer/assets/tree01/model.gltf" position="-9.366 0 2.373" scale="0.004 0.004 0.004">
+                                </a-entity><a-entity gltf-model="renderer/assets/tree01/model.gltf" position="-9.982 0 -3.496" scale="-0.004 0.005 -0.005">
+                                </a-entity><a-entity gltf-model="renderer/assets/tree01/model.gltf" position="-9.815 0 4.906" scale="-0.004 0.005 -0.005">
+                                </a-entity><a-entity gltf-model="renderer/assets/tree01/model.gltf" position="-6.392 0 7.567" scale="-0.004 0.005 -0.005">
+                                </a-entity><a-entity gltf-model="renderer/assets/tree01/model.gltf" position="-10.585 0 -7.944" scale="-0.004 0.005 -0.005">
+                                </a-entity><a-entity gltf-model="renderer/assets/tree01/model.gltf" position="-4.184 0 9.929" scale="-0.004 0.005 -0.005">
+                                </a-entity><a-entity gltf-model="renderer/assets/tree01/model.gltf" position="-7.461 0 9.92" scale="-0.004 0.005 -0.005">
+                                </a-entity><a-entity gltf-model="renderer/assets/tree01/model.gltf" position="-8.655 0 6.879" scale="-0.004 0.005 -0.005">
+                                </a-entity><a-entity gltf-model="renderer/assets/tree01/model.gltf" position="6.087 0 2.816" scale="-0.004 0.005 -0.005">
+                                </a-entity><a-entity gltf-model="renderer/assets/tree01/model.gltf" position="6.669 0 6.519" scale="-0.004 0.005 -0.005">
+                                </a-entity><a-entity gltf-model="renderer/assets/tree01/model.gltf" position="6.643 0 -7.703" scale="-0.004 0.005 -0.005">
+                                </a-entity><a-entity gltf-model="renderer/assets/tree01/model.gltf" position="8.452 0 -7.817" scale="-0.004 0.005 -0.005">
+                                </a-entity><a-entity gltf-model="renderer/assets/tree01/model.gltf" position="8.193 0 5.297" scale="-0.004 0.005 -0.005">
+                                </a-entity><a-entity gltf-model="renderer/assets/tree01/model.gltf" position="-8.072 0 -8.38" scale="0.005 0.005 0.005">
+                                </a-entity><a-entity gltf-model="renderer/assets/tree01/model.gltf" position="-3.614 0 8.015" scale="0.005 0.005 0.005">
+                                </a-entity><a-entity gltf-model="renderer/assets/tree01/model.gltf" position="4.866 0 3.987" scale="0.005 0.005 0.005">
+                                </a-entity><a-entity gltf-model="renderer/assets/tree01/model.gltf" position="7.058 0 -5.896" scale="0.005 0.005 0.005">
+                                </a-entity><a-entity gltf-model="renderer/assets/tree01/model.gltf" position="-6.291 0 -10.03" scale="0.005 0.005 0.005">
+                                </a-entity><a-entity gltf-model="renderer/assets/tree01/model.gltf" position="8.708 0 -3.175" scale="0.005 0.005 0.005">
+                                </a-entity><a-entity gltf-model="renderer/assets/table/model.gltf" position="0.292 -0.103 0" scale="2.5 0.01 1.5">
+                                </a-entity><a-entity gltf-model="renderer/assets/mill/model.gltf" position="-5.84 1.375 -7.071" scale="1.25 1.25 1.25" rotation="0 54.145 0">
+                                </a-entity><a-entity gltf-model="renderer/assets/grass/model.gltf" position="7.429 -0.039 -4.479" scale="2 0.75 2">
+                                </a-entity><a-entity gltf-model="renderer/assets/grass/model.gltf" position="-9.234 0.067 -5.228" scale="2 0.75 2">
+                                </a-entity><a-entity gltf-model="renderer/assets/grass02/model.gltf" position="-5.35 -0.103 10.006" scale="2 1 2">
+                                </a-entity><a-entity gltf-model="renderer/assets/grass02/model.gltf" position="6.101 -0.103 7.226" scale="2 1 2">
+                                </a-entity><a-entity gltf-model="renderer/assets/towerdecor/scene.gltf" position="4.477 -0.103 6.821" scale="0.5 0.5 0.5">
+                                </a-entity><a-entity gltf-model="renderer/assets/stone/model.gltf" position="4.477 -0.103 6.821" scale="0.5 0.5 0.5">
+                                </a-entity><a-entity gltf-model="renderer/assets/pond/scene.gltf" position="-6.798 0.221 4.282" scale="1 0.5 1" rotation="0 63.94208993659988 0">
+                                </a-entity>
+                              </a-entity>
+
+              <a-entity position="0 13.138 10.5" rotation="-53 0 0" camera="active: true" wasd-controls="acceleration: 250" >
+                  <a-entity cursor="" position="0 0 -1" geometry="primitive: ring; radiusInner: 0.02; radiusOuter: 0.03" material="color: black; shader: flat" raycaster="objects: [data-raycastable]">
+                  </a-entity>
+              </a-entity>
+    </a-scene>
+</body>
+
+</html>

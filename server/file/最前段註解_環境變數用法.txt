@@ -1,0 +1,7 @@
+// luffy.ee.ncku.edu.tw
+// vi /home/wp2018/user/syn55698/.bash.profile 
+// source /home/wp2018/user/syn55698/.bash.profile 
+// export TDAR_DATA_SOURCE = https://sheltered-atoll-22672.herokuapp.com/query?type=query_tdar
+//url = "https://sheltered-atoll-22672.herokuapp.com/query?type=query_tdar"
+// set TDAR_DATA_SOURCE =https://sheltered-atoll-22672.herokuapp.com/query?type=query_tdar
+//============================這段寫，初始 bcrypt 加密工具

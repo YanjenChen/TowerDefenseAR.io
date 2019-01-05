@@ -1,0 +1,401 @@
+else if(msg["event_name"]=="serverResponseRenewRoomUser"){
+	           // console.log("回應囉 : \n"+JSON.stringify(msg))
+	           
+	
+	           //先把所有的block 設成看不見
+	            $(".block").css({"visibility":"hidden"})
+	
+	           len=$(".block").length
+	           join_room_user = msg["join_room_user"]
+	           user_num = join_room_user.length
+	           i=0
+	           for(user in join_room_user){
+	                
+                    // 若是剛進入，則必須先更新自己的 棋子 & 旗子
+                    // 之後手動按鈕更新，會在各在的 "serverResponseUserChangeTeam" , "serverResponseUserChangeReady" 處理
+                    /*
+					if(
+                        (String(user)==String($("#username").val()))
+                        && 
+
+                        first_time_need_renew_my_chess_flag
+                        ){
+                            dom = $(".block").filter(
+				                function(index){
+		                            //console.log("k1 : "+$(this).find(".block_in").html()+" , "+$("#username").val())
+				                    return ( ($(this).find(".block_in").html())==(String(user)) )  ;// 選取 目前 物件(抓每個<p>檢查) 內 <span> 數量，若是2就回傳 true
+				                }
+				            )
+
+                            $(dom).css({visibility:"hidden"})
+                             //$(  (".block:eq("+i+")")  ).css({"visibility":"hidden"})
+	                    // 更新自己 所在陣營
+                        // 更新棋子
+	                    out_team_id = join_room_user[user]["team_id"]
+                        if(out_team_id == 1){
+                            now_fac = 'A'
+                            $('#Fac').addClass("FacA").removeClass("FacB")
+                        }else if(out_team_id == 2){
+                            now_fac = 'B'
+                            $('#Fac').addClass("FacB").removeClass("FacA")
+                        }
+
+
+                        // 更新棋子顏色
+                        if(join_room_user[user]["team_id"]==1){
+	                        // 紅隊 A對
+	                        $(  (".block:eq("+i+")")  ).removeClass("chessB",).addClass("chessA")
+	                        //back_color="red"
+	                    }else if(join_room_user[user]["team_id"]==2){
+	                        // 藍隊 B對
+	                        $(  (".block:eq("+i+")")  ).removeClass("chessA",).addClass("chessB")
+	                        //back_color="blue"
+	                    }
+
+                        // 更新完，才會顯示旗子，這樣比較不醜
+                        //$("#Fac").css({visibility:"visible"})
+
+                        
+
+
+                        // 更新準備狀態
+                            
+                        if(join_room_user[user]["status"]){ // 準備好了
+                            
+                            if(dom.length==1){
+		                        dom = dom[0]
+                                if(join_room_user[user]["team_id"]==1){
+                                     $(dom).css({"-webkit-filter": "drop-shadow(0px 0px 40px rgba(255, 0, 0, 0.8))"});
+                                }else if(join_room_user[user]["team_id"]==2){
+                                    $(dom).css({"-webkit-filter": "drop-shadow(0px 0px 40px rgba(0, 191, 255, 0.8))"});
+                                }
+                            }
+                        }else{
+                            if(dom.length==1){
+		                        dom = dom[0]
+                                $(dom).css({"-webkit-filter": ""});
+                            }
+                        }
+
+                        // 有動畫效果的
+                        $("#Fac").css({visibility:"visible", opacity: 0.0})
+							.animate({opacity: 0.2},200)
+						    .animate({opacity: 0.4},200)
+							.animate({opacity: 0.6},200)
+							.animate({opacity: 0.8},200)
+							.animate({opacity: 1.0},200)
+
+                        // 有動畫效果的
+                        //$(dom)
+                        
+                         $(  (".block:eq("+i+")")  ).css({visibility:"visible", opacity: 0.0})
+							.animate({opacity: 0.2},200)
+						    .animate({opacity: 0.4},200)
+							.animate({opacity: 0.6},200)
+							.animate({opacity: 0.8},200)
+							.animate({opacity: 1.0},200,function(){
+                                    console.log("P1")
+                                    
+                            })
+
+                        
+
+                        first_time_need_renew_my_chess_flag = false
+                        console.log("初始載入 , now_fac : "+now_fac+" , ")	                   
+                        // console.log("out_team_id : "+out_team_id)
+	                }
+                    
+					*/
+					//console.log("user : "+user)
+					// 更新全域變數就好
+					// 有換旗子的動畫
+					if(
+                        (String(user)==String($("#username").val()))
+
+						//&&
+						//first_time_need_renew_my_chess_flag
+
+					){
+						
+						// 注意，旗子若要加動畫，得跑得比定時更新還快 (兩個 setInterval)
+						// setInterval 現在為 2000，旗子動畫時常為 800+800 = 1600 ，比 2000 小。還OK
+						// 為了動畫效果，還把 後端 monitor() 的時間間隔調成2100，原本1050
+						// 旗子動畫，成功 
+						// 旗子只限我方
+
+						out_team_id = join_room_user[user]["team_id"]
+						//$('#Fac').css({visibility:"visible"})
+                       // console.log("進來了 ,  : "+out_team_id)
+						if(out_team_id == 1){
+                            now_fac = 'A'
+                           //console.log("開始動畫 , out_team_id : "+out_team_id)
+								
+							if(!ori_fac){
+
+								//初次顯示時，也要對手機做調整
+									var x = window.matchMedia("(min-width: 1000px)")		
+									if (! x.matches) { // 手機
+										$("#Fac").css({position:"absolute",top:"30%",left:"35%"})
+									}
+
+								//console.log("e1 : "+ori_fac+" , now_fac : "+now_fac)
+								$('#Fac').fadeOut(800,function(){
+							   		$('#Fac').addClass("FacA").removeClass("FacB")
+						   			$('#Fac').css({visibility:"visible"})
+
+									$('#Fac').fadeIn(800,function(){})
+						   		})
+								   ori_fac = now_fac
+							}else{
+								if(ori_fac!= now_fac){ // 代表要更新，使用動畫效果
+
+									run_pen()
+
+									var x = window.matchMedia("(min-width: 1000px)")		
+									if (! x.matches) { // 手機
+										$("#Fac").css({position:"absolute",top:"30%",left:"35%"})
+									}
+									$('#Fac').css({visibility:"hidden"})
+									//console.log("e2 : "+ori_fac+" , now_fac : "+now_fac)
+									$('#Fac').fadeOut(800,function(){
+							   			$('#Fac').addClass("FacA").removeClass("FacB")
+						   				$('#Fac').css({visibility:"visible"})
+
+										$('#Fac').fadeIn(800,function(){})
+						   			})
+
+
+									   ori_fac = now_fac
+								}else{
+									//console.log("e3 : "+ori_fac+" , now_fac : "+now_fac)
+									// 同隊伍，沒變，不須特效
+									$('#Fac').addClass("FacA").removeClass("FacB")
+						   				$('#Fac').css({visibility:"visible"})
+										   ori_fac = now_fac
+								}
+							}
+						   
+						   // 原版
+						   /*
+						   $('#Fac').addClass("FacA").removeClass("FacB")
+						   $('#Fac').css({visibility:"visible"})
+						   */
+						}else if(out_team_id == 2){
+                            now_fac = 'B'
+							console.log("開始動畫 , out_team_id : "+out_team_id)
+                            
+							/*
+							$('#Fac').fadeOut(800,function(){
+								$('#Fac').addClass("FacB").removeClass("FacA")
+						   		$('#Fac').css({visibility:"visible"})
+
+								$('#Fac').fadeIn(800,function(){})
+						   })
+						   */
+
+							if(!ori_fac){
+							   //console.log("e1 : "+ori_fac+" , now_fac : "+now_fac)
+
+							   //初次顯示時，也要對手機做調整
+							   // 藍色會偏右
+									var x = window.matchMedia("(min-width: 1000px)")		
+									if (! x.matches) { // 手機
+										$("#Fac").css({position:"absolute",top:"30%",left:"20%"}) // 藍色的，不知為啥都會偏右，所以手動往左拉
+									}
+
+
+								$('#Fac').fadeOut(800,function(){
+							   		$('#Fac').addClass("FacB").removeClass("FacA")
+						   			$('#Fac').css({visibility:"visible"})
+
+									$('#Fac').fadeIn(800,function(){})
+						   		})
+								   ori_fac = now_fac
+							}else{
+								if(ori_fac!= now_fac){ // 代表要更新，使用動畫效果
+
+									run_pen()
+
+									// 藍色會偏右
+									var x = window.matchMedia("(min-width: 1000px)")		
+									if (! x.matches) { // 手機
+										$("#Fac").css({position:"absolute",top:"30%",left:"20%"}) // 藍色的，不知為啥都會偏右，所以手動往左拉
+									}
+									
+
+									$('#Fac').css({visibility:"hidden"})
+									//console.log("e2 : "+ori_fac+" , now_fac : "+now_fac)
+									$('#Fac').fadeOut(800,function(){
+							   			$('#Fac').addClass("FacB").removeClass("FacA")
+						   				$('#Fac').css({visibility:"visible"})
+
+										$('#Fac').fadeIn(800,function(){})
+						   			})
+									   ori_fac = now_fac
+								}else{
+									//console.log("e3 : "+ori_fac+" , now_fac : "+now_fac)
+									// 同隊伍，沒變，不須特效
+									$('#Fac').addClass("FacB").removeClass("FacA")
+						   				$('#Fac').css({visibility:"visible"})
+										   ori_fac = now_fac
+								}
+							}
+
+							// 原版
+							/*
+							$('#Fac').addClass("FacB").removeClass("FacA")
+							$('#Fac').css({visibility:"visible"})
+							*/
+						}
+
+						//first_time_need_renew_my_chess_flag = false
+					}
+					
+	                // block_in
+	                 //$(  (".block:eq("+i+")")  ).find(".player").html(user)
+	                 $(  (".block:eq("+i+")")  ).find(".block_in").html(user)
+                     //console.log("CCC")
+                     $(  (".block:eq("+i+")")  ).css({visibility:"visible", opacity: 1.0})
+	                
+                   // 對不是自己的，更新 棋子顏色 & 準備狀態
+                   if(   //(String(user)!=String($("#username").val())) 
+				   	true
+                        
+						// 不要打開，打開問題會很多
+						//||
+
+                        //((String(user)==String($("#username").val())) && (!first_time_need_renew_my_chess_flag))
+                     ){
+	                    $(  (".block:eq("+i+")")  ).css({"visibility":"hidden"})
+                        // 棋子顏色
+                        if(join_room_user[user]["team_id"]==1){
+	                        // 紅隊 A對
+	                        $(  (".block:eq("+i+")")  ).removeClass("chessB",).addClass("chessA")
+	                        //back_color="red"
+	                    }else if(join_room_user[user]["team_id"]==2){
+	                        // 藍隊 B對
+	                        $(  (".block:eq("+i+")")  ).removeClass("chessA",).addClass("chessB")
+	                        //back_color="blue"
+	                    }
+
+						// 自己的旗子
+						if(String(user)==String($("#username").val())){
+							if(join_room_user[user]["team_id"]==1){
+								$('#Fac').addClass("FacA").removeClass("FacB")
+							}else if(join_room_user[user]["team_id"]==2){
+								$('#Fac').addClass("FacB").removeClass("FacA")
+						
+							}
+						}
+
+						/*
+						// 第一次顯示時，更新旗子
+						if(first_time_need_renew_my_chess_flag){
+							if(join_room_user[user]["team_id"]==1){ // 紅隊
+
+							}else{ // 藍隊
+
+							}
+							first_time_need_renew_my_chess_flag = false
+						}
+						*/
+
+                        // 更新準備狀態
+		                if(  join_room_user[user]["status"] ){
+		                	//console.log("DDDD")
+		                    
+		                    // 不需要這兩行
+		                    //div.innerHTML = "Ready";
+		                    //changeclick=false;
+		                      
+		
+		                    // 測試，只變'#one'
+		                    if(join_room_user[user]["team_id"]==1){ // A對，進入準備狀態
+		
+								// 記得改成，每個人各自的區塊，不一定是 #one
+		                    	//$('#one').css({"-webkit-filter": "drop-shadow(0px 0px 40px rgba(255, 0, 0, 0.8))"});
+		                        //$('#one').addClass("chessA").removeClass("chessB")
+		
+		                        
+		                        // 找 有哪個 .block ，裡面的 .block_in 的 html() 為 aaa(玩家名稱)，找到指定玩家在的位置
+		                        dom = $(".block").filter(
+				                    function(index){
+		                                // 在這邊，是耕莘每個玩家顯示，所以改寫 String(user) ，因為是對各自玩家
+				                        return ( ($(this).find(".block_in").html())==(String(user)) )  ;// 選取 目前 物件(抓每個<p>檢查) 內 <span> 數量，若是2就回傳 true
+				                    }
+				                )
+		
+		                        // 對第一個 block 加上 css
+		                        if(dom.length==1){
+		                            dom = dom[0]
+		                            
+		                            $(dom).css({"-webkit-filter": "drop-shadow(0px 0px 40px rgba(255, 0, 0, 0.8))"});
+		                            
+		                            // 用 class 無法顯示想要的..不知為啥
+		                            //$(dom).addClass("ready_a").removeClass("ready_b").removeClass("ready_no")
+		                        }
+		
+		                        
+		                    }
+		                    else{ // B對，進入準備狀態
+		
+		                        // 找 有哪個 .block ，裡面的 .block_in 的 html() 為 aaa(玩家名稱)，找到指定玩家在的位置
+		                        dom = $(".block").filter(
+				                    function(index){
+		                                //console.log("k1 : "+$(this).find(".block_in").html()+" , "+$("#username").val())
+				                        return ( ($(this).find(".block_in").html())==(String(user)) )  ;// 選取 目前 物件(抓每個<p>檢查) 內 <span> 數量，若是2就回傳 true
+				                    }
+				                )
+		
+		                        // 對第一個 block 加上 css
+		                        if(dom.length==1){
+		                            dom = dom[0]
+		                            
+		                            $(dom).css({"-webkit-filter": "drop-shadow(0px 0px 40px rgba(0, 191, 255, 0.8))"});
+		                            
+		                            // 用 class 無法顯示想要的..不知為啥
+		                            //$(dom).addClass("ready_a").removeClass("ready_b").removeClass("ready_no")
+		                        }
+		        
+		            		}
+		
+						}
+						else{
+		                     // 不需要這兩行
+		                    //changeclick=true;
+		                	//div.innerHTML = curText;
+		
+							// 記得改成，每個人各自的區塊，不一定是 #one
+		                        dom = $(".block").filter(
+				                    function(index){
+		                                //console.log("k1 : "+$(this).find(".block_in").html()+" , "+$("#username").val())
+				                        return ( ($(this).find(".block_in").html())==(String(user)) )  ;// 選取 目前 物件(抓每個<p>檢查) 內 <span> 數量，若是2就回傳 true
+				                    }
+				                )
+		                        if(dom.length==1){
+		                            dom = dom[0]
+		                            
+		                            $(dom).css({"-webkit-filter": ""})
+		                            
+		                            // 用 class 無法顯示想要的..不知為啥
+		                            //$(dom).addClass("ready_a").removeClass("ready_b").removeClass("ready_no")
+		                        }
+		                        //console.log(changeclick);
+						}
+
+                         $(  (".block:eq("+i+")")  ).css({"visibility":"visible"})
+                   }
+	
+	
+	                // $((".block:eq("+i+") > div")).eq(0).css({"background-color":back_color})
+	               
+                   // 這句放到 if(String(user)!=String($("#username").val())){ ... 內
+                   // $(  (".block:eq("+i+")")  ).css({"visibility":"visible"})
+	               
+	               
+	               
+	               ++i
+	            }
+	           
+	
+	        }

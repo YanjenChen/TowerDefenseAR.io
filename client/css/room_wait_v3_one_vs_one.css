@@ -1,0 +1,590 @@
+/*手機*/
+@media (max-width: 1000px) {
+	body {
+	  background:black;
+	  background-size: cover;
+	}
+	
+	.touch:hover{
+	  -webkit-filter: drop-shadow(0px 0px 40px rgba(255, 235, 0, 0.8));
+	  cursor:pointer;
+	}
+	
+	
+	#Leave{
+	  background-image:url("../image/Leave.png");
+	  position: absolute;
+	  
+	  left:8%;
+	  /*原本*/
+		/*
+		top:4.5%;
+		width:15%;
+	  height:15%;
+	  */
+
+		/*新的*/
+		top:1%;
+		width:25%;
+	  height:25%;
+
+		background-size: contain;
+	  background-repeat: no-repeat;
+	  padding-bottom: 1%;
+	}
+	
+	
+	#signout{
+	  position: absolute;
+	  background-image:url("../image/signout.png");
+	   left: 60%;
+	   
+	   
+		 /*原本*/
+		 /*
+		 width: 20%;
+	   height:15%;
+	   top:2%;
+		 */
+
+		 /*新的*/
+		 width: 30%;
+	   height:30%;
+		 top:2%;
+
+		 background-size:contain;
+	   background-repeat:no-repeat;
+	}
+	
+	#Background{
+	  background: url("../image/background.jpg");
+	  background-size: cover;
+	  background-repeat: no-repeat;
+	}
+	
+	#ChangeFaction{
+	  position: absolute;
+	  top:70%;
+	  left:3%;
+	  width:80%;
+	  height:30%;
+	}
+	
+	#pen {
+	  background-image:url("../image/pen.png");
+	  position: absolute;
+	  left:5%;
+
+		/*原本*/
+	   /*
+		 width: 50%;
+	   height: 50%;
+	   */
+
+		 /*新的*/
+		 width: 50%;
+	   height: 50%;
+		 top : -20%;
+
+
+		 background-size:contain;
+	   background-repeat:no-repeat;
+	}
+	
+	#ink {
+	  background-image:url("../image/ink.png");
+	  position: absolute;
+	  
+		
+		/*原本*/
+		/*
+	   width: 50%;
+	   height:30%;
+	   top:30%;
+		 */
+
+
+		 width: 80%;
+	   height:80%;
+		 top:-10%;
+
+		 background-size:contain;
+	   background-repeat:no-repeat;
+	}
+	
+	
+	
+	#Ready{
+	  position: absolute;
+	  
+	  left: 65%;
+		
+		/*舊版*/
+		/*
+		top:70%;
+		width: 30%;
+	  height:30%;
+		*/
+
+		/*新版*/
+		top:62%;
+		width: 30%;
+	  height:30%;
+
+
+	  background: url("../image/Flag.png");
+	  background-size: contain;
+	  background-repeat: no-repeat;
+	}
+	#ReadyFont{
+
+	   
+	   font-family: fantasy;
+	   color: #e1ad46;
+	   position: relative;
+		text-shadow: 2px 2px black;
+	  
+		/*原版*/
+		/*
+		top:60%;
+		right:4%;
+		font-size: 30px;
+		*/
+
+		/*新版*/
+
+		top:50%;
+		left:10%;
+		font-size: 50px;
+	}
+	
+	.FacA{
+	  position: absolute;
+	  left:80px;
+	  top:150px;
+	  width: 80%;
+	  height:40%;
+	  background: url("../image/Red.png");
+	  background-size: contain;
+	  background-repeat: no-repeat;
+	}
+	
+	.FacB{
+	  position: absolute;
+	  left:0px;
+	  top:150px;
+	  width: 100%;
+	  height:50%;
+	  background: url("../image/blue.png");
+	  background-size: contain;
+	  background-repeat: no-repeat;
+	}
+	
+	.chessA{
+	  position: absolute;
+	  background-position: center;
+	  left:10%;
+	  top:-2.5%;
+	  width: 100%;
+	  height:100%;
+	  background: url("../image/FacA.png");
+	  background-size: contain;
+	  background-repeat: no-repeat;
+	  /*-webkit-filter: drop-shadow(0px 0px 40px rgba(255, 0, 0, 0.8));*/
+	}
+	
+	.chessB{
+	  position: absolute;
+	  background-position: center;
+	  left:10%;
+	  top:-2.5%;
+	  width: 100%;
+	  height:100%;
+	  background: url("../image/FacB.png");
+	  background-size: contain;
+	  background-repeat: no-repeat;
+	  /*-webkit-filter: drop-shadow(0px 0px 40px rgba(0, 191, 255, 0.8));*/
+	}
+	
+	
+	
+	/*都先藏起來*/
+	.block{
+		visibility: hidden;
+	}
+	
+	#Leave_in{
+	
+		font-family: fantasy; color: #e1ad46; position: relative;left:4%; top:50%;  text-shadow: 2px 2px black;
+
+		/*原本*/
+		/*
+		font-size: 30px;
+		*/
+
+		/*新的，也新增 line-height*/
+		font-size: 50px;
+		line-height: 60px;
+	}
+	
+	#Signout_in{
+		font-family: fantasy; color: #e1ad46; position: relative;left:4%;   text-shadow: 2px 2px black;
+		
+		/*原本*/
+		/*
+		font-size: 30px;
+		top:80%;
+		*/
+
+		/*新的*/
+		font-size: 50px;
+		top:50%;
+	
+	}
+	
+	#ink_in{
+		font-family: fantasy; color: #e1ad46; position: relative;left:4%;   text-shadow: 2px 2px black;
+		
+		/*原本*/
+		/*
+		font-size: 30px;
+		top:90%;
+		*/
+
+		/*新的，加上 line-height*/
+		top:30%;
+		font-size: 50px;
+		line-height: 60px;
+	}
+	
+	.block_in{
+		font-family: fantasy; color: #e1ad46; position: relative;
+	                			
+												
+												
+												
+												text-shadow: 2px 2px black;
+												
+												/*v2的*/
+												/*
+												font-size: 60px;
+												left:30%; 
+												top:30%;
+												*/
+
+												/*v3的*/
+												font-size: 75px;
+												left:38%;
+												top:25%; 
+		}
+	
+	
+	.ready_a{
+		-webkit-filter: "drop-shadow(0px 0px 40px rgba(255, 0, 0, 0.8))";
+	}
+	
+	.ready_b{
+		-webkit-filter: "drop-shadow(0px 0px 40px rgba(0, 191, 255, 0.8))";
+	}
+	
+	.ready_no{
+		-webkit-filter: "";
+	}
+	
+	
+	#Fac{
+		visibility: hidden;
+	}
+
+
+	#Fac_fade{
+		width: 100%;
+	  height:100%;
+	  background: url("../image/background_min.jpg");
+	  background-size: contain;
+	}
+}
+/*其他寬螢幕*/
+@media (min-width: 1000px) {
+	body {
+	  background:black;
+	  background-size: cover;
+	}
+	
+	.touch:hover{
+	  -webkit-filter: drop-shadow(0px 0px 40px rgba(255, 235, 0, 0.8));
+	  cursor:pointer;
+	}
+	
+	
+	#Leave{
+	  background-image:url("../image/Leave.png");
+	  position: absolute;
+	  
+	  left:8%;
+	  
+		/*舊版*/
+		/*
+		width:15%;
+	  height:15%;
+	  top:4.5%;
+		*/
+
+		/*新版*/
+		width:40%;
+	  height:20%;
+		top:4.5%;
+
+		background-size: contain;
+	  background-repeat: no-repeat;
+	  padding-bottom: 1%;
+	}
+	
+	
+	#signout{
+	  position: absolute;
+	  background-image:url("../image/signout.png");
+	   left: 60%;
+	   top:2%;
+
+		 /*舊版*/
+		 /*
+	   width: 20%;
+	   height:15%;
+	   */
+
+		 /*新版*/
+
+		 width: 40%;
+	   height:40%;
+		 background-size:contain;
+	   background-repeat:no-repeat;
+	}
+	
+	#Background{
+	  background: url("../image/background.jpg");
+	  background-size: cover;
+	  background-repeat: no-repeat;
+	}
+	
+	#ChangeFaction{
+	  position: absolute;
+	  top:70%;
+	  left:3%;
+	  width:80%;
+	  height:30%;
+	}
+	
+	#pen {
+	  background-image:url("../image/pen.png");
+	  position: absolute;
+	  left:5%;
+	   width: 50%;
+	   height: 50%;
+	   background-size:contain;
+	   background-repeat:no-repeat;
+	}
+	
+	#ink {
+	  background-image:url("../image/ink.png");
+	  position: absolute;
+	  top:30%;
+	   width: 50%;
+	   height:30%;
+	   background-size:contain;
+	   background-repeat:no-repeat;
+	}
+	
+	
+	
+	#Ready{
+	  position: absolute;
+	  top:70%;
+	  left: 65%;
+	  width: 30%;
+	  height:30%;
+	  background: url("../image/Flag.png");
+	  background-size: contain;
+	  background-repeat: no-repeat;
+	}
+	#ReadyFont{
+	   
+	   font-family: fantasy;
+	   color: #e1ad46;
+	   position: relative;
+	  
+		text-shadow: 2px 2px black;
+	  font-size: 30px;
+		line-height: 40px;
+		/*舊版*/
+		/*
+		right:4%;
+	  top:60%;
+		*/
+
+		/*新版*/
+
+		left:20%;
+	  top:30%;
+	}
+	
+	.FacA{
+	  position: absolute;
+	  left:80px;
+	  top:150px;
+	  width: 80%;
+	  height:40%;
+	  background: url("../image/Red.png");
+	  background-size: contain;
+	  background-repeat: no-repeat;
+	}
+	
+	.FacB{
+	  position: absolute;
+	  left:0px;
+	  top:150px;
+	  width: 100%;
+	  height:50%;
+	  background: url("../image/blue.png");
+	  background-size: contain;
+	  background-repeat: no-repeat;
+	}
+	
+	.chessA{
+	  position: absolute;
+	  background-position: center;
+	  left:10%;
+	  top:-2.5%;
+	  width: 100%;
+	  height:100%;
+	  background: url("../image/FacA.png");
+	  background-size: contain;
+	  background-repeat: no-repeat;
+	  /*-webkit-filter: drop-shadow(0px 0px 40px rgba(255, 0, 0, 0.8));*/
+	}
+	
+	.chessB{
+	  position: absolute;
+	  background-position: center;
+	  left:10%;
+	  top:-2.5%;
+	  width: 100%;
+	  height:100%;
+	  background: url("../image/FacB.png");
+	  background-size: contain;
+	  background-repeat: no-repeat;
+	  /*-webkit-filter: drop-shadow(0px 0px 40px rgba(0, 191, 255, 0.8));*/
+	}
+	
+	
+	
+	/*都先藏起來*/
+	.block{
+		visibility: hidden;
+		/*
+		width:10%;
+		height:10%;
+		*/
+	}
+	
+	#Leave_in{
+	
+		font-family: fantasy; color: #e1ad46; position: relative;
+		
+	  text-shadow: 2px 2px black;font-size: 30px;
+
+		/*舊版*/
+		/*
+		top:50%;
+		left:4%; 
+		*/
+
+		/*新版*/
+		left:8%; 
+		top:20%;
+
+
+
+		line-height: 40px;
+	}
+	
+	#Signout_in{
+		font-family: fantasy; color: #e1ad46; position: relative;left:4%;   text-shadow: 2px 2px black;font-size: 30px;
+		line-height: 40px;
+
+		/*舊版*/
+		/*
+		top:80%;
+		*/
+
+		/*新版*/
+
+		top:20%;
+	}
+	
+	#ink_in{
+		font-family: fantasy; color: #e1ad46; position: relative;left:4%;   text-shadow: 2px 2px black;font-size: 30px;
+		/*舊版*/
+		/*
+		top:90%;
+		*/
+
+		/*新版*/
+		top:10%;
+		line-height: 40px;
+	}
+	
+	.block_in{
+		font-family: fantasy; color: #e1ad46; position: relative;
+	                			 top:50%;  text-shadow: 2px 2px black;
+												/*v2的*/
+												/*
+												font-size: 30px;
+												left:20%;
+												*/
+
+												/*v3的*/
+												font-size: 80px;
+												left:40%;
+	}
+	
+	
+	.ready_a{
+		-webkit-filter: "drop-shadow(0px 0px 40px rgba(255, 0, 0, 0.8))";
+	}
+	
+	.ready_b{
+		-webkit-filter: "drop-shadow(0px 0px 40px rgba(0, 191, 255, 0.8))";
+	}
+	
+	.ready_no{
+		-webkit-filter: "";
+	}
+	
+	
+	#Fac{
+		visibility: hidden;
+	}
+
+
+	#Fac_fade{
+		position:absolute;
+		
+		/*
+		left:18%;
+		top:18%;
+		width: 100%;
+	  height:40%;
+	  */
+		background: url("../image/background_min_v2.jpg");
+		background-repeat: no-repeat;
+	  /*
+		background-size: "100px 100px";
+		
+		visibility: none;
+		*/
+		z-index: 5;
+		
+	}
+}
+

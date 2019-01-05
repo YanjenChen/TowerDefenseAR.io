@@ -1,0 +1,47 @@
+/*手機*/
+@media (max-width: 1000px) {
+    #message_modal{
+        position:relative;
+        top:50%;width:90%;height:400px;right:60%;
+        
+    }
+
+    #message_modal_in{
+        width:90%;height:200px;position:relative;left:5%;
+    }
+
+    #message_to_alert{
+        font-size:50px;
+        
+        text-align:center;;line-height:60px;
+    }
+
+    #close_message_modal{
+        position:relative;left:25%;width:50%;
+    }
+
+    #close_message_modal{
+
+        height:100px;
+        font-size:50px;
+    }
+}
+/*其他寬螢幕*/
+@media (min-width: 1000px) {
+
+    #message_modal{
+        position:relative;top:30%;width:60%;height:30%;right:20%;
+    }
+
+    #message_modal_in{
+        width:90%;height:50%;position:relative;left:5%;
+    }
+
+    #message_to_alert{
+        font-size:25px;text-align:center;;line-height:60px;
+    }
+
+    #close_message_modal{
+        position:relative;left:35%;width:200px;
+    }
+}

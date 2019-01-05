@@ -1,0 +1,382 @@
+<html>
+
+<head>
+    <title>TDAR Game Lobby - Player <%=username%></title>
+   
+
+    <link rel="stylesheet" href="css/jquery-ui.css">
+    <script src="javascript/jquery-2.1.4.min.js"></script>
+    <script src="javascript/jquery.flip.min.js"></script>
+
+
+
+
+   
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+    <script src="javascript/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="css/semantic.min-2.2.9.css" />
+    <script src="javascript/semantic.min-2.2.9.js"></script>
+
+	<!--
+	<script src="app.js"></script>
+	-->
+	<!-- 載入 socket.io 的 js 檔，從後端抓的 -->
+	<script src="/socket.io/socket.io.js"></script>
+
+	<!-- 播故事那段，需要這三個檔案-->
+	<link rel="stylesheet" href="css/lobby_story.css" />
+	<script src="javascript/lobby_story.js"></script>
+	<script src="javascript/delay.js"></script>
+	
+	<!-- 人物介紹-->
+	<script src="javascript/figure_demo.js"></script>
+
+	<link href="css/room_lobby_v3.css" rel="stylesheet">
+	<link href="css/room_lobby_v3_message_modal.css" rel="stylesheet">
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	<script src="javascript/room_lobby_v3_原始正常版.js"></script>
+
+	<%
+		if(!from_login){
+	%>
+
+		<input id="not_from_login" style="display:none;visibility:hidden"></input>	
+
+	<%
+		}else{
+	%>
+		<input id="from_login" style="display:none;visibility:hidden"></input>	
+	<%
+		}
+	%>
+</head>
+
+<!--
+<body class="scene">
+-->
+
+<body>
+	
+
+	
+<img class="scene" alt="XXX" />
+<div id="lobby_all">
+	
+	<div id="hidden_form_area">
+		<input id="username" value="<%=username%>" type='hidden'/>
+        <input id="disconnect" value="<%=username%>" type='hidden'/>
+        <form id="logoutForm" method="post" action="/logout">
+            <input id="logoutName" name="logoutName" type="hidden" />
+            <input id="logoutHash" name="logoutHash" type="hidden" />
+        </form>
+        <form id="createRoomForm" method="post" action="/createRoom">
+            <input id="createRoomName" name="createRoomName" type="hidden" />
+            <input id="createRoomHash" name="createRoomHash" type="hidden" />
+        </form>
+        <form id="joinRoomForm" method="post" action="/joinRoom">
+            <input id="joinRoomName" name="joinRoomName" type="hidden" />
+            <input id="joinRoomId" name="joinRoomId" type="hidden" />
+            <input id="joinRoomHash" name="joinRoomHash" type="hidden" />
+        </form>
+	</div>
+
+
+	<div id="message_modal" class="ui modal" >
+        <br>
+        <div id="message_modal_in"  class="ui error message">
+            
+            <h1 id="message_to_alert"  class="ui center"></h1>
+            <br>
+            
+        </div>
+        <button id="close_message_modal" class="ui big orange button" >OK</button>
+    </div>
+
+
+    <div id="sidebar">
+    	<ul>
+      		<li><a href="https://github.com/"style="color:white;">Character</a></li>
+      		<li>StoryLine</li>
+      		<li>About</li>
+      		<li>Contact</li>
+    	</ul>
+  	</div>
+
+	  <!--
+	  	onclick="SidebarToggle(this)"
+	  -->
+  	<div id="toggle-btn" >
+    	<span></span>
+    	<span></span>
+    	<span></span>
+  	</div>
+
+    <div id="signout" >
+      <div id="signoutFont" class="MenuFont">
+        Sign Out
+      </div>
+    </div>
+    <div id="createroom" >
+      <div id="createRoomFont" class="MenuFont">
+        Create 
+		<div id="space1">
+			<br>
+		</div>
+		New Room
+      </div>
+    </div>
+
+	<!--
+		right page 按下無法翻頁原因，因為寫了 兩個 class 屬性，只會讀取一個。寫一個就好
+	-->
+    <div id="card"  >
+        <div class="front" >
+            <div class="ui grid">
+                <div style="background-image:url(image/booktexture.png);background-size:cover; " class="left_page eight wide column left page">
+
+					<div class="room" style="background-image: url(image/select.png);background-repeat : no-repeat;background-size:cover;">
+
+						<h1 class="room_id_show" >Room1</h1>
+					</div>
+
+					<div class="room" style="background-image: url(image/select.png);background-repeat : no-repeat;background-size:cover;">
+
+						<h1 class="room_id_show" >Room5</h1>
+					</div>
+
+					<div class="room" style="background-image: url(image/select.png);background-repeat : no-repeat;background-size:cover;">
+
+						<h1 class="room_id_show" >Room5</h1>
+					</div>
+
+					<div class="room" style="background-image: url(image/select.png);background-repeat : no-repeat;background-size:cover;">
+
+						<h1 class="room_id_show" >Room5</h1>
+					</div>
+
+
+
+
+					<div  style="position:absolute;bottom:50px;left:45%">
+						<h1 class="page_number">1</h1>
+					</div>
+
+				</div>
+                <div style="background-color:transparent;" class="right_page eight wide column right page">
+
+					<div class="room" style="background-image: url(image/select.png);background-repeat : no-repeat;background-size:cover;">
+
+						<h1 class="room_id_show">Room2</h1>
+					</div>
+
+					<div class="room" style="background-image: url(image/select.png);background-repeat : no-repeat;background-size:cover;">
+
+						<h1 class="room_id_show">Room2</h1>
+					</div>
+
+					<div class="room" style="background-image: url(image/select.png);background-repeat : no-repeat;background-size:cover;">
+
+						<h1 class="room_id_show">Room2</h1>
+					</div>
+
+					<div class="room" style="background-image: url(image/select.png);background-repeat : no-repeat;background-size:cover;">
+
+						<h1 class="room_id_show">Room2</h1>
+					</div>
+
+
+
+					<div  style="position:absolute;bottom:50px;left:45%">
+						<h1 class="page_number">2</h1>
+					</div>
+				</div>
+            </div>
+        </div>
+        <div class="back" >
+            <div class="ui grid">
+                <div style="background-color:transparent;" class="left_page eight wide column left page">
+
+					<div class="room" style="background-image: url(image/select.png);background-repeat : no-repeat;background-size:cover;">
+
+						<h1 class="room_id_show">Room3</h1>
+					</div>
+
+					<div class="room" style="background-image: url(image/select.png);background-repeat : no-repeat;background-size:cover;">
+
+						<h1 class="room_id_show">Room3</h1>
+					</div>
+
+					<div class="room" style="background-image: url(image/select.png);background-repeat : no-repeat;background-size:cover;">
+
+						<h1 class="room_id_show">Room3</h1>
+					</div>
+
+					<div class="room" style="background-image: url(image/select.png);background-repeat : no-repeat;background-size:cover;">
+
+						<h1 class="room_id_show">Room3</h1>
+					</div>
+
+					<div  style="position:absolute;bottom:50px;left:45%">
+						<h1 class="page_number">3</h1>
+					</div>
+
+				</div>
+				<!--
+					background-size:cover;
+					background-size: 100px 100px;
+					background-image:url(image/booktexture2.png); background-size: 20% 90%; background-repeat:no-repeat;
+					background-image:url(image/booktexture2.png); background-size:cover;
+					
+
+					@media (min-width: 1000px) {
+						background-image:url(image/booktexture2.png); background-size:cover;
+					}
+				-->
+				<div  id="ppp" style="background-image:url(image/booktexture2.png); background-size:cover;" class="right_page eight wide column right page">
+					<div class="room" style="background-image: url(image/select.png);background-repeat : no-repeat;background-size:cover;">
+						<h1 class="room_id_show">Room4</h1>
+
+					</div>
+
+					<div class="room" style="background-image: url(image/select.png);background-repeat : no-repeat;background-size:cover;">
+						<h1 class="room_id_show">Room4</h1>
+
+					</div>
+
+					<div class="room" style="background-image: url(image/select.png);background-repeat : no-repeat;background-size:cover;">
+						<h1 class="room_id_show">Room4</h1>
+
+					</div>
+
+					<div class="room" style="background-image: url(image/select.png);background-repeat : no-repeat;background-size:cover;">
+						<h1 class="room_id_show">Room4</h1>
+
+					</div>
+
+					<div >
+						<h1 class="page_number">4</h1>
+					</div>
+
+				</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="lobby_story">
+
+
+	<div id="p_content" style="display: none">
+		<p>
+		
+			英格蘭有兩大家族
+			n分別為蘭開斯特家族和約克家族
+			n雙方圍繞著王位繼承權的爭奪
+			n並且爆發許多武裝衝突
+		
+		</p>
+		<p>
+			最終，王位輾轉傳到了
+			n蘭開斯特王族的亨利六世手中
+			n全國終於能迎到和平的曙光
+		</p>
+	
+		<p>
+			然而，隨著亨利身體日漸衰老
+			n約克王儲理查開始密謀篡位
+			n並且約克開始在國內煽動民心
+			n把輿論導向亨利並不適合做
+			n一位國王
+		</p>
+	
+		<p>
+			國內的大臣也紛紛見風轉舵
+			n國內也因此充滿著
+			n一種不安的氛圍
+		</p>
+		
+		<p>
+			亨利的皇后瑪麗
+			n得知理查的陰謀後
+			n便將理查處死，
+			n以為此事件會就此落幕
+			n但是....
+		</p>
+	
+		<p>
+			沒想到引發理查的養子威廉
+			n強烈的不滿
+			n並誓言為父報仇
+			n一場內戰一觸即發
+		</p>
+	
+		<p>
+			長久的內戰導致英格蘭民不聊生
+			n皇后瑪麗也因為長期的憂國憂民
+			n身體日漸衰弱
+			n最後生了一場重病去世
+		</p>
+	
+		<p>
+			臨終前，她將她的這份使命n託付給唯一女兒-安妮
+			n不久便與世長辭
+		</p>
+	</div>
+	
+	<div id="show" style="display: none">
+	
+	</div>
+
+	
+	
+	<div id="type_word" style="visibility: hidden">
+		小公主安妮在青春年華a便接付重任a究竟她能否憑她過人的才智a為英格蘭的動盪畫下休止符呢...	
+	</div>
+	<img id="story_back" src="image/story_back.png" >
+	
+
+	<img id="skip" src="image/skip.png" alt="XXX" />
+	<!--
+	<i id="skip" class="angle double right icon"></i>
+	-->
+</div>
+
+
+<div id="figure_story">
+
+
+		<div id="Scrol1" style="
+            position: absolute;
+            top:10px;
+            left:0px;
+        ">
+            <img  id="Scrol1_in" src="image/book/羊皮紙2.png" alt="XXX"/>
+        </div>
+        
+		
+		<img id="book" src="image/book/卷軸.png" alt="XXX" style="
+            position: absolute;
+            top:10px;
+            left:-60px;
+        "/>
+
+
+        <div id="images">
+            <img class="blue" id="William" src="image/figure/William.png" alt="xxxx">
+            <img class="blue" id="Richard" src="image/figure/Richard.png" alt="xxxx">
+            <img class="red" id="Queen" src="image/figure/Queen.png" alt="xxxx">
+            <img class="red" id="Princess" src="image/figure/Princess.png" alt="xxxx">
+        </div>
+        
+		<img id="fac_flag" alt="XXX" />
+        <div id="say"></div>
+        <div id="name"></div>
+
+
+		
+		<iframe id="figure_story_frame" ></iframe>
+</div>
+
+</body>
+
+</html>

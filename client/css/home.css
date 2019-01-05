@@ -1,0 +1,232 @@
+/*手機*/
+@media (max-width: 1000px) {
+
+	#red_team_flag_area{
+	    position:absolute;
+	    left:10%;
+        top:20%;
+	    width: 30%;
+	    height: 100%;
+	    
+	}
+	
+	#blue_team_flag_area{
+	    position:absolute;
+	    left:95%;
+        top:20%;
+	    width: 30%;
+	    height: 100%;
+	}
+
+    #img_red_team{
+        position: relative;top:30%;left:10%;
+
+    }
+
+    #img_blue_team{
+        position: relative;top:30%;right:30%;
+    }
+    #valhalla_logo_area{
+
+        position: relative;
+        left:30%;
+        top:200px;
+    }
+
+
+    #login_area , #register_area{
+        position:absolute;
+        width:50%;
+        height:50%;
+        top:20%;
+        left:15%;
+    }
+
+    #enter_game_area p{
+        color:red;
+        font-size:80px;
+        line-height: 90px;
+    }
+
+    #enter_game_area input{
+		width:80%;
+		height: 35px;
+		margin-bottom: 15px;
+		border:none;
+		border-bottom: 1.5px solid rgb(254, 218, 100);
+		background-color:transparent;
+		color:rgb(255, 255,255);
+        
+        
+        height:"100px"; /*重要*/
+	}
+
+    /******************************************************/
+    #point_area{
+        position:absolute;
+        width:20%;
+        height:50%;
+        left:10%;
+        top:10%;
+    }
+
+    #point_area i{
+
+        color:red;
+        font-size:100px;
+    }
+
+    #point_area h1{
+        color:rgb(254, 218, 100);
+        font-size:38px;
+        position: absolute;
+        top:40%;
+    }
+
+    
+    #menu .co{
+        color:rgb(254, 218, 100);
+        width:200%;
+        height:30%;
+    }
+
+    #menu .co:hover{
+        color:rgb(254, 218, 100);
+        border : rgb(254, 218, 100) solid 3px;
+        width:200%;
+        height:30%;
+    }
+
+    #menu .ac{
+        color:red;
+        border : red solid 3px;
+        width:200%;
+        height:30%;
+    }
+
+    
+
+    #menu{
+        background: transparent;
+        font-size:70px;
+    }
+
+    .go:hover{
+
+        -webkit-filter: drop-shadow(0px 0px 8px rgba(255, 215, 0, 0.8));
+	  cursor:pointer;
+    }
+
+    
+}
+/*其他寬螢幕*/
+@media (min-width: 1000px) {
+
+	#red_team_flag_area{
+	    position:absolute;
+	    left:10%;
+	
+	    width: 300px;
+	    height: 100%;
+	    
+	}
+	
+	#blue_team_flag_area{
+	    position:absolute;
+	    left:75%;
+	
+	    width: 300px;
+	    height: 100%;
+	}
+
+    #img_red_team{
+        position: relative;top:30%;left:10%;
+
+    }
+
+    #img_blue_team{
+        position: relative;top:30%;right:25%;
+    }
+
+    #valhalla_logo_area{
+
+        position: relative;
+        left:30%;
+        top:200px;
+    }
+
+    #login_area , #register_area{
+        position:absolute;
+        width:50%;
+        height:50%;
+        left:15%;
+    }
+
+    #enter_game_area p{
+        color:red;
+        font-size:30px;
+        line-height: 40px;
+    }
+
+    #enter_game_area input{
+		width:250px;
+		height: 25px;
+		margin-bottom: 15px;
+		border:none;
+		border-bottom: 1.5px solid rgb(254, 218, 100);
+		background-color:transparent;
+		color:rgb(255, 255,255);
+	}
+    
+    #point_area{
+        position:absolute;
+        width:20%;
+        height:50%;
+        left:65%;
+        top:10%;
+    }
+
+    #point_area i{
+
+        color:red;
+        font-size:100px;
+    }
+
+    #point_area h1{
+        color:rgb(254, 218, 100);
+        font-size:38px;
+        position: absolute;
+        top:40%;
+    }
+
+    
+    #menu .co{
+        color:rgb(254, 218, 100);
+        width:80%;
+    }
+
+    #menu .co:hover{
+        color:rgb(254, 218, 100);
+        border : rgb(254, 218, 100) solid 3px;
+        width:80%;
+    }
+
+    #menu .ac{
+        color:red;
+        border : red solid 3px;
+        width:80%;
+    }
+
+    
+
+    #menu{
+        background: transparent;
+        font-size:30px;
+    }
+
+    .go:hover{
+
+        -webkit-filter: drop-shadow(0px 0px 8px rgba(255, 215, 0, 0.8));
+	  cursor:pointer;
+    }
+}

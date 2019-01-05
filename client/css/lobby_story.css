@@ -1,0 +1,89 @@
+/*手機*/
+@media (max-width: 1000px) {
+	#show{
+		
+		position: absolute;
+		
+		top:35%;
+		color:white;font-size:50px;
+		width:100%;
+
+		padding-left:100px; 
+		letter-spacing: 10px;
+		font-family: "fantasy";
+	}
+
+	#story_back{
+		width:100%;
+		height:100%;
+	}
+
+
+	#skip{
+		position: absolute;
+		left:70%;
+		top:70%;
+		visibility: hidden;
+		color:rgb(254, 218, 100);
+		font-size: 100px;
+
+
+		
+		
+	}
+
+	#skip:hover{
+		position: absolute;
+		left:70%;
+		top:70%;
+		/*color:red;*/
+		font-size: 100px;
+		
+		-webkit-filter: drop-shadow(0px 0px 8px rgba(255, 215, 0, 0.8));
+	  	cursor:pointer;
+	}
+}
+/*其他寬螢幕*/
+@media (min-width: 1000px) {
+	#show{
+		
+		position: absolute;
+		
+		top:28%;
+		color:white;
+		background: transparent;
+		font-size:40px;
+		width:100%;
+		letter-spacing: 10px;
+		/*
+		left:500px;
+		*/
+		font-family: "fantasy";
+		height:20%;
+	}
+
+	#story_back{
+		width:100%;
+		height:100%;
+	}
+
+	#skip{
+		position: absolute;
+		left:70%;
+		top:70%;
+		visibility: hidden;
+		color:rgb(254, 218, 100);
+		font-size: 100px;
+		
+	}
+
+	#skip:hover{
+		position: absolute;
+		left:70%;
+		top:70%;
+		/*color:red;*/
+		font-size: 100px;
+		-webkit-filter: drop-shadow(0px 0px 8px rgba(255, 215, 0, 0.8));
+	  	cursor:pointer;
+	}
+}

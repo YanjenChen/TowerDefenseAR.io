@@ -1,0 +1,123 @@
+<html>
+  <head>
+    <title>TDAR Game Waiting Room - <%=room_id%> , Player <%=user%></title>
+
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+	<!--
+    <script src="http://cdnjs.cloudflare.com/ajax/libs/gsap/1.18.0/TweenMax.min.js"></script>
+    <script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
+    <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/themes/smoothness/jquery-ui.css">
+	<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.2.9/semantic.min.css" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.2.9/semantic.min.js"></script>
+	-->
+
+	 <script src="javascript/jquery-2.1.4.min.js"></script>
+        <link rel="stylesheet" href="css/jquery-ui.css">
+		<script src="javascript/jquery-ui.min-1.12.1.js"></script>
+    	<link href="css/bootstrap.min.css" rel="stylesheet">
+    	<script src="javascript/bootstrap.min.js"></script>
+    	<link rel="stylesheet" href="css/semantic.min-2.2.9.css" />
+    	<script src="javascript/semantic.min-2.2.9.js"></script>
+
+
+    <link rel="stylesheet" href="css/room_wait_v3_one_vs_one.css" />
+
+    
+    <script src="/socket.io/socket.io.js"></script> 
+    <script src="javascript/room_wait_v3_one_vs_one.js"></script>
+  </head>
+  <body>
+		<input id="username" value="<%=user%>" type='hidden'/>
+		<input id="room_id" value="<%=room_id%>" type='hidden'/>
+
+        <form id="logoutForm" method="post" action="/logout">
+            <input id="logoutName" name="logoutName" type="hidden" />
+            <input id="logoutHash" name="logoutHash" type="hidden" />
+        </form>
+
+        <form id="backLobbyForm" method="post" action="/">
+            <input id="backLobbyUser" name="backLobbyUser" type="hidden" />
+            <input id="backLobbyRoom" name="backLobbyRoom" type="hidden" />
+        </form>
+
+        <form id="leaveRoomForm" method="post" action="/">
+            <input id="leaveRoomUser" name="leaveRoomUser" type="hidden" />
+            <input id="leaveRoomId" name="leaveRoomId" type="hidden" />
+            <input id="leaveRoomHash" name="leaveRoomHash" type="hidden" />
+        </form>
+
+
+		    <form id="startGameForm" method="post" action="/game">
+            <input id="startGameUser" name="startGameUser" type="hidden" />
+            <input id="startGameRoom" name="startGameRoom" type="hidden" />
+			      <input id="startGameHash" name="startGameHash" type="hidden" />
+        </form>
+
+
+		<!-- 這一行的CSS，一釘得寫在 style 內，寫 .css 引入無效-->
+		<div id="outer" style="height:90%; position:center; background:transparent;">
+			<div class="button_area" id="Background" style="margin-bottom:0px;">
+				<div class="ui grid">
+					<div id="Leave" class="touch">
+						<div id="Leave_in" >
+						
+							Leave <br>Room
+						</div>
+					</div>
+            
+					<br>
+
+            		<div id="Signout" class="touch">
+						<div id="Signout_in">
+					
+							Sign Out
+						</div>
+					</div>
+    			</div>
+				
+
+				<div id="Fac_wrapper" style ="overflow:hidden;position:absolute;">
+					<img id="Fac_img" alt="XXXX"></img>
+				</div>
+				<!--
+					<div id="Fac" class="FacA"></div>
+					<div id="Fac_fade" ></div>
+				-->
+				<div id="ChangeFaction" class="touch">
+					<div id="pen"></div>
+					<div id="ink">
+						<div id="ink_in">
+							Change <br> Faction
+						</div>
+					</div>
+				</div>
+
+				<div id="Ready" class="touch">
+					<div id="ReadyFont">Wait</div>
+				</div>
+        	</div>
+
+			<div class="chess_area" style="margin-top:0px;" id="Background">
+				<div class="ui two column grid" style="height:100%">
+					<div class="column">
+						<div class="block" id="one">
+							<div class="block_in">
+							
+							</div>
+						</div>
+					</div>
+					<div class="column">
+						<div class="block">
+							<div class="block_in">
+
+							</div>
+						</div>
+					</div>
+				</div>
+        	</div>
+    	</div>
+
+  </body>
+</html>

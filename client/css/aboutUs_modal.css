@@ -1,0 +1,244 @@
+
+/*手機*/
+@media (max-width: 1000px) {
+	#play_modal{
+		margin:0;
+		padding:0;
+		font-family: sans-serif;
+		height:350px;
+		position: relative;
+		top:3%;
+	}
+	
+	
+	
+	.tab{
+	    padding:0;
+
+		/*在手機，不可開啟，會亂掉*/
+		/*height:650px;
+	    */
+		position:absolute;
+		
+	}
+	
+	.close_play_modal{
+		position:absolute;
+		bottom:-50px;
+		right:20px;
+	}
+	.space1{
+		display: none;	
+	}
+	.space2{
+		display: block;	
+	}
+	.loginbox{
+		width: 80%;
+		background:#000;
+		color:#fff;
+		position:relative;
+		top:220px;
+		
+		/*原本80%*/
+		left:50%;
+	
+		transform: translate(-50%,-50%);
+		box-sizing:border-box;
+		border-radius: 15px;
+		border-style: solid;
+		border-color:#DAA520;
+		padding-left: 30px;
+	}
+	.logo{
+		width: 80px;
+		height: 80px;
+		border-radius: 50%;
+	
+		position: absolute;
+		left: 35%;
+	}
+	
+	h1{
+		padding: 0 0 20px;
+		padding-left: 90px;
+		font-size: 25px;
+		font-family: serif;
+		color: #B8860B
+	}
+	.loginbox p{
+		font-weight: bold;
+		font-size: 15px;
+		color: #DAA520;
+	}
+	.loginbox input{
+		width:180px;
+		height: 25px;
+		margin-bottom: 15px;
+		border:none;
+		border-bottom: 1.5px solid rgb(254, 218, 100);
+		background-color:rgb(23, 22, 22);
+		color:rgb(255, 255,255);
+	}
+	.loginbox button{
+		width:180px;
+		border-spacing: 1px;
+		height: 35px;
+		border:2px solid rgb(118, 118, 118);
+		background-color: rgb(42, 40, 34);
+		color: rgb(107, 107, 107);
+		font-size: 15px;
+		font-family: serif;
+	}
+	.loginbox button:hover{
+		width:180px;
+		border-spacing: 1px;
+		height: 35px;
+		border:2px solid ;
+		border-color: rgb(1, 135, 140);
+	
+	
+	    border-color: -webkit-linear-gradient(rgb(1, 135, 140), rgb(45, 230, 237));
+	    border-color: -o-linear-gradient(rgb(1, 135, 140), rgb(45, 230, 237));
+	    border-color: linear-gradient(rgb(1, 135, 140), rgb(45, 230, 237));
+	
+		background-color: rgb(42, 40, 34);
+		font-size: 15px;
+		font-family: serif;
+		color: rgb(96, 249, 255);
+	}
+	.loginbox a{
+		padding-top: 10px;
+		text-decoration: none;
+		font-size: 12px;
+		line-height: 20px;
+		color: darkgray;
+	}
+	.loginbox a:hover{
+		padding-top: 10px;
+		text-decoration: none;
+		font-size: 12px;
+		line-height: 20px;
+		color: rgb(0, 149, 242);
+	}
+
+}
+
+/*其他寬螢幕*/
+@media (min-width: 1000px) {
+	#play_modal_in{
+		margin:0;
+		padding:0;
+		font-family: sans-serif;
+	}
+	
+	
+	
+	.tab{
+	    padding:0;height:650px;
+	    position:absolute;
+	}
+	
+	/*
+	background-image:url(eddie-mendoza-valhalla.jpg);background-size:"cover";margin:0;
+	*/
+	.close_play_modal{
+		position:absolute;bottom:20px;right:20px;
+	}
+	.space1{
+		display: block;	
+	}
+	.space2{
+		display: none;	
+	}
+	.loginbox{
+		width: 320px;
+		height:530px;
+		background:#000;
+		color:#fff;
+		position:relative;
+		top:45%;
+	
+		left:80%;
+	
+		transform: translate(-50%,-50%);
+		box-sizing:border-box;
+		border-radius: 15px;
+		border-style: solid;
+		border-color:#DAA520;
+		padding-left: 30px;
+	}
+	.logo{
+		width: 100px;
+		height: 100px;
+		border-radius: 50%;
+	
+		position: absolute;
+		left: 110px;
+	}
+	
+	h1{
+		padding: 0 0 20px;
+		padding-left: 90px;
+		font-size: 25px;
+		font-family: serif;
+		color: #B8860B
+	}
+	.loginbox p{
+		font-weight: bold;
+		font-size: 15px;
+		color: #DAA520;
+	}
+	.loginbox input{
+		width:250px;
+		height: 25px;
+		margin-bottom: 15px;
+		border:none;
+		border-bottom: 1.5px solid rgb(254, 218, 100);
+		background-color:rgb(23, 22, 22);
+		color:rgb(255, 255,255);
+	}
+	.loginbox button{
+		width:250px;
+		border-spacing: 1px;
+		height: 35px;
+		border:2px solid rgb(118, 118, 118);
+		background-color: rgb(42, 40, 34);
+		color: rgb(107, 107, 107);
+		font-size: 15px;
+		font-family: serif;
+	}
+	.loginbox button:hover{
+		width:250px;
+		border-spacing: 1px;
+		height: 35px;
+		border:2px solid ;
+		border-color: rgb(1, 135, 140);
+	
+	
+	    border-color: -webkit-linear-gradient(rgb(1, 135, 140), rgb(45, 230, 237));
+	    border-color: -o-linear-gradient(rgb(1, 135, 140), rgb(45, 230, 237));
+	    border-color: linear-gradient(rgb(1, 135, 140), rgb(45, 230, 237));
+	
+		background-color: rgb(42, 40, 34);
+		font-size: 15px;
+		font-family: serif;
+		color: rgb(96, 249, 255);
+	}
+	.loginbox a{
+		padding-top: 10px;
+		text-decoration: none;
+		font-size: 12px;
+		line-height: 20px;
+		color: darkgray;
+	}
+	.loginbox a:hover{
+		padding-top: 10px;
+		text-decoration: none;
+		font-size: 12px;
+		line-height: 20px;
+		color: rgb(0, 149, 242);
+	}
+
+}
+

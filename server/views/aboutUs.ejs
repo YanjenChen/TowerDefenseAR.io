@@ -1,0 +1,500 @@
+<!DOCTYPE HTML>
+<html>
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+    <title>TDAR</title>
+    <link type="text/css" rel="stylesheet" href="css/aboutUs_modal.css">
+    <link type="text/css" rel="stylesheet" href="css/aboutUs_hacker.css">
+	
+    <link type="text/css" rel="stylesheet" href="css/aboutUs.css">
+    <link type="text/css" rel="stylesheet" href="css/aboutUs_message_modal.css">
+    <!--
+    <link type="text/css" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.3.3/semantic.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.3.3/semantic.min.js"></script>
+    -->
+
+
+    <link type="text/css" rel="stylesheet" href="framework/semantic.min-2.3.3.css">
+    <script src="framework/jquery.min-3.3.1.js"></script>
+    <script src="framework/semantic.min-2.3.3.js"></script>
+
+
+    <!-- 載入 socket.io 的 js 檔，從後端抓的 --> 
+    <script src="/socket.io/socket.io.js"></script> 
+
+    <script src="javascript/login_register.js"></script>
+	
+</head>
+
+<body class="loading">
+
+
+    <div id = "hacker_guide_area" class="ui modal">
+        <h1 id="guide_title" >~ Hacker Guide ~</h1>
+        <br>
+        <hr>        
+        <br>
+        <span id="input" >Input : </span>
+        <button id="hacker_register" class="hacker_button ui teal button" >
+            Register
+        </button>
+        <button id="hacker_login" class="hacker_button ui red button" >
+            Login
+        </button>
+        <br><br><br>
+        <hr>    
+        <br>
+        <span style="font-size:30px;position:relative;text-align:left;top:20px;left:20px;">Request URLs <br>(Using Post) : </span>
+        <br><br><br><br>
+
+		<table id="requset_url" >
+		  <thead>
+		    <tr>
+                <th >
+		            URL
+		        </th>
+                <th>
+		            Parameters
+		        </th>
+                <th>
+		            Function
+		        </th>
+		    </tr>
+           </thead>
+		  <tbody>
+		    <tr>
+		      <td>
+		         /regiter
+		      </td>
+		      <td>registerName , registerPass<br><br>registerHash</td>
+              <td>Register Account</td>
+		    </tr>
+
+            <tr>
+		      <td>
+		         /
+		      </td>
+		      <td>loginName , loginPass , loginHash</td>
+              <td>Login</td>
+		    </tr>
+
+            <tr>
+		      <td>
+		         /
+		      </td>
+		      <td>endGameBackUser<br><br>endGameBackHash</td>
+              <td>Game End , back to lobby</td>
+		    </tr>
+
+            <tr>
+		      <td>
+		         /
+		      </td>
+		      <td>leaveRoomUser , leaveRoomId<br><br>leaveRoomHash</td>
+              <td>Player leave room<br><br>back to lobby</td>
+		    </tr>
+
+
+            <tr>
+		      <td>
+		         /logout
+		      </td>
+		      <td>logoutName , logoutHash</td>
+              <td>Logout</td>
+		    </tr>
+
+            <tr>
+		      <td>
+		         /createRoom
+		      </td>
+		      <td>createRoomName , createRoomHash</td>
+              <td>Player <br><br>Create a new Room</td>
+		    </tr>
+
+
+            <tr>
+		      <td>
+		         /joinRoom
+		      </td>
+		      <td>joinRoomName , joinRoomId<br><br>joinRoomHash</td>
+              <td>Player join a Room</td>
+		    </tr>
+
+            <tr>
+		      <td>
+		         /changeTeam
+		      </td>
+		      <td>changeTeamUser , changeTeamHash<br><br>room_id , new_team_id</td>
+              <td>Player change to another team</td>
+		    </tr>
+
+            <tr>
+		      <td>
+		         /changeReady
+		      </td>
+		      <td>changeReadyUser , changeReadyHash<br><br>room_id , new_ready_id</td>
+              <td>Player change state<br><br>meaning player is ready or not</td>
+		    </tr>
+
+
+            <tr>
+		      <td>
+		         /game
+		      </td>
+		      <td>startGameUser , startGameRoom<br><br>startGameHash</td>
+              <td>Player start entering game</td>
+		    </tr>
+		    
+		  </tbody>
+		</table>
+
+
+
+
+        <br>
+        <br>
+        <hr>
+        <br>
+        <br>
+
+
+        <div id="friendly_talks_area">
+
+
+        <span id="friendly_talks_area_title" ">Friendly Talks : </span>
+        <br><br><br><br>
+        <ul id="friendly_talks_area_list">
+            
+            <li>
+                All Parameters are extremely checked <br>
+                in Frontend and Backend .  <br>
+                <br>Only English or Number char is permitted.<br>
+                <br>Therefore , it is difficult to excute <br> sql injection , XSS or CSRF .<br>
+            </li>
+            <br>
+            <li>
+                Unfortunately , there is not any function needing file-upload. <br><br>
+                Then , there is no oppurtunity to execute web-shell attack .
+            </li>
+            <br>
+            <li>
+                Cookie or Session is not adapted <br> in the site . <br><br>
+                Just omit the cookie . <br>
+                It is no use for attacking site .
+            </li>
+            <br>
+            <li>
+                The database site adapt is not mysql <br> , mssql , mongodb , postgresql or oracle.
+                <br><br>
+                Therefore , do not use sql injection <br> of mysql. Such as "information_schema" .
+            </li>
+
+            <br>
+            <li>
+                Backend use nodejs .
+            </li>
+
+            <br>
+            <li>
+                Player password is encrypted by bcrypt. <br>
+                It is extremely difficult to decrypt .
+            </li>
+            <br>
+            <li>
+                Other Type of web attack is welcomed .
+
+            </li>
+            </h1>
+        <ul>
+
+
+        </div>
+        <br>
+        <br>
+    </div>
+
+    <div id="hidden_form_area" style="visibility:hidden">
+
+        <form id="loginForm" action="/" method="post">
+                <input id="loginName" name="loginName" type="hidden" />
+                <input id="loginPass" name="loginPass" type="hidden" />
+                <input id="loginHash" name="loginHash" type="hidden" />
+        </form>
+
+        <form id="registerForm" action="/register" method="post">
+                <input id="registerName" name="registerName" type="hidden" />
+                <input id="registerPass" name="registerPass" type="hidden" />
+                <input id="registerHash" name="registerHash" type="hidden" />
+        </form>
+    </div>
+
+    <div id="message_modal" class="ui modal" >
+        <br>
+        <div id="message_modal_in"  class="ui error message">
+            
+            <h1 id="message_to_alert"  class="ui center"></h1>
+            <br>
+            
+        </div>
+        <button id="close_message_modal" class="ui big orange button" >OK</button>
+    </div>
+
+	<div id="play_modal" class="ui modal" >
+		<div class="ui top attached tabular menu" >
+			<a id="login_item" class="active item ui red button" data-tab="login_tab" style="background: transparent;font-size:25px;">Login</a>
+			<a id="register_item" class="item ui red button" data-tab="register_tab" style="background: transparent;font-size:25px;">Register</a>
+		</div>
+		
+		<div id="play_modal_in"  >
+			<div class="login_box_outer active ui tab segment"  style="background-image:url(image/eddie-mendoza-valhalla.jpg);margin:0;background-size:cover" data-tab="login_tab" >
+                <button  class="huge ui  red button close_play_modal">Close</button>
+                <div class="loginbox">
+                    <br>
+                    <img src="image/valhalla-logo.jpg" alt="game logo" class="logo" />
+                    
+                        <br><br><br><br>
+                        
+                        
+                        <div class="space1">
+                            <br><br><br><br>
+                        </div>
+                    
+                    <h1>Login</h1>
+                    <form >
+                        <br>
+                        <p>Username</p>
+                        <input type="text" name="loginNameInput" id="loginNameInput" placeholder="Enter Username">
+                        <br>
+                        <p>Password</p>
+                        <input type="password" name="loginPassInput" id="loginPassInput" placeholder="Enter Password"><br>
+                        <br>
+                        <button id="login_button" type="button" >Login</button><br>
+                    </form>
+
+                    <div class="space2">
+                        <br><br><br><br><br><br>
+                    </div>
+                </div>
+			</div>
+
+            <!--
+                style="background-image:url(image/eddie-mendoza-valhalla.jpg);background-size:cover;margin:0;"
+            -->
+			<div class="login_box_outer ui tab segment" style="background-image:url(image/eddie-mendoza-valhalla.jpg);margin:0;background-size:cover" data-tab="register_tab" >
+                <button   class="huge ui  red button close_play_modal">Close</button>
+                <div class="loginbox">
+                    <br>
+                    <img src="image/valhalla-logo.jpg" alt="game logo" class="logo" />
+                    
+                    
+                        <br><br><br><br>
+                        <div class="space1">
+                            <br><br><br><br>
+                        </div>
+                    <h1>Register</h1>
+                    <form >
+                        <br>
+                        <p>Username</p>
+                        <input type="text" id="registerNameInput" name="registerNameInput" placeholder="Enter Username">
+                        <br>
+                        <p>Password</p>
+                        <input type="password" id="registerPassInput" name="registerPassInput" placeholder="Enter Password"><br>
+                        <br>
+                        <p>Password Check</p>
+                        <input type="password" id="registerPassCheckInput" name="registerPassCheckInput" placeholder="Enter Password Again"><br>
+                        <br>
+                        <button type="button" id="register_button" >Register</button><br>
+                    </form>
+                </div>
+            </div>
+			
+		</div>
+	</div>
+
+    <div class="ui active dimmer">
+        <div class="ui text loader">Loading</div>
+    </div>
+
+    <div class="ui left vertical inverted sidebar labeled icon menu">
+        <a class="item" ><i class="home icon"></i>Home</a>
+        <a class="item" ><i class="code icon"></i>Blog</a>
+    </div>
+    <div class="pusher">
+        <nav class="bar mobile">
+            <div class="ui container">
+                <div class="ui massive borderless icon menu">
+                    <a class="item" id="sidebar-icon"><i class="bars icon"></i></a>
+                    <a class="right item"><i class="github icon"></i></a>
+                </div>
+            </div>
+        </nav>
+
+        <nav class="bar desktop">
+            <div class="ui container">
+                <div class="ui massive borderless menu">
+                    <a class="item"><i class="home icon"></i>Home</a>
+                    <a class="item"><i class="code icon"></i>Blog</a>
+                    <div class="right compact menu">
+                        <a class="item" href="https://github.com/syn55698/TowerDefense.io.ctf"><i class="github icon"></i>Github</a>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <header class="masthead">
+            <div class="ui text center aligned container">
+                <img src="assets/logo.svg" class="ui large centered image">
+                <button id="play_button" class="ui button">
+                    Play
+                    <i class="right arrow icon"></i>
+                </button>
+
+
+                <button id="open_hacker_guide" class="ui button">
+                    Hacker Guide
+                    <i class="right arrow icon"></i>
+                </button>
+            </div>
+        </header>
+
+        <section class="stripe alternate">
+            <div class="ui text container">
+                <h2 class="ui center aligned header">Web AR Experiment & Tower Defense</h2>
+                <p>Tower Defense AR is a web-based augmanted reality tower defense game. It is a final project in WP2018. The goal of this project is exploring the posibility of current web AR technology, and create a 60-fps smooth game which can run on mobile.
+                </p>
+            </div>
+        </section>
+
+        <section class="stripe">
+            <div class="ui container">
+                <h2 class="ui center aligned header">Meet The Team</h2>
+                <div class="ui four doubling cards">
+                    <div class="ui card">
+                        <div class="image">
+                            <img src="assets/IMG_1901.jpg">
+                        </div>
+                        <div class="content">
+                            <a class="header">John Chen</a>
+                            <div class="meta">
+                                <a>Client team leader</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="ui card">
+                        <div class="image">
+                            <img src="assets/IMG_1902.jpg">
+                        </div>
+                        <div class="content">
+                            <a class="header">Glen Liu</a>
+                            <div class="meta">
+                                <a>Front-end engineer</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="ui card">
+                        <div class="image">
+                            <img src="assets/IMG_1903.jpg">
+                        </div>
+                        <div class="content">
+                            <a class="header">Lin Chi Yeh</a>
+                            <div class="meta">
+                                <a>Back-end engineer</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="ui card">
+                        <div class="image">
+                            <img src="assets/IMG_1904.jpg">
+                        </div>
+                        <div class="content">
+                            <a class="header">Syn Chang</a>
+                            <div class="meta">
+                                <a>Server team leader</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="ui card">
+                        <div class="image">
+                            <img src="assets/IMG_1905.jpg">
+                        </div>
+                        <div class="content">
+                            <a class="header">Nick Chung</a>
+                            <div class="meta">
+                                <a>Scene designer</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="ui card">
+                        <div class="image">
+                            <img src="assets/IMG_1906.jpg">
+                        </div>
+                        <div class="content">
+                            <a class="header">Peter Yang</a>
+                            <div class="meta">
+                                <a>Back-end engineer</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="stripe alternate">
+            <div class="ui three column center aligned divided relaxed doubling grid container">
+                <div class="row">
+                    <div class="column">
+                        <h2 class="ui icon header">
+                            <img class="ui icon image" src="https://png.icons8.com/ios/50/000000/frame-rate.png">
+                            60 FPS
+                        </h2>
+                        <p>Smooth gameplay experience on all devices.</p>
+                        <a class="fluid ui button">Find Tips</a>
+                    </div>
+                    <div class="column">
+                        <h2 class="ui icon header">
+                            <img class="ui icon image" src="https://png.icons8.com/ios/50/000000/network.png">
+                            Multiplayer
+                        </h2>
+                        <p>Maximum six players join the game.</p>
+                        <a class="fluid ui primary button">Invite Friends</a>
+                    </div>
+                    <div class="column">
+                        <h2 class="ui icon header">
+                            <img class="ui icon image" src="https://png.icons8.com/ios/50/000000/metal-music.png">
+                            Gesture Detect
+                        </h2>
+                        <p>Use your gesture to use unique skill.</p>
+                        <a class="fluid ui button">See Gestures</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <footer class="stripe inverted thin">
+            <div class="ui container">
+                <a href="https://icons8.com">Icon pack by Icons8</a>
+            </div>
+        </footer>
+    </div>
+
+    <script src="javascript/aboutUs.js"></script>
+
+    <input id="from_logout_user" type="hidden" value="<%=from_logout_user%>">
+
+    <%
+        if(from_logout){
+    %>
+
+        <script class="is_from_signout">
+            
+            alert("使用者 ["+$("#from_logout_user").val()+"] 登出成功")
+        </script>
+    <%
+        }
+    %>
+
+</body>
+
+</html>

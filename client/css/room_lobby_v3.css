@@ -1,0 +1,464 @@
+
+/*手機*/
+@media (max-width: 1000px) {
+
+	* {
+	  margin: 0px;
+	  padding: 0px;
+	  box-sizing: border-box;
+	  font-family: fantasy;
+	}
+	
+	/*
+	.scene{
+	  background:url("../image/scene.png");
+	  background-repeat: no-repeat;
+	  background-size: cover;
+	
+	}
+	*/
+
+
+	
+	
+	#sidebar {
+	  position:absolute;
+	  top:0px;
+	  left:0px;
+	  width:200px;
+	  height:100vh;
+	  background:#1a1a1a;
+	  text-align:center;
+	  transform-origin:left;
+	  transform:perspective(1200px) rotateY(90deg);
+	  transition:all 400ms ease;
+	  z-index: 5;
+	}
+	#sidebar ul li {
+	  color:#ccc;
+	  font-size:20px;
+	  width:100%;
+	  height:50px;
+	  border-bottom:1px solid #222222;
+	  line-height:50px;
+	  z-index: 5;
+	}
+	#sidebar.active {
+	  transform:perspective(1200px) rotateY(0deg);
+	  z-index: 5;
+	}
+	
+	#toggle-btn {
+	  position:absolute;
+	  left:30px;
+	  top:20px;
+	  transition:left 200ms linear 0ms,transform 300ms ease 100ms;
+	  cursor: pointer;
+	  z-index: 5;
+	}
+	#toggle-btn.active {
+	  left:230px;
+	  transform:rotate(360deg);
+	  z-index: 5;
+	}
+	#toggle-btn span {
+	  position:relative;
+	  top:0px;
+	  display:block;
+	  background:white;
+	  width:30px;
+	  height:5px;
+	  margin:5px 0px;
+	  cursor:pointer;
+	  transition:transform 300ms ease 200ms;
+	  z-index: 5;
+	}
+	#toggle-btn.active span:nth-child(1) {
+	  top:10px;
+	  transform:rotate(45deg);
+	  z-index: 5;
+	}
+	#toggle-btn.active span:nth-child(2) {
+	  opacity:0;
+	  z-index: 5;
+	}
+	#toggle-btn.active span:nth-child(3) {
+	  top:-10px;
+	  transform:rotate(-45deg);
+	  z-index: 5;
+	}
+	
+	#signout{
+	  background-image:url("../image/signout.png");
+	   /*
+		 position: relative;
+		 left: 5%;
+     top:5%;;
+	   */
+
+		 position: absolute;
+	   left: 5%;
+		 top:5%;
+
+		 width:45%;
+	   height:20%;
+     
+	   background-size:contain;
+	   background-repeat:no-repeat;
+	}
+	#signout:hover {
+		-webkit-filter: drop-shadow(0px 0px 8px rgba(255, 215, 0, 0.8));
+	  cursor:pointer;
+	  
+	
+	}
+  #space1{
+    display: block;
+  }
+  #createRoomFont{
+    font-family: fantasy;
+	  color: #e1ad46;
+	  position: relative;
+    width:100%;
+	  left:20%;
+	  top:20%;
+	  text-shadow: 2px 2px black;
+
+		/*舊版*/
+		/*
+	  font-size: 25px;
+		*/
+
+		/*新版*/
+		font-size: 50px;
+		line-height: 50px;
+	}
+
+  #signoutFont{
+
+
+    font-family: fantasy;
+	  color: #e1ad46;
+	  position: relative;
+	  left:30%;
+	  top:50%;
+	  text-shadow: 2px 2px black;
+	  
+		/*舊版*/
+		/*
+		font-size: 30px;
+		*/
+
+		/*新版*/
+		font-size: 60px;
+	}
+
+  /*把 .MenuFont 分成 #createRoomFont , #signoutFont*/
+	/*稍微移動位置*/
+	/*
+  .MenuFont{
+	  font-family: fantasy;
+	  color: #e1ad46;
+	  position: relative;
+	  left:20%;
+	  top:50%;
+	  text-shadow: 2px 2px black;
+	  font-size: 30px;
+	}
+	
+  */
+
+
+	#createroom{
+	  background-image:url("../image/key.png");
+	  /*
+		position: relative;
+	  bottom:15%;
+	  left:50%;
+		*/
+
+		position: absolute;
+	  top:5%;
+	  left:55%;
+
+
+	  width:30%;
+	  height:30%;
+	  background-size: contain;
+	  background-repeat: no-repeat;
+	}
+	#createroom:hover {
+		-webkit-filter: drop-shadow(0px 0px 8px rgba(255, 215, 0, 0.8));
+	  cursor:pointer;
+	}
+	
+  
+
+  /*這段沒使用*/
+  /*
+	#CreateroomFont{
+	  font-family: fantasy;
+	  color:white;
+	  position: relative;
+	  left:25%;
+	  top:50%;
+	  text-shadow: 1px 1px black;
+	}
+  */
+	
+	
+	.room_id_show{
+	  position:relative;
+	  left:35%;
+	  font-size:55px;
+	  top:40%;
+	  color:#BDB76B;
+	  font-weight:normal;
+	}
+	
+	
+	.room_id_show:hover{
+	  position:relative;
+	  left:35%;
+	  font-size:55px;
+	  top:40%;
+	  color:#FFD700;
+	  font-weight:bold;
+	}
+
+
+	.room{
+		/*懶得調大小了*/
+		width:160px;height:75px;
+		
+		
+		position:relative;
+		right:40px;margin: 0px 0px 20px 0px;
+
+		
+	}
+
+
+	
+
+}
+/*其他寬螢幕*/
+@media (min-width: 1000px) {
+	* {
+	  margin: 0px;
+	  padding: 0px;
+	  box-sizing: border-box;
+	  font-family: fantasy;
+	}
+	/*
+	.scene{
+	  background:url("../image/scene.png");
+	  background-repeat: no-repeat;
+	  background-size: cover;
+	
+	}
+	*/
+	
+	#sidebar {
+	  position:absolute;
+	  top:0px;
+	  left:0px;
+	  width:200px;
+	  height:100vh;
+	  background:#1a1a1a;
+	  text-align:center;
+	  transform-origin:left;
+	  transform:perspective(1200px) rotateY(90deg);
+	  transition:all 400ms ease;
+	  z-index: 5;
+	}
+	#sidebar ul li {
+	  color:#ccc;
+	  font-size:20px;
+	  width:100%;
+	  height:50px;
+	  border-bottom:1px solid #222222;
+	  line-height:50px;
+	  z-index: 5;
+	}
+	#sidebar.active {
+	  transform:perspective(1200px) rotateY(0deg);
+	  z-index: 5;
+	}
+	
+	#toggle-btn {
+	  position:absolute;
+	  left:30px;
+	  top:20px;
+	  transition:left 200ms linear 0ms,transform 300ms ease 100ms;
+	  cursor: pointer;
+	  z-index: 5;
+	}
+	#toggle-btn.active {
+	  left:230px;
+	  transform:rotate(360deg);
+	  z-index: 5;
+	}
+	#toggle-btn span {
+	  position:relative;
+	  top:0px;
+	  display:block;
+	  background:white;
+	  width:30px;
+	  height:5px;
+	  margin:5px 0px;
+	  cursor:pointer;
+	  transition:transform 300ms ease 200ms;
+	  z-index: 5;
+	}
+	#toggle-btn.active span:nth-child(1) {
+	  top:10px;
+	  transform:rotate(45deg);
+	  z-index: 5;
+	}
+	#toggle-btn.active span:nth-child(2) {
+	  opacity:0;
+	  z-index: 5;
+	}
+	#toggle-btn.active span:nth-child(3) {
+	  top:-10px;
+	  transform:rotate(-45deg);
+	  z-index: 5;
+	}
+	
+	#signout{
+	  background-image:url("../image/signout.png");
+    	/*
+			position: relative;
+	   left: 8%;
+	   */
+		 position: absolute;
+	   left: 8%;
+		 top:5%;
+
+		 width:50%;
+	   height:50%;
+	   background-size:contain;
+	   background-repeat:no-repeat;
+	}
+	#signout:hover {
+		-webkit-filter: drop-shadow(0px 0px 8px rgba(255, 215, 0, 0.8));
+	  cursor:pointer;
+	  
+	
+	}
+  #space1{
+    display: none;
+  }
+  #createRoomFont{
+    font-family: fantasy;
+	  color: #e1ad46;
+	  position: relative;
+	  left:20%;
+	  top:50%;
+	  text-shadow: 2px 2px black;
+		/*舊版*/
+		/*
+	  font-size: 30px;
+		*/
+
+		/*新版*/
+		font-size: 50px;
+	}
+
+  #signoutFont{
+
+
+    font-family: fantasy;
+	  color: #e1ad46;
+	  position: relative;
+	  left:20%;
+	  top:50%;
+	  text-shadow: 2px 2px black;
+	  
+		/*舊版*/
+		/*
+		font-size: 30px;
+		*/
+
+		font-size: 50px;
+	}
+
+  /*把 .MenuFont 分成 #createRoomFont , #signoutFont*/
+	/*
+	.MenuFont{
+	  font-family: fantasy;
+	  color: #e1ad46;
+	  position: relative;
+	  left:20%;
+	  top:50%;
+	  text-shadow: 2px 2px black;
+	  font-size: 30px;
+	}
+	*/
+	#createroom{
+	  background-image:url("../image/key.png");
+	  /*
+		position: relative;
+	  top:10%;
+	  left:15%;
+	  */
+		position: absolute;
+	  top:60%;
+	  left:15%;
+
+		width:30%;
+	  height:30%;
+	  background-size: contain;
+	  background-repeat: no-repeat;
+	}
+	#createroom:hover {
+		-webkit-filter: drop-shadow(0px 0px 8px rgba(255, 215, 0, 0.8));
+	  cursor:pointer;
+	}
+  
+  /*這段沒使用*/
+  /*
+	#CreateroomFont{
+	  font-family: fantasy;
+	  color:white;
+	  position: relative;
+	  left:25%;
+	  top:50%;
+	  text-shadow: 1px 1px black;
+	}
+  */
+	
+	.room_id_show{
+	  position:relative;
+	  left:40%;
+	  font-size:40px;
+	  top:30%;
+	  color:#BDB76B;
+	  font-weight:normal;
+	}
+	
+	
+	.room_id_show:hover{
+	  position:relative;
+	  left:40%;
+	  font-size:40px;
+	  top:30%;
+	  color:#FFD700;
+	  font-weight:bold;
+	}
+
+	.room{
+		/*懶得調大小了*/
+		width:400px;height:100px;
+		
+		
+		position:relative;
+		right:5%;margin: 0px 0px 20px 0px;
+	}
+	/*
+	.back .right_page{
+		background-image:url(image/booktexture2.png); background-size:cover;
+	}
+	*/
+}

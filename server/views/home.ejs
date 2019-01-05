@@ -1,0 +1,212 @@
+<html>
+	<head>
+		 <script src="http://cdnjs.cloudflare.com/ajax/libs/gsap/1.18.0/TweenMax.min.js"></script>
+         <title>TDAR Home</title>
+
+		 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+		 
+		 <!--
+        <script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
+        <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/themes/smoothness/jquery-ui.css">
+		<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.2.9/semantic.min.css" />
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.2.9/semantic.min.js"></script>
+		-->
+
+		<!--
+		<link rel="stylesheet" href="css/jquery-ui.css">
+    	<script src="javascript/jquery-2.1.4_V2.min.js"></script>
+		-->
+
+		
+		 <script src="javascript/jquery-2.1.4.min.js"></script>
+        <link rel="stylesheet" href="css/jquery-ui.css">
+		<script src="javascript/jquery-ui.min-1.12.1.js"></script>
+    	<link href="css/bootstrap.min.css" rel="stylesheet">
+    	<script src="javascript/bootstrap.min.js"></script>
+    	<link rel="stylesheet" href="css/semantic.min-2.2.9.css" />
+    	<script src="javascript/semantic.min-2.2.9.js"></script>
+		
+
+		 <!-- lazy painter 套件，支援畫 path 動畫-->
+        <script src="javascript/lazy-line-painter-1.9.1.js" ></script>
+
+        <!-- 
+				1 svg animate 套件，實際上要引入兩個檔案，才會有用，支援 fill 變紅色，動畫
+				2 官方網站 : http://keith-wood.name/svg.html
+		-->
+
+		<!--
+        <script src="http://keith-wood.name/js/jquery.svg.js" ></script>
+        <script src="http://keith-wood.name/js/jquery.svganim.js" ></script>
+		-->
+
+		<script src="javascript/jquery.svg.js" ></script>
+        <script src="javascript/jquery.svganim.js" ></script>
+
+        <!-- 套件 github : 
+            https://github.com/KhaledElAnsari/backgroundor
+        -->
+        <script src="javascript/backgroundor.jquery.js"></script>
+
+		
+
+		<link rel="stylesheet" href="css/home.css" />
+		<link rel="stylesheet" href="css/home_message_modal.css" />
+		<!--
+		<link rel="stylesheet" href="css/home_modal.css" />
+		 -->
+
+		 <!-- 載入 socket.io 的 js 檔，從後端抓的 --> 
+    	<script src="/socket.io/socket.io.js"></script> 
+
+		 <script src="javascript/home.js"></script>
+		 <input id="from_logout_user" type="hidden" value="<%=from_logout_user%>">
+	</head>
+
+
+	<body>
+
+		<div id="hidden_form_area" style="visibility:hidden">
+
+        	<form id="loginForm" action="/" method="post">
+                <input id="loginName" name="loginName" type="hidden" />
+                <input id="loginPass" name="loginPass" type="hidden" />
+                <input id="loginHash" name="loginHash" type="hidden" />
+        	</form>
+
+        	<form id="registerForm" action="/register" method="post">
+                <input id="registerName" name="registerName" type="hidden" />
+                <input id="registerPass" name="registerPass" type="hidden" />
+                <input id="registerHash" name="registerHash" type="hidden" />
+        	</form>
+    	</div>
+
+    	<div id="message_modal" class="ui modal" >
+        	<br>
+        	<div id="message_modal_in"  class="ui error message">
+            
+            	<h1 id="message_to_alert"  class="ui center"></h1>
+            	<br>
+            
+        	</div>
+        	<button id="close_message_modal" class="ui big orange button" >OK</button>
+    	</div>
+
+		<img id="back_img"  />
+		<div id="twin_flag_area">
+			<div id="red_team_flag_area">
+				 <img id="img_red_team" src="image/Red.png" >
+			</div>
+
+			<div id="blue_team_flag_area">
+				<img id="img_blue_team" src="image/Blue.png" >
+			</div>
+		</div>
+
+        <svg id="valhalla_logo_area" width="800px" height="300px" 
+        
+            xmlns="http://www.w3.org/2000/svg"
+            xmlns:xlink="http://www.w3.org/1999/xlink"
+            version="1.1"
+        	>
+			
+
+            <path id="v1" data-llp-duration="2000"  d="M 0 0 L 30 300 L 50 300 L 80 0 L 60 0 L 40 200 L 20 0 L 0 0"  ></path>
+
+            <path id="a1_out" data-llp-duration="2000"  d="M 80 300 L 115 0 L 125 0 L 160 300 L 140 300 L 130 200 L 110 200 L 105 250 L 100 300 L 80 300"    />
+            <path id="a1_in"data-llp-duration="2000"  d="M 110 180 L 120 60 L 130 180 L 110 180"    />
+
+            <path id="l1" data-llp-duration="2000" d="M 180 0 L 180 300 L 260 300 L 260 270 L 200 270 L 200 0 L 180 0"    />
+            
+            <path id="h1" data-llp-duration="2000"  d="M 280 300 L 280 0 L 300 0 L 300 140 L 360 140 L 360 0 L 380 0 L 380 300 L 360 300 L 360 160 L 300 160 L 300 300 L 280 300"    />
+
+            <path id="a2_out" data-llp-duration="2000"  d="M 400 300 L 435 0 L 445 0 L 480 300 L 460 300 L 450 200 L 430 200 L 425 250 L 420 300 L 400 300"    />
+            <path id="a2_in" data-llp-duration="2000"  d="M 430 180 L 440 60 L 450 180 L 430 180"    />
+
+            <path id="l2" data-llp-duration="2000" d="M 490 0 L 490 300 L 570 300 L 570 270 L 510 270 L 510 0 L 490 0"    />
+
+            <path id="l3" data-llp-duration="2000"  d="M 580 0 L 580 300 L 660 300 L 660 270 L 600 270 L 600 0 L 580 0"    />
+
+            <path id="a3_out" data-llp-duration="2000" d="M 670 300 L 705 0 L 715 0 L 750 300 L 730 300 L 720 200 L 700 200 L 695 250 L 690 300 L 670 300"   />
+            <path id="a3_in" data-llp-duration="2000" d="M 700 180 L 710 60 L 720 180 L 700 180"    />
+        </svg>
+			<img id="loading" />
+			<img id="img_board" />
+			<img id="img_l_chain"  />
+			<img id="img_r_chain"  />
+
+			<img id="img_ml1_chain"  />
+			<img id="img_mr1_chain"  />
+			<img id="img_ml2_chain"  />
+			<img id="img_mr2_chain"  />
+		<div id="enter_game_area" >
+
+			<div id="login_area" class="loginbox">
+						<br><br><br>
+						<!--
+							<div class="sep" style="height:5px"></div>
+							-->
+						<p>Username
+							
+							<input type="text" name="loginNameInput" id="loginNameInput" placeholder="Enter Username" />
+							
+						</p>
+                        
+                       
+                        <p>Password
+								
+								<input type="password" name="loginPassInput" id="loginPassInput" placeholder="Enter Password" />
+								
+						</p>
+                        
+                        <br>
+						
+			</div>
+
+
+			<div id="register_area" style="display: none;">
+						<br><br><br>
+                        <p>Username
+							
+							 <input type="text" id="registerNameInput" name="registerNameInput" placeholder="Enter Username" />
+						</p>
+                       
+                        
+                        <p>Password
+							
+							<input type="password" id="registerPassInput" name="registerPassInput" placeholder="Enter Password" /><br>
+						</p>
+                        
+                        
+                        <p>Password <br> Check <br>
+							
+							<input type="password" id="registerPassCheckInput" name="registerPassCheckInput" placeholder="Enter Password Again" /><br>
+						</p>
+                        
+                        <br>
+                       
+			</div>
+
+			<div id="point_area">
+				
+
+				<div id="menu">
+					<a id="switch_login" class="item switch">
+						Login
+					</a>
+					<br>
+					<a id="switch_register" class="item switch">
+						Register
+					</a>
+				</div>
+
+				<img id="login" class="go" alt="XXX" > </img>
+				<h1 id="go_button"></h1>
+			</div>
+		</div>
+
+		
+		
+	</body>
+</html>

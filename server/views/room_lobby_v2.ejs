@@ -1,0 +1,217 @@
+<html>
+
+<head>
+    <title>Web TDAR Game Lobby</title>
+    <script src="http://cdnjs.cloudflare.com/ajax/libs/gsap/1.18.0/TweenMax.min.js"></script>
+    
+
+    <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/themes/smoothness/jquery-ui.css">
+    <script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
+    <script src="https://cdn.rawgit.com/nnattawat/flip/master/dist/jquery.flip.min.js"></script>
+
+
+
+    
+    <!-- 新 Bootstrap 核心 CSS 文件 -->
+    <link href="https://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
+    <!-- 最新的 Bootstrap 核心 JavaScript 文件 -->
+    <script src="https://cdn.bootcss.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.2.9/semantic.min.css" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.2.9/semantic.min.js"></script>
+    
+	<!--
+	<script src="javascript/app.js"></script>
+	-->
+	<link href="css/room_lobby_v2.css" rel="stylesheet">
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    
+    <!--
+	
+    <script src="src/room_lobby.js"></script>
+
+
+	-->
+	<!-- 載入 socket.io 的 js 檔，從後端抓的 -->
+	<script src="/socket.io/socket.io.js"></script>
+	<script src="javascript/room_lobby_v2.js"></script>
+</head>
+
+<body class="scene">
+
+	<div id="hidden_form_area">
+		<input id="username" value="<%=username%>" type='hidden'/>
+        <input id="disconnect" value="<%=username%>" type='hidden'/>
+        <form id="logoutForm" method="post" action="/logout">
+            <input id="logoutName" name="logoutName" type="hidden" />
+            <input id="logoutHash" name="logoutHash" type="hidden" />
+        </form>
+        <form id="createRoomForm" method="post" action="/createRoom">
+            <input id="createRoomName" name="createRoomName" type="hidden" />
+            <input id="createRoomHash" name="createRoomHash" type="hidden" />
+        </form>
+        <form id="joinRoomForm" method="post" action="/joinRoom">
+            <input id="joinRoomName" name="joinRoomName" type="hidden" />
+            <input id="joinRoomId" name="joinRoomId" type="hidden" />
+            <input id="joinRoomHash" name="joinRoomHash" type="hidden" />
+        </form>
+	</div>
+
+
+	<div id="message_modal" class="ui modal" style="position:absolute;top:300px;width:600px;height:200px;">
+        <br>
+        <div style="width:90%;height:50%;position:relative;left:5%;"class="ui error message">
+            
+            <h1 id="message_to_alert" style="font-size:25px;text-align:center;;line-height:60px;" class="ui center"></h1>
+            <br>
+            
+        </div>
+        <button id="close_message_modal" class="ui big orange button" style="position:relative;left:35%;width:200px;">OK</button>
+    </div>
+
+
+    <div id="sidebar">
+    	<ul>
+      		<li><a href="https://github.com/"style="color:white;">Character</a></li>
+      		<li>StoryLine</li>
+      		<li>About</li>
+      		<li>Contact</li>
+    	</ul>
+  	</div>
+  	<div id="toggle-btn" onclick="SidebarToggle(this)">
+    	<span></span>
+    	<span></span>
+    	<span></span>
+  	</div>
+
+
+	
+    <div id="card" > 
+        <div class="front" > 
+            <div class="ui grid">
+                <div  style="background-image:url(image/booktexture.png);background-size:cover; " class="left_page eight wide column left page">
+				
+					<div class="room" style="background-image: url(image/select.png);width:400px;height:100px;position:relative;right:5%;margin: 0px 0px 20px 0px;">
+
+						<h1 class="room_id_show" >Room1</h1>
+					</div>
+
+					<div class="room" style="background-image: url(image/select.png);width:400px;height:100px;position:relative;right:5%;margin: 0px 0px 20px 0px;">
+
+						<h1 class="room_id_show" >Room5</h1>
+					</div>
+
+					<div class="room" style="background-image: url(image/select.png);width:400px;height:100px;position:relative;right:5%;margin: 0px 0px 20px 0px;">
+
+						<h1 class="room_id_show" >Room5</h1>
+					</div>
+
+					<div class="room" style="background-image: url(image/select.png);width:400px;height:100px;position:relative;right:5%;margin: 0px 0px 20px 0px;">
+
+						<h1 class="room_id_show" >Room5</h1>
+					</div>
+
+
+
+
+					<div  style="position:absolute;bottom:50px;left:45%">
+						<h1 class="page_number">1</h1>
+					</div>
+
+				</div>
+                <div   class="right_page eight wide column right page">
+				
+					<div class="room" style="background-image: url(image/select.png);width:400px;height:100px;position:relative;right:5%;margin: 0px 0px 20px 0px;">
+
+						<h1 class="room_id_show">Room2</h1>
+					</div>
+
+					<div class="room" style="background-image: url(image/select.png);width:400px;height:100px;position:relative;right:5%;margin: 0px 0px 20px 0px;">
+
+						<h1 class="room_id_show">Room2</h1>
+					</div>
+
+					<div class="room" style="background-image: url(image/select.png);width:400px;height:100px;position:relative;right:5%;margin: 0px 0px 20px 0px;">
+
+						<h1 class="room_id_show">Room2</h1>
+					</div>
+
+					<div class="room" style="background-image: url(image/select.png);width:400px;height:100px;position:relative;right:5%;margin: 0px 0px 20px 0px;">
+
+						<h1 class="room_id_show">Room2</h1>
+					</div>
+
+
+
+					<div  style="position:absolute;bottom:50px;left:45%">
+						<h1 class="page_number">2</h1>
+					</div>
+				</div>
+            </div>
+        </div> 
+        <div class="back" >
+            <div class="ui grid">
+                <div  style="background-color:transparent;" class="left_page eight wide column left page" >
+				
+					<div class="room" style="background-image: url(image/select.png);width:400px;height:100px;position:relative;right:5%;margin: 0px 0px 20px 0px;">
+
+						<h1 class="room_id_show">Room3</h1>
+					</div>
+
+					<div class="room" style="background-image: url(image/select.png);width:400px;height:100px;position:relative;right:5%;margin: 0px 0px 20px 0px;">
+
+						<h1 class="room_id_show">Room3</h1>
+					</div>
+
+					<div class="room" style="background-image: url(image/select.png);width:400px;height:100px;position:relative;right:5%;margin: 0px 0px 20px 0px;">
+
+						<h1 class="room_id_show">Room3</h1>
+					</div>
+
+					<div class="room" style="background-image: url(image/select.png);width:400px;height:100px;position:relative;right:5%;margin: 0px 0px 20px 0px;">
+
+						<h1 class="room_id_show">Room3</h1>
+					</div>
+
+					<div  style="position:absolute;bottom:50px;left:45%">
+						<h1 class="page_number">3</h1>
+					</div>
+
+				</div>
+				<div  style="background-image:url(image/booktexture2.png);background-size:cover; 
+				
+				
+				
+				"  class="right_page eight wide column right page">
+					<div class="room" style="background-image: url(image/select.png);width:400px;height:100px;position:relative;right:5%;margin: 0px 0px 20px 0px;">
+						<h1 class="room_id_show">Room4</h1>
+
+					</div>
+
+					<div class="room" style="background-image: url(image/select.png);width:400px;height:100px;position:relative;right:5%;margin: 0px 0px 20px 0px;">
+						<h1 class="room_id_show">Room4</h1>
+
+					</div>
+
+					<div class="room" style="background-image: url(image/select.png);width:400px;height:100px;position:relative;right:5%;margin: 0px 0px 20px 0px;">
+						<h1 class="room_id_show">Room4</h1>
+
+					</div>
+
+					<div class="room" style="background-image: url(image/select.png);width:400px;height:100px;position:relative;right:5%;margin: 0px 0px 20px 0px;">
+						<h1 class="room_id_show">Room4</h1>
+
+					</div>
+
+
+					<div  style="position:absolute;bottom:50px;left:45%">
+						<h1 class="page_number">4</h1>
+					</div>
+					
+				</div>
+            </div>
+        </div> 
+    </div>
+	
+</body>
+
+</html>
