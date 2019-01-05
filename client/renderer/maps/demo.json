@@ -69,8 +69,8 @@
     },
     "globalVar": {
         "gridConfig": {
-            "width": 40,
-            "depth": 40
+            "width": 20,
+            "depth": 20
         },
         "sceneScale": 1,
         "tileSize": 4
@@ -115,38 +115,32 @@
                 }
             }, {
                 "gridPosition": {
-                    "x": 10,
+                    "x": 5,
                     "y": 0,
-                    "z": 10
+                    "z": 5
                 }
             }],
             "BLACK": [{
                 "gridPosition": {
                     "x": 1,
                     "y": 0,
-                    "z": 38
-                }
-            }, {
-                "gridPosition": {
-                    "x": 10,
-                    "y": 0,
-                    "z": 28
+                    "z": 18
                 }
             }]
         },
         "castle": {
             "RED": {
                 "gridPosition": {
-                    "x": 38,
+                    "x": 18,
                     "y": 0,
                     "z": 1
                 }
             },
             "BLACK": {
                 "gridPosition": {
-                    "x": 38,
+                    "x": 18,
                     "y": 0,
-                    "z": 38
+                    "z": 18
                 }
             }
         }
@@ -232,7 +226,7 @@
             },
             "cavalry": {
                 "damage": 1,
-                "speed": 8,
+                "speed": 2,
                 "laserEffectiveness": 1,
                 "missileEffectiveness": 0.5,
                 "animation_timeScale": 1.4,

@@ -199,8 +199,6 @@ class GameManager {
 
         if (mode == 'ar') {
             // Insert shadow plane.
-            console.warn('Old AR script has been executed.');
-
             let planeGeometry = new THREE.PlaneGeometry(2000, 2000);
             planeGeometry.rotateX(-Math.PI / 2);
             let shadowMesh = new THREE.Mesh(planeGeometry, new THREE.ShadowMaterial({
@@ -472,19 +470,14 @@ class GameManager {
 
         if (mode == 'ar') {
             // TODO: NEED UPDATE ALL SCRIPT HERE.
-            console.warn('Old AR script has been executed.');
+            sceneEl.object3D.visible = false;
 
-            sceneEl.addEventListener('loaded', function() {
-                this.object3D.visible = false;
-
-                let reticle = document.createElement('a-entity');
-                // Affect base scene object scale.
-                reticle.setAttribute('reticle', {
-                    targetEl: '#' + this.id,
-                    scaleFactor: self.configs.staticScene.scaleFactor
-                });
-                this.sceneEl.appendChild(reticle);
+            let reticleEl = document.createElement('a-entity');
+            reticleEl.setAttribute('reticle', {
+                targetEl: '#' + sceneEl.id
             });
+            this.sceneEl.appendChild(reticleEl);
+
         } else {
             this.sceneEl.systems['tdar-game'].networkManager.emit('nonPlayingEvent', {
                 event_name: 'model_ready'

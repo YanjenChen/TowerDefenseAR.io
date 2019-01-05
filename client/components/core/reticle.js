@@ -1,5 +1,9 @@
 (() => {
+
+    'use strict';
+
     AFRAME.registerComponent('reticle', {
+
         schema: {
             targetEl: {
                 type: 'selector',
@@ -11,21 +15,23 @@
             }
         },
         init: function() {
+
             this.targetEl = this.data.targetEl;
 
             let indicatorEl = this.el.sceneEl.querySelector('#stabilization');
+
             if (!indicatorEl) {
-                //
+
                 indicatorEl = document.createElement('div');
                 indicatorEl.setAttribute('id', 'stabilization');
                 indicatorEl.classList.add('a-hidden');
                 this.el.sceneEl.appendChild(indicatorEl);
+
             }
 
             this.session = null;
             this.arManager = null;
             this.frameOfReference = null;
-
 
             // load reticle object3D
             this.loader = new THREE.TextureLoader();
