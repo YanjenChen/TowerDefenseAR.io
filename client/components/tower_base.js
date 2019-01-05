@@ -136,7 +136,8 @@
                 event_name: 'request_remove_tower',
                 faction: this.el.sceneEl.systems['tdar-game'].data.userFaction,
                 id: this.el.id,
-                ampamount:this.gameManager.settings.tower[this.el.components['tower'].data.type][0].amplifyAmount
+                ampamount:this.gameManager.settings.tower[this.el.components['tower'].data.type][0].amplifyAmount,
+                amount:this.gameManager.settings.tower[this.el.components['tower'].data.type][0].cost
             });
 
             this.uiManager.updateObjectControl([]);
@@ -198,15 +199,17 @@
                 }];
             } else {
               let upgradecost=this.gameManager.settings.tower[this.el.components['tower'].data.type][this.el.components['tower'].data.tier +1].cost*-1;
+              let uptier=this.el.components['tower'].data.tier+2;
+              let removemoney=Math.round(this.gameManager.settings.tower[this.el.components['tower'].data.type][this.el.components['tower'].data.tier].cost*-0.35);
                 uisets = [{
                     callback: this.requestRemove,
-                    icon: 'demolish',
-                    header: 'Remove',
-                    cost:0
+                    icon: 'money-bag',
+                    header: 'Sell',
+                    cost:'$'+removemoney
                 }, {
                     callback: currentMoney >= upgradecost? this.requestUpgrade : null,
                     icon: 'upgrade',
-                    header: 'Upgrade',
+                    header: 'Up('+uptier+')',
                     cost:upgradecost,
                     disable:currentMoney >= upgradecost ? false : true
                 }];

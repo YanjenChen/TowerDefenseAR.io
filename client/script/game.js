@@ -89,7 +89,8 @@
                     if (this.gameManager.dynamicScene.querySelector('#' + content['id']) != null)
                         this.cashManager.moneytowerbuild(content['ampamount']*-1, content['faction']);
                         this.gameManager.dynamicScene.querySelector('#' + content['id']).emit('remove-tower', content);
-
+                        this.cashManager.executeUpdateCash(Math.round(content['amount']*-0.35), content['faction']);
+                        console.log("remover:  "+Math.round(content['amount']*-0.35));
                     break;
                 case 'tower_get_damaged':
 
