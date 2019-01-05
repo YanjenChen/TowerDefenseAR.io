@@ -198,7 +198,8 @@
             this.system.networkManager.emit('playingEvent', {
                 event_name: 'request_remove_tower',
                 faction: this.el.sceneEl.systems['tdar-game'].data.userFaction,
-                id: this.el.id
+                id: this.el.id,
+                ampamount: this.system.gameManager.settings.tower[this.el.components['tower'].data.type][0].amplifyAmount
             });
 
             this.system.uiManager.updateObjectControl([]);

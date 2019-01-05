@@ -90,9 +90,10 @@
 
                     break;
                 case 'do_tower_remove':
-                    if (this.gameManager.dynamicScene.querySelector('#' + content['id']) != null)
+                    if (this.gameManager.dynamicScene.querySelector('#' + content['id']) != null) {
+                        this.cashManager.moneytowerbuild(content['ampamount'] * -1, content['faction']);
                         this.gameManager.dynamicScene.querySelector('#' + content['id']).emit('remove-tower', content);
-                    this.cashManager.moneytowerbuild(content['ampamount'] * -1, content['faction']);
+                    }
                     break;
                 case 'tower_execute_update_target':
                     if (this.gameManager.dynamicScene.querySelector('#' + content['id']) != null)
