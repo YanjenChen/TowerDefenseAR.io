@@ -245,7 +245,8 @@
             this.system.networkManager.emit('playingEvent', {
                 event_name: 'spawner_request_addto_spawnbuffer',
                 id: this.el.id,
-                type: type
+                type: type,
+                autoSpawn: this.el.is('autospawn')
             });
             if (update === true) {
 
@@ -282,7 +283,11 @@
             let currentMoney = this.system.cashManager.currentMoney[this.el.sceneEl.systems['tdar-game'].data.userFaction];
             let uisets;
 
-            if (this.el.is('autospawn')) {
+            if (this.data.faction !== this.el.sceneEl.systems[GAME_SYS_NAME].data.userFaction) {
+
+                uisets = [];
+
+            } else if (this.el.is('autospawn')) {
 
                 uisets = [{
                     callback: this.requestRemoveAutoSpawn,

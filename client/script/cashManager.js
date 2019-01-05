@@ -1,4 +1,5 @@
 class CashManager {
+
     constructor(sceneEl) {
         /*
          * FUNCTION API SPEC
@@ -38,37 +39,57 @@ class CashManager {
         this.userFaction = sceneEl.systems['tdar-game'].data.userFaction;
 
         this.uiManager.updateMoneyPoint(this.currentMoney[this.userFaction]);
+
     }
     tick(time, timeDelta) {
+
         if (time - this.prevCheckTime > this.incrementalDuration) {
+
             this.requestUpdateCash(
                 this.basicIncreaseAmount + this.moneyAmplifer.RED * this.amplifyAmount,
-                'RED'
-            )
+                'RED',
+                false
+            );
             this.requestUpdateCash(
                 this.basicIncreaseAmount + this.moneyAmplifer.BLACK * this.amplifyAmount,
-                'BLACK'
-            )
+                'BLACK',
+                false
+            );
             this.prevCheckTime = time;
+
         }
+
     }
-    requestUpdateCash(amount, faction) {
+    requestUpdateCash(amount, faction, userEmit) {
+
         this.networkManager.emit('playingEvent', {
             event_name: 'request_update_cash',
             amount: amount,
-            faction: faction
+            faction: faction,
+            userEmit: userEmit
         });
+
     }
     executeUpdateCash(amount, faction) {
+
         this.currentMoney[faction] += amount;
         if (faction == this.userFaction) {
+
             this.uiManager.updateMoneyPoint(this.currentMoney[faction]);
 
-            if (this.gameManager.gridEl)
+            if (this.gameManager.gridEl) {
+
                 this.gameManager.gridEl.components['grid'].onEndProcess();
+
+            }
+
         }
+
     }
-    moneytowerbuild(ampAmount, faction) {
+    updateMoneyAmplifer(ampAmount, faction) {
+
         this.moneyAmplifer[faction] += ampAmount;
+
     }
+
 }

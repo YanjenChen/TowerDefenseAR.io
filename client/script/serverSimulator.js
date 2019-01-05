@@ -25,28 +25,28 @@ class ServerSimulator {
                 break;
             case 'playingEvent':
                 switch (detail.event_name) {
-                    case 'enemy_be_attacked':
+                    case 'enemy_be_attacked': // Base on host emit.
                         detail.event_name = 'enemy_get_damaged';
                         break;
-                    case 'castle_be_attacked':
+                    case 'castle_be_attacked': // Base on host emit.
                         detail.event_name = 'castle_get_damaged';
                         break;
-                    case 'request_create_tower':
+                    case 'request_create_tower': // Base on user emit.
                         detail.event_name = 'create_tower_success';
                         break;
-                    case 'request_upgrade_tower':
+                    case 'request_upgrade_tower': // Base on user emit.
                         detail.event_name = 'do_tower_upgrade';
                         break;
-                    case 'request_remove_tower':
+                    case 'request_remove_tower': // Base on user emit.
                         detail.event_name = 'do_tower_remove';
                         break;
-                    case 'tower_request_update_target':
+                    case 'tower_request_update_target': // Base on host emit.
                         detail.event_name = 'tower_execute_update_target';
                         break;
-                    case 'tower_be_attacked':
+                    case 'tower_be_attacked': // Base on host emit.
                         detail.event_name = 'tower_get_damaged';
                         break;
-                    case 'wave_spawner_request_spawn_enemy':
+                    case 'wave_spawner_request_spawn_enemy': // Base on host emit.
                         detail.event_name = 'wave_spawner_create_enemy';
                         detail.healthPoint = Math.ceil(detail.time / 60000) * 100;
                         detail.enemy_id = this.enemyCounter;
@@ -54,16 +54,20 @@ class ServerSimulator {
                         detail.targetCastle = detail.ws_faction == 'RED' ? '#BLACK-castle' : '#RED-castle';
                         this.enemyCounter++;
                         break;
-                    case 'spawner_request_set_autospawn':
+                    case 'spawner_request_set_autospawn': // Base on user emit.
                         detail.event_name = 'spawner_execute_set_autospawn';
                         break;
-                    case 'spawner_request_remove_autospawn':
+                    case 'spawner_request_remove_autospawn': // Base on user emit.
                         detail.event_name = 'spawner_execute_remove_autospawn';
                         break;
                     case 'spawner_request_addto_spawnbuffer':
+                        // if (detail.autoSpawn === true), base on host emit.
+                        // if (detail.autoSpawn === false), base on user emit.
                         detail.event_name = 'spawner_execute_addto_spawnbuffer';
                         break;
                     case 'request_update_cash':
+                        // if (detail.userEmit === true), base on user emit.
+                        // if (detail.userEmit !== true), base on host emit.
                         detail.event_name = 'execute_update_cash';
                         break
                     default:

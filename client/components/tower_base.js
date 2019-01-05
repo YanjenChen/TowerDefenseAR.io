@@ -146,6 +146,7 @@
             });
             this.el.removeState('empty');
             this.el.addState('processing');
+            this.currentOwner = evt.detail.faction;
 
             this.system.gameManager.updateGameGridByModel(
                 this.el.object3D.position,
@@ -156,6 +157,9 @@
             this.el.sceneEl.emit('systemupdatepath', {
                 faction: evt.detail.faction
             });
+
+            this.system.cashManager.requestUpdateCash(evt.detail.amount, evt.detail.faction, true);
+            this.system.cashManager.updateMoneyAmplifer(evt.detail.ampamount, evt.detail.faction);
 
         },
         requestUpgrade: function() {
@@ -173,17 +177,19 @@
             this.system.networkManager.emit('playingEvent', {
                 event_name: 'request_upgrade_tower',
                 id: this.el.id,
-                faction: this.el.sceneEl.systems['tdar-game'].data.userFaction,
+                faction: this.el.sceneEl.systems[GAME_SYS_NAME].data.userFaction,
                 amount: this.system.gameManager.settings.tower[type][tier].cost
             });
 
             this.system.uiManager.updateObjectControl([]);
 
         },
-        upgradeTower: function() {
+        upgradeTower: function(evt) {
 
             this.el.addState('processing');
             this.el.components['tower'].upgradeTier();
+            this.system.cashManager.requestUpdateCash(evt.detail.amount, evt.detail.faction, true);
+            // this.system.cashManager.updateMoneyAmplifer(evt.detail.ampamount, evt.detail.faction);
 
         },
         requestRemove: function() {
@@ -197,16 +203,20 @@
 
             this.system.networkManager.emit('playingEvent', {
                 event_name: 'request_remove_tower',
-                faction: this.el.sceneEl.systems['tdar-game'].data.userFaction,
+                faction: this.el.sceneEl.systems[GAME_SYS_NAME].data.userFaction,
                 id: this.el.id,
                 ampamount: this.system.gameManager.settings.tower[this.el.components['tower'].data.type][this.el.components['tower'].data.tier].amplifyAmount,
                 amount: this.system.gameManager.settings.tower[this.el.components['tower'].data.type][this.el.components['tower'].data.tier].cost
             });
 
+            this.currentOwner = null;
             this.system.uiManager.updateObjectControl([]);
 
         },
         removeTower: function(evt) {
+
+            this.system.cashManager.updateMoneyAmplifer(evt.detail.ampamount * -1, evt.detail.faction);
+            this.system.cashManager.requestUpdateCash(Math.round(evt.detail.amount * -0.35), evt.detail.faction, true);
 
             this.system.gameManager.updateGameGridByModel(
                 this.el.object3D.position,
@@ -231,7 +241,7 @@
 
             }
 
-            let currentMoney = this.system.cashManager.currentMoney[this.el.sceneEl.systems['tdar-game'].data.userFaction];
+            let currentMoney = this.system.cashManager.currentMoney[this.el.sceneEl.systems[GAME_SYS_NAME].data.userFaction];
             let uisets;
 
             if (this.el.is('empty')) {
@@ -259,6 +269,10 @@
                     cost: goldminecost,
                     disable: currentMoney >= goldminecost ? false : true
                 }];
+
+            } else if (this.currentOwner !== this.el.sceneEl.systems[GAME_SYS_NAME].data.userFaction) {
+
+                uisets = [];
 
             } else if (this.el.components['tower'].isMaxTier()) {
 
