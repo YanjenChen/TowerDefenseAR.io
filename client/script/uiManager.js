@@ -20,6 +20,10 @@ class UIManager {
         // this.waveMonitorEl = this.createWaveMonitor();
         // this.waveSpawnerControlCallbacks = [];
         // this.waveSpawnerControlEl = this.createWaveSpawnerControl();
+        this.arControlCallback = {
+            onTouchStart: null,
+            onTouchEnd: null
+        };
         this.arControlEl = this.createARControl();
 
         for (let i = 0; i < MAX_UI; i++) {
@@ -221,5 +225,32 @@ class UIManager {
 
         if (callback)
             callback();
+    }
+    updateARControl(onTouchStart, onTouchEnd) {
+        /*
+         *   SPEC:
+         *       (function) onTouchStart: callback on touchstart.
+         *       (function) onTouchEnd: callback on touchend.
+         */
+        var self = this;
+        this.clearObjectControl(function() {
+
+            self.arControlEl.addEventListener('touchstart', onTouchStart);
+            self.arControlEl.addEventListener('touchend', onTouchEnd);
+            self.arControlCallback.onTouchStart = onTouchStart;
+            self.arControlCallback.onTouchEnd = onTouchEnd;
+
+        });
+    }
+    clearARControl(callback) {
+
+        this.arControlEl.removeEventListener('touchstart', this.arControlCallback.onTouchStart);
+        this.arControlEl.removeEventListener('touchend', this.arControlCallback.onTouchEnd);
+        this.arControlCallback.onTouchStart = null;
+        this.arControlCallback.onTouchEnd = null;
+
+        if (callback)
+            callback();
+
     }
 }

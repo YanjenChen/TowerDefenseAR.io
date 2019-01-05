@@ -207,7 +207,7 @@ class GameManager {
             }));
             shadowMesh.name = 'arShadowMesh';
             shadowMesh.receiveShadow = true;
-            shadowMesh.position.y = 10000;
+            shadowMesh.position.y = 1000;
             sceneEl.object3D.add(shadowMesh);
 
             // Insert light to scene.
@@ -469,7 +469,7 @@ class GameManager {
 
 
         if (mode == 'ar') {
-            // TODO: NEED UPDATE ALL SCRIPT HERE.
+
             sceneEl.object3D.visible = false;
 
             let reticleEl = document.createElement('a-entity');
