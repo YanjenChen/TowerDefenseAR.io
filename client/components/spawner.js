@@ -94,7 +94,7 @@
             },
             duration: {
                 type: 'number',
-                default: 10000
+                default: 5000
             },
             faction: {
                 type: 'string',
@@ -111,9 +111,12 @@
             this.el.setObject3D('mesh', this.system.getMesh(this));
 
             this.onSpawnEnemy = this.onSpawnEnemy.bind(this);
-            this.setAutoSpawn = this.setAutoSpawn.bind(this);
-            this.removeAutoSpawn = this.removeAutoSpawn.bind(this);
-            this.addToSpawnBuffer = this.addToSpawnBuffer.bind(this);
+            this.requestSetAutoSpawn = this.requestSetAutoSpawn.bind(this);
+            this.executeSetAutoSpawn = this.executeSetAutoSpawn.bind(this);
+            this.requestRemoveAutoSpawn = this.requestRemoveAutoSpawn.bind(this);
+            this.executeRemoveAutoSpawn = this.executeRemoveAutoSpawn.bind(this);
+            this.requestAddToSpawnBuffer = this.requestAddToSpawnBuffer.bind(this);
+            this.executeAddToSpawnBuffer = this.executeAddToSpawnBuffer.bind(this);
             this.addInfantryToSpawnBuffer = this.addInfantryToSpawnBuffer.bind(this);
             this.addCavalryToSpawnBuffer = this.addCavalryToSpawnBuffer.bind(this);
             this.updateUI = this.updateUI.bind(this);
@@ -126,9 +129,18 @@
             this.el.addState('activate');
             this.el.addState('autospawn');
             this.el.addEventListener('spawn_enemy', this.onSpawnEnemy);
+            this.el.addEventListener('setautospawn', this.executeSetAutoSpawn);
+            this.el.addEventListener('removeautospawn', this.executeRemoveAutoSpawn);
+            this.el.addEventListener('addtospawnbuffer', this.executeAddToSpawnBuffer);
 
         },
         tick: function(time, timeDelta) {
+
+            if (this.el.is('synchronize')) {
+
+                return true;
+
+            }
 
             this.timeCounter += timeDelta;
 
@@ -142,7 +154,7 @@
 
                 if (this.el.is('autospawn') && this.spawnBuffer.length === 0) {
 
-                    this.addToSpawnBuffer(UNIT_TYPE[Math.floor(Math.random() * 2)]);
+                    this.requestAddToSpawnBuffer(UNIT_TYPE[Math.floor(Math.random() * 2)]);
 
                 }
 
@@ -195,32 +207,68 @@
             enemyEl.setAttribute('unit', evt.detail);
 
         },
-        setAutoSpawn: function() {
+        requestSetAutoSpawn: function() {
+
+            this.el.addState('synchronize');
+            this.system.networkManager.emit('playingEvent', {
+                event_name: 'spawner_request_set_autospawn',
+                id: this.el.id
+            });
+            this.updateUI();
+
+        },
+        executeSetAutoSpawn: function(evt) {
 
             this.el.addState('autospawn');
+            this.el.removeState('synchronize');
+
+        },
+        requestRemoveAutoSpawn: function() {
+
+            this.el.addState('synchronize');
+            this.system.networkManager.emit('playingEvent', {
+                event_name: 'spawner_request_remove_autospawn',
+                id: this.el.id
+            });
             this.updateUI();
 
         },
-        removeAutoSpawn: function() {
+        executeRemoveAutoSpawn: function(evt) {
 
             this.el.removeState('autospawn');
-            this.updateUI();
+            this.el.removeState('synchronize');
 
         },
-        addToSpawnBuffer: function(type) {
+        requestAddToSpawnBuffer: function(type, update) {
 
-            this.spawnBuffer.unshift(type);
+            this.el.addState('synchronize');
+            this.system.networkManager.emit('playingEvent', {
+                event_name: 'spawner_request_addto_spawnbuffer',
+                id: this.el.id,
+                type: type
+            });
+            if (update === true) {
+
+                this.updateUI();
+
+            }
+
+        },
+        executeAddToSpawnBuffer: function(evt) {
+
+            this.spawnBuffer.unshift(evt.detail.type);
+            this.el.removeState('synchronize');
 
         },
         addInfantryToSpawnBuffer: function() {
 
-            this.addToSpawnBuffer(UNIT_INFANTRY_NAME);
+            this.requestAddToSpawnBuffer(UNIT_INFANTRY_NAME, true);
             this.updateUI();
 
         },
         addCavalryToSpawnBuffer: function() {
 
-            this.addToSpawnBuffer(UNIT_CAVALRY_NAME);
+            this.requestAddToSpawnBuffer(UNIT_CAVALRY_NAME, true);
             this.updateUI();
 
         },
@@ -237,7 +285,7 @@
             if (this.el.is('autospawn')) {
 
                 uisets = [{
-                    callback: this.removeAutoSpawn,
+                    callback: this.requestRemoveAutoSpawn,
                     icon: undefined,
                     header: 'AutoOff',
                     cost: 0,
@@ -259,7 +307,7 @@
                     cost: 0,
                     disable: false
                 }, {
-                    callback: this.setAutoSpawn,
+                    callback: this.requestSetAutoSpawn,
                     icon: undefined,
                     header: 'AutoOn',
                     cost: 0,

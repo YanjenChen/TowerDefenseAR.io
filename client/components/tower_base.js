@@ -62,6 +62,7 @@
 
             this.timeCounter = 0;
             this.currentOwner = null;
+            this.isTowerBase = true;
 
             this.el.addEventListener('create-tower', this.createTower);
             this.el.addEventListener('upgrade-tower', this.upgradeTower);

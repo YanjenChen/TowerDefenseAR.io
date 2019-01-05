@@ -221,6 +221,8 @@
 
             this.upgradeTier = this.upgradeTier.bind(this);
             this.isMaxTier = this.isMaxTier.bind(this);
+            this.requestUpdateTargetEl = this.requestUpdateTargetEl.bind(this);
+            this.executeUpdateTargetEl = this.executeUpdateTargetEl.bind(this);
 
             switch (this.data.type) {
 
@@ -289,6 +291,8 @@
                     console.warn('Tower init with unknown type.');
 
             }
+
+            this.el.addEventListener('update-target', this.executeUpdateTargetEl);
 
             function _find(child) {
 
@@ -360,7 +364,7 @@
         },
         tick: function(time, timeDelta) {
 
-            if (this.data.type === TYPE_GOLDMINE || this.el.is('initializing')) {
+            if (this.data.type === TYPE_GOLDMINE || this.el.is('initializing') || this.el.is('synchronizing')) {
 
                 return true;
 
@@ -420,7 +424,8 @@
 
             } else {
 
-                this.targetEl = this.system.getNearestEnemy(this);
+                // this.targetEl = this.system.getNearestEnemy(this);
+                this.requestUpdateTargetEl(this.system.getNearestEnemy(this));
                 if (this.targetEl !== undefined) {
 
                     this.el.addState('activate');
@@ -471,6 +476,30 @@
         isMaxTier: function() {
 
             return this.data.tier >= this.setting.length - 1;
+
+        },
+        requestUpdateTargetEl: function(targetEl) {
+
+            if (targetEl === undefined) {
+
+                return true;
+
+            }
+
+            console.log('aa');
+            this.el.addState('synchronizing');
+            this.system.networkManager.emit('playingEvent', {
+                event_name: 'tower_request_update_target',
+                id: this.el.id,
+                enemy_id: targetEl.id
+            });
+
+        },
+        executeUpdateTargetEl: function(evt) {
+
+            this.targetEl = this.system.gameManager.dynamicScene.querySelector('#' + evt.detail.enemy_id);
+            this.el.removeState('synchronizing');
+            console.log('bb');
 
         }
 

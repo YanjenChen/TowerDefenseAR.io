@@ -94,6 +94,10 @@
                         this.gameManager.dynamicScene.querySelector('#' + content['id']).emit('remove-tower', content);
                     this.cashManager.moneytowerbuild(content['ampamount'] * -1, content['faction']);
                     break;
+                case 'tower_execute_update_target':
+                    if (this.gameManager.dynamicScene.querySelector('#' + content['id']) != null)
+                        this.gameManager.dynamicScene.querySelector('#' + content['id']).emit('update-target', content);
+                    break;
                 case 'tower_get_damaged':
 
                     break;
@@ -110,6 +114,18 @@
                             type: content['type']
                         });
                     }
+                    break;
+                case 'spawner_execute_set_autospawn':
+                    if (this.gameManager.dynamicScene.querySelector('#' + content['id']) != null)
+                        this.gameManager.dynamicScene.querySelector('#' + content['id']).emit('setautospawn', content);
+                    break;
+                case 'spawner_execute_remove_autospawn':
+                    if (this.gameManager.dynamicScene.querySelector('#' + content['id']) != null)
+                        this.gameManager.dynamicScene.querySelector('#' + content['id']).emit('removeautospawn', content);
+                    break;
+                case 'spawner_execute_addto_spawnbuffer':
+                    if (this.gameManager.dynamicScene.querySelector('#' + content['id']) != null)
+                        this.gameManager.dynamicScene.querySelector('#' + content['id']).emit('addtospawnbuffer', content);
                     break;
                 case 'execute_update_cash':
                     this.cashManager.executeUpdateCash(content['amount'], content['faction']);

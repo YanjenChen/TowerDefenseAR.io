@@ -231,6 +231,10 @@
 
                 this.system.uiManager.updateObjectControl([]);
 
+            } else if (!placeable && selectedBase.isTowerBase === true && selectedBase.el.is('empty')) {
+
+                this.system.uiManager.updateObjectControl([]);
+
             } else {
 
                 this.system.uiManager.updateObjectControl(selectedBase.getUIsets());
@@ -242,7 +246,8 @@
 
             if (base === this.hoveringBase) {
 
-                this.updateUI();
+                // this.updateUI();
+                this.system.uiManager.updateObjectControl(base.getUIsets());
 
             }
 

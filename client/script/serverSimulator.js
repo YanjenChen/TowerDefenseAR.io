@@ -40,6 +40,9 @@ class ServerSimulator {
                     case 'request_remove_tower':
                         detail.event_name = 'do_tower_remove';
                         break;
+                    case 'tower_request_update_target':
+                        detail.event_name = 'tower_execute_update_target';
+                        break;
                     case 'tower_be_attacked':
                         detail.event_name = 'tower_get_damaged';
                         break;
@@ -50,6 +53,15 @@ class ServerSimulator {
                         detail.reward = Math.ceil(detail.time / 60000) * 5;
                         detail.targetCastle = detail.ws_faction == 'RED' ? '#BLACK-castle' : '#RED-castle';
                         this.enemyCounter++;
+                        break;
+                    case 'spawner_request_set_autospawn':
+                        detail.event_name = 'spawner_execute_set_autospawn';
+                        break;
+                    case 'spawner_request_remove_autospawn':
+                        detail.event_name = 'spawner_execute_remove_autospawn';
+                        break;
+                    case 'spawner_request_addto_spawnbuffer':
+                        detail.event_name = 'spawner_execute_addto_spawnbuffer';
                         break;
                     case 'request_update_cash':
                         detail.event_name = 'execute_update_cash';
