@@ -10,11 +10,11 @@
                 "scalar": 2.5
             },
             "tower-catapult": {
-                "src": "renderer/assets/models/general/tower-catapult.gltf",
+                "src": "renderer/assets/models/red/tower-catapult.gltf",
                 "scalar": 1.2
             },
             "tower-goldMine": {
-                "src": "renderer/assets/models/general/tower-goldMine.gltf",
+                "src": "renderer/assets/models/red/tower-goldMine.gltf",
                 "scalar": 1
             },
             "tower-laser": {
@@ -22,11 +22,11 @@
                 "scalar": 1.4
             },
             "unit-cavalry": {
-                "src": "renderer/assets/models/general/unit-cavalry.gltf",
+                "src": "renderer/assets/models/red/unit-cavalry.gltf",
                 "scalar": 2.4
             },
             "unit-infantry": {
-                "src": "renderer/assets/models/general/unit-infantry.gltf",
+                "src": "renderer/assets/models/red/unit-infantry.gltf",
                 "scalar": 0.6
             }
         },
@@ -40,11 +40,11 @@
                 "scalar": 2.5
             },
             "tower-catapult": {
-                "src": "renderer/assets/models/general/tower-catapult.gltf",
+                "src": "renderer/assets/models/black/tower-catapult.gltf",
                 "scalar": 1.2
             },
             "tower-goldMine": {
-                "src": "renderer/assets/models/general/tower-goldMine.gltf",
+                "src": "renderer/assets/models/black/tower-goldMine.gltf",
                 "scalar": 1
             },
             "tower-laser": {
@@ -52,11 +52,11 @@
                 "scalar": 1.4
             },
             "unit-cavalry": {
-                "src": "renderer/assets/models/general/unit-cavalry.gltf",
+                "src": "renderer/assets/models/black/unit-cavalry.gltf",
                 "scalar": 2.4
             },
             "unit-infantry": {
-                "src": "renderer/assets/models/general/unit-infantry.gltf",
+                "src": "renderer/assets/models/black/unit-infantry.gltf",
                 "scalar": 0.6
             }
         },
