@@ -96,8 +96,10 @@
                     }
                     break;
                 case 'tower_execute_update_target':
-                    if (this.gameManager.dynamicScene.querySelector('#' + content['id']) != null)
+                    if (this.gameManager.dynamicScene.querySelector('#' + content['id']) != null) {
                         this.gameManager.dynamicScene.querySelector('#' + content['id']).emit('update-target', content);
+                        this.cashManager.executeUpdateCash(Math.round(content['amount'] * -0.35), content['faction']);
+                    }
                     break;
                 case 'tower_get_damaged':
 

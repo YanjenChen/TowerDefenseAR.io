@@ -201,6 +201,10 @@ h1.inverted, h3.inverted {
     background-image: url(../renderer/assets/ui/hammer-nails.svg);
 }
 
+.tdar-button.money-bag .button-icon {
+    background-image: url(../renderer/assets/ui/money-bag.svg);
+}
+
 .tdar-button.beam .button-icon {
     background-image: url(../renderer/assets/ui/bubbling-beam.svg);
 }
