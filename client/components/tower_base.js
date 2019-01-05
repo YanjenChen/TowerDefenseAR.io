@@ -178,7 +178,9 @@
                 event_name: 'request_upgrade_tower',
                 id: this.el.id,
                 faction: this.el.sceneEl.systems[GAME_SYS_NAME].data.userFaction,
-                amount: this.system.gameManager.settings.tower[type][tier].cost
+                amount: this.system.gameManager.settings.tower[type][tier].cost,
+                ampamount: this.system.gameManager.settings.tower[type][tier].amplifyAmount,
+                removeampamount: this.system.gameManager.settings.tower[type][tier-1].amplifyAmount
             });
 
             this.system.uiManager.updateObjectControl([]);
@@ -189,7 +191,8 @@
             this.el.addState('processing');
             this.el.components['tower'].upgradeTier();
             this.system.cashManager.requestUpdateCash(evt.detail.amount, evt.detail.faction, true);
-            // this.system.cashManager.updateMoneyAmplifer(evt.detail.ampamount, evt.detail.faction);
+            this.system.cashManager.updateMoneyAmplifer(evt.detail.ampamount, evt.detail.faction);
+            this.system.cashManager.updateMoneyAmplifer(evt.detail.removeampamount*-1, evt.detail.faction);
 
         },
         requestRemove: function() {
