@@ -65,7 +65,7 @@ class CashManager {
             this.uiManager.updateMoneyPoint(this.currentMoney[faction]);
 
             if (this.gameManager.gridEl)
-                this.gameManager.gridEl.components['grid'].updateUI();
+                this.gameManager.gridEl.components['grid'].onEndProcess();
         }
     }
     moneytowerbuild(ampAmount, faction) {

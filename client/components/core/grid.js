@@ -134,9 +134,8 @@
         // WARNING: Using async function to modify aframe API is an UNSTABLE trick.
         tick: async function(time, timeDelta) {
 
-            if (time - this.prevCheckTime > this.data.interval) {
+            if (time - this.prevCheckTime > this.data.interval || this.el.is('needforceupdate')) {
 
-                // console.log(this.el.is('cursor-hovered'));
                 if (this.el.is('cursor-hovered')) {
 
                     if (!this.getIntersection) {
@@ -176,6 +175,7 @@
 
                 }
                 this.prevCheckTime = time;
+                this.el.removeState('needforceupdate');
 
             }
 
@@ -242,14 +242,9 @@
             }
 
         },
-        onEndProcess: function(base) {
+        onEndProcess: function() {
 
-            if (base === this.hoveringBase) {
-
-                // this.updateUI();
-                this.system.uiManager.updateObjectControl(base.getUIsets());
-
-            }
+            this.el.addState('needforceupdate');
 
         }
 

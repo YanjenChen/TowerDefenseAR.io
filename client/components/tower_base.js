@@ -77,7 +77,7 @@
                 if (this.timeCounter >= PROCESS_TIME) {
 
                     this.el.removeState('processing');
-                    this.system.gameManager.gridEl.components['grid'].onEndProcess(this);
+                    this.system.gameManager.gridEl.components['grid'].onEndProcess();
                     this.timeCounter = 0;
 
                 }
