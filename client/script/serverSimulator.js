@@ -43,7 +43,7 @@ class ServerSimulator {
                     case 'tower_request_update_target': // Base on host emit.
                         detail.event_name = 'tower_execute_update_target';
                         break;
-                    case 'tower_be_attacked': // Base on host emit.
+                    case 'tower_be_attacked': // Base on user emit.
                         detail.event_name = 'tower_get_damaged';
                         break;
                     case 'wave_spawner_request_spawn_enemy': // Base on host emit.
