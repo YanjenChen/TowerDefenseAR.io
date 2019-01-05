@@ -486,7 +486,6 @@
 
             }
 
-            console.log('aa');
             this.el.addState('synchronizing');
             this.system.networkManager.emit('playingEvent', {
                 event_name: 'tower_request_update_target',
@@ -499,7 +498,6 @@
 
             this.targetEl = this.system.gameManager.dynamicScene.querySelector('#' + evt.detail.enemy_id);
             this.el.removeState('synchronizing');
-            console.log('bb');
 
         }
 
