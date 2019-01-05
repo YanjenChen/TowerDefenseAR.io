@@ -150,7 +150,7 @@
             "laser": [{
                 "restDuration": 1000,
                 "activateDuration": 1000,
-                "range": 5,
+                "range": 4,
                 "damagePoint": 1,
                 "laserColor": "rgb(68,170,68)",
                 "amplifyAmount": 0,
@@ -162,15 +162,15 @@
                 "damagePoint": 2,
                 "laserColor": "rgb(68,68,170)",
                 "amplifyAmount": 0,
-                "cost": -50
+                "cost": -80
             }, {
                 "restDuration": 0,
                 "activateDuration": 1000,
-                "range": 5,
+                "range": 6,
                 "damagePoint": 3,
                 "laserColor": "rgb(170,68,68)",
                 "amplifyAmount": 0,
-                "cost": -50
+                "cost": -120
             }],
             "catapult": [{
                 "restDuration": 4000,
@@ -180,7 +180,7 @@
                 "attackRange": 1.5,
                 "speed": 10,
                 "amplifyAmount": 0,
-                "cost": -50
+                "cost": -80
             }, {
                 "restDuration": 3000,
                 "activateDuration": 1,
@@ -189,7 +189,7 @@
                 "attackRange": 1.6,
                 "speed": 10,
                 "amplifyAmount": 0,
-                "cost": -50
+                "cost": -130
             }, {
                 "restDuration": 1500,
                 "activateDuration": 1,
@@ -198,11 +198,17 @@
                 "attackRange": 1.6,
                 "speed": 12,
                 "amplifyAmount": 0,
-                "cost": -50
+                "cost": -160
             }],
             "goldMine": [{
                 "amplifyAmount": 5,
                 "cost": -100
+            }, {
+                "amplifyAmount": 7,
+                "cost": -150
+            }, {
+                "amplifyAmount": 10,
+                "cost": -200
             }]
         },
         "castle": {

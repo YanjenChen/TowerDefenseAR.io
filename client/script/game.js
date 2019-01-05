@@ -76,14 +76,14 @@
                         console.warn('castle_get_damaged emit to unknown id: ', content['id']);
                     break;
                 case 'create_tower_success':
-                    if (this.gameManager.dynamicScene.querySelector('#' + content['id']) != null)
+                    if (this.gameManager.dynamicScene.querySelector('#' + content['id']) != null) {
                         this.gameManager.dynamicScene.querySelector('#' + content['id']).emit('create-tower', content);
-                    this.cashManager.executeUpdateCash(content['amount'], content['faction']);
-                    this.cashManager.moneytowerbuild(content['ampamount'], content['faction']);
+                        this.cashManager.executeUpdateCash(content['amount'], content['faction']);
+                        this.cashManager.moneytowerbuild(content['ampamount'], content['faction']);
+                    }
                     break;
                 case 'do_tower_upgrade':
                     if (this.gameManager.dynamicScene.querySelector('#' + content['id']) != null) {
-
                         this.gameManager.dynamicScene.querySelector('#' + content['id']).emit('upgrade-tower', content);
                         this.cashManager.executeUpdateCash(content['amount'], content['faction']);
                     }
@@ -92,13 +92,13 @@
                 case 'do_tower_remove':
                     if (this.gameManager.dynamicScene.querySelector('#' + content['id']) != null) {
                         this.cashManager.moneytowerbuild(content['ampamount'] * -1, content['faction']);
+                        this.cashManager.executeUpdateCash(Math.round(content['amount'] * -0.35), content['faction']);
                         this.gameManager.dynamicScene.querySelector('#' + content['id']).emit('remove-tower', content);
                     }
                     break;
                 case 'tower_execute_update_target':
                     if (this.gameManager.dynamicScene.querySelector('#' + content['id']) != null) {
                         this.gameManager.dynamicScene.querySelector('#' + content['id']).emit('update-target', content);
-                        this.cashManager.executeUpdateCash(Math.round(content['amount'] * -0.35), content['faction']);
                     }
                     break;
                 case 'tower_get_damaged':
