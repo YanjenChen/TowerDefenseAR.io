@@ -27,16 +27,20 @@ class NetworkManager {
         this.user = jQuery("#user").val();
         this.user_faction = jQuery("#user_faction").val();
         this.user_team_id = jQuery("#user_team_id").val();
+        this.userFaction = this.user_faction === '1' ? 'RED' : 'BLACK';
 
         this.getSocket = this.getSocket.bind(this);
         this.checkOnline = this.checkOnline.bind(this);
 
         if (mode == 'multi-player') {
             console.log('Game is in multi player mode.');
-            this.getSocket()
+            this.getSocket();
+            setInterval(this.checkOnline, 1000);
+            /*
             jQuery(function() {
                 setInterval(this.checkOnline, 1000)
-            })
+            });
+            */
         }
     }
     checkOnline() {
@@ -66,6 +70,7 @@ class NetworkManager {
         while (true) {
             try {
                 this.SOCKET = io();
+                console.log('CREATE SOCKET.');
                 break;
             } catch (e) {
 
@@ -100,7 +105,7 @@ class NetworkManager {
         })
     }
     addEventListener(evtName, callback) {
-        //console.log('NM ADD EVENTLISTNER HAS BEEN CALLED.');
+        console.log('NM ADD EVENTLISTNER HAS BEEN CALLED.');
 
         var self = this;
         var wrapper = function(evt) {
@@ -124,6 +129,7 @@ class NetworkManager {
             detail.room_id = this.room_id;
             detail.user = this.user;
 
+            //console.log(detail);
             this.SOCKET.emit(evtName, detail);
         } else {
             this.serverSimulator.emit(evtName, detail);

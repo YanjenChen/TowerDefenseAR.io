@@ -114,7 +114,7 @@
             this.system.networkManager.emit('playingEvent', {
                 event_name: 'request_create_tower',
                 id: this.el.id,
-                faction: this.el.sceneEl.systems[GAME_SYS_NAME].data.userFaction,
+                faction: this.system.networkManager.userFaction,
                 type: type,
                 amount: this.system.gameManager.settings.tower[type][0].cost,
                 ampamount: this.system.gameManager.settings.tower[type][0].amplifyAmount
@@ -145,9 +145,10 @@
                 type: evt.detail.type,
                 tier: 0
             });
-            this.el.removeState('empty');
             this.el.addState('processing');
+            this.el.removeState('empty');
             this.currentOwner = evt.detail.faction;
+            // console.log('CREATE TOWER: ', this.currentOwner);
 
             this.system.gameManager.updateGameGridByModel(
                 this.el.object3D.position,
@@ -178,7 +179,7 @@
             this.system.networkManager.emit('playingEvent', {
                 event_name: 'request_upgrade_tower',
                 id: this.el.id,
-                faction: this.el.sceneEl.systems[GAME_SYS_NAME].data.userFaction,
+                faction: this.system.networkManager.userFaction,
                 amount: this.system.gameManager.settings.tower[type][tier].cost
             });
 
@@ -204,7 +205,7 @@
 
             this.system.networkManager.emit('playingEvent', {
                 event_name: 'request_remove_tower',
-                faction: this.el.sceneEl.systems[GAME_SYS_NAME].data.userFaction,
+                faction: this.system.networkManager.userFaction,
                 id: this.el.id,
                 ampamount: this.system.gameManager.settings.tower[this.el.components['tower'].data.type][this.el.components['tower'].data.tier].amplifyAmount,
                 amount: this.system.gameManager.settings.tower[this.el.components['tower'].data.type][this.el.components['tower'].data.tier].cost
@@ -242,8 +243,10 @@
 
             }
 
-            let currentMoney = this.system.cashManager.currentMoney[this.el.sceneEl.systems[GAME_SYS_NAME].data.userFaction];
+            let currentMoney = this.system.cashManager.currentMoney[this.system.networkManager.userFaction];
             let uisets;
+
+            // console.log(this.currentOwner, this.system.networkManager.userFaction, this.currentOwner !== this.system.networkManager.userFaction);
 
             if (this.el.is('empty')) {
 
@@ -271,7 +274,7 @@
                     disable: currentMoney >= goldminecost ? false : true
                 }];
 
-            } else if (this.currentOwner !== this.el.sceneEl.systems[GAME_SYS_NAME].data.userFaction) {
+            } else if (this.currentOwner !== this.system.networkManager.userFaction) {
 
                 uisets = [];
 

@@ -165,6 +165,7 @@
                 mesh = THREE.AnimationUtils.clone(this.models[key].model);
 
             }
+            //console.log(this.animationGroups[key], component.data.id, Math.round(component.data.id % ANIMATION_GROUP_NUM));
             this.animationGroups[key][Math.round(component.data.id % ANIMATION_GROUP_NUM)].add(mesh);
             return mesh;
 

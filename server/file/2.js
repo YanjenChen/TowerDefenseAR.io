@@ -110,7 +110,7 @@ function check_offline(user) {
         // team_id  也要寫0，強制退出時
         /*
             "CREATE TABLE IF NOT EXISTS Users (id integer PRIMARY KEY AUTOINCREMENT, name char(50),password char(70),login_hash char(70) DEFAULT NULL, logout_hash char(70) DEFAULT NULL, create_room_hash char(70) DEFAULT NULL, join_room_hash char(70) DEFAULT NULL, leave_room_hash char(70) DEFAULT NULL, change_team_hash char(70) DEFAULT NULL, change_ready_hash char(70) DEFAULT NULL , start_game_hash char(70) DEFAULT NULL, end_game_hash char(70) DEFAULT NULL,isAdmin bit DEFAULT 0, hasLogin bit DEFAULT 0,isPlaying bit DEFAULT 0,join_room_id char(50) DEFAULT NULL,playing_room_id char(70) , team_id integer DEFAULT 0)"
-        
+
         */
         // 把所有 hash 紀錄消除掉
         erase_hasLogin = 'UPDATE Users SET login_hash = NULL , hasLogin = 0 , logout_hash = NULL , create_room_hash = NULL , join_room_hash = NULL , leave_room_hash = NULL , change_team_hash = NULL , change_ready_hash = NULL , start_game_hash = NULL , end_game_hash = NULL , playing_room_id = NULL , join_room_id = NULL , team_id = 0 , isPlaying = 0 where name="' + String(user) + '";';
@@ -224,7 +224,7 @@ function delUserToRoomUserStr(user, room_id, col, team_id) { // col 是 join_roo
 
                 // 不知為啥，有時會出現 TypeError: Cannot read property 'usernum' of undefined
                 // 先確定有，在操作，懶了
-                if(join_team[(team_id - 1)]["usernum"]){ 
+                if(join_team[(team_id - 1)]["usernum"]){
                     join_team[(team_id - 1)]["usernum"] = join_team[(team_id - 1)]["usernum"] - 1
                     new_join_team_str = JSON.stringify(join_team)
 
@@ -239,7 +239,7 @@ function delUserToRoomUserStr(user, room_id, col, team_id) { // col 是 join_roo
                 // 當兩隊人數都變0時，把這房間消除掉
                 if(
                     (join_team[0]["usernum"] == 0)
-                    && 
+                    &&
                     (join_team[0]["usernum"] == 0)
                 ){
 
@@ -249,16 +249,16 @@ function delUserToRoomUserStr(user, room_id, col, team_id) { // col 是 join_roo
 
                     del_room_sql = "delete from PlayRooms where room_id = '" + room_id + "'"
                     usedb(del_room_sql, Object())
-                    
+
                     //delete all_playing_room_master[room_id]
-                    
+
                     // 剩下的一些 Object ，有關 room 的，刪乾淨 。參考 function endGameBackLobby(room_id)
                     // 靠北，第一次跑，三句都開，就丟例外
                     // 測試時，一句句個別開，都沒例外。一起開，也沒例外...這啥狀況...
                     delete in_playing_room[room_id] // 這句安全，不會噴例外
                     delete game_enemy[room_id] // 這句安全，不會噴例外
                     delete all_playing_room_master[room_id] // 這句安全，不會噴例外??
-                    
+
                     console.log("\n\nB2\n\n")
                 }
             } else {
@@ -293,7 +293,7 @@ function monitor() {
                 if ((!obj["res"]["isPlaying"]) && (!(obj["res"]["hasLogin"] === false))) {
                     all_player_monitor[user]["record"] = all_player_monitor[user]["record"] + 1;
                     //console.log("這邊")
-                    console.log("B monitor " + user + " ++ , value : " + all_player_monitor[user]["record"])
+                    //console.log("B monitor " + user + " ++ , value : " + all_player_monitor[user]["record"])
                     if (all_player_monitor[user]["record"] > 5) {
                         // 一樣，必須不在遊戲中，才可動手
                         check_offline(user)

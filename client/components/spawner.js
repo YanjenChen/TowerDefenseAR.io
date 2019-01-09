@@ -94,7 +94,7 @@
             },
             duration: {
                 type: 'number',
-                default: 5000
+                default: 10000
             },
             faction: {
                 type: 'string',
@@ -126,7 +126,8 @@
             this.spawnCounter = 0;
             this.spawnBuffer = []; // store type of unit.
 
-            this.el.addState('activate');
+            // this.el.addState('activate');
+            this.el.pause();
             this.el.addState('autospawn');
             this.el.addEventListener('spawn_enemy', this.onSpawnEnemy);
             this.el.addEventListener('setautospawn', this.executeSetAutoSpawn);
@@ -280,10 +281,10 @@
         },
         getUIsets: function() {
 
-            let currentMoney = this.system.cashManager.currentMoney[this.el.sceneEl.systems['tdar-game'].data.userFaction];
+            let currentMoney = this.system.cashManager.currentMoney[this.system.networkManager.userFaction];
             let uisets;
 
-            if (this.data.faction !== this.el.sceneEl.systems[GAME_SYS_NAME].data.userFaction) {
+            if (this.data.faction !== this.system.networkManager.userFaction) {
 
                 uisets = [];
 

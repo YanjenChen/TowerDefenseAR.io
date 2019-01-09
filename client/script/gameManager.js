@@ -89,6 +89,7 @@ class GameManager {
             self.sceneEl.systems['tdar-game'].cashManager = new CashManager(self.sceneEl); // Init cash manager.
 
             // Pre-load model by assets management system.
+            /*
             let assetsEl = document.createElement('a-assets');
 
             jQuery.each(configs.assets, function(faction, contents) {
@@ -104,9 +105,11 @@ class GameManager {
                 });
 
             });
+            */
 
-            assetsEl.addEventListener('loaded', self.loadObject3D);
-            self.sceneEl.appendChild(assetsEl);
+            // assetsEl.addEventListener('loaded', self.loadObject3D);
+            self.loadObject3D();
+            // self.sceneEl.appendChild(assetsEl);
 
         });
 
@@ -238,6 +241,15 @@ class GameManager {
             sceneEl.appendChild(anchorEl);
 
             sceneEl = this.anchorEl = anchorEl;
+        } else {
+
+            // Insert light.
+            let directionalLight;
+            sceneEl.object3D.add(new THREE.AmbientLight(0x404040, 2));
+            directionalLight = new THREE.DirectionalLight(0xffffff, 0.7);
+            directionalLight.position.set(0, 1, 0);
+            sceneEl.object3D.add(directionalLight);
+
         }
 
 
@@ -482,6 +494,7 @@ class GameManager {
             this.sceneEl.systems['tdar-game'].networkManager.emit('nonPlayingEvent', {
                 event_name: 'model_ready'
             });
+            console.log('SEND MODEL READY');
         }
     }
     updateGameGridByModel(pos, key, walkable, scalar) {

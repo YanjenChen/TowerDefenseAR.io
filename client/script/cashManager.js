@@ -36,7 +36,7 @@ class CashManager {
             BLACK: 0
         };
         this.prevCheckTime = 0;
-        this.userFaction = sceneEl.systems['tdar-game'].data.userFaction;
+        this.userFaction = this.networkManager.userFaction;
 
         this.uiManager.updateMoneyPoint(this.currentMoney[this.userFaction]);
 

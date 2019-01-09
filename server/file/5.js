@@ -23,7 +23,7 @@ io.on('connection', function(socket) {
                     obj["event_name"] = "serverResponseRegister";
                     //obj["cause"] = "請勿輸入非英文或數字的字元"
                     obj["cause"] = reject_cause["only_num_eng"]
-                    
+
                     socket.emit("nonPlayingEvent", obj)
                     return
                 } catch (e) {
@@ -190,9 +190,9 @@ io.on('connection', function(socket) {
             //console.log("A Momitor "+msg["user"]+" --")
             // console.log("PPP : "+msg["user"])
 
-            if(  
+            if(
                 (!checkEngNum(msg["user"]))
-                
+
                 ){
 
                     obj = Object()
@@ -220,7 +220,7 @@ io.on('connection', function(socket) {
                     if ((!obj["res"]["isPlaying"]) && (!(obj["res"]["hasLogin"] === false))) {
                         all_player_monitor[msg["user"]]["record"] = all_player_monitor[msg["user"]]["record"] - 1
                     }
-                    console.log("B Monitor " + msg["user"] + " -- , value : " + all_player_monitor[msg["user"]]["record"])
+                    //console.log("B Monitor " + msg["user"] + " -- , value : " + all_player_monitor[msg["user"]]["record"])
                 }
             }
             obj2 = Object()
@@ -784,7 +784,7 @@ io.on('connection', function(socket) {
                     return
                 }
             }
-        } 
+        }
         // 已加密
         else if (msg["event_name"] == "checkRoomExist") { // 回傳 room 是否還在
 
@@ -1180,8 +1180,8 @@ io.on('connection', function(socket) {
             }
 
         }
-        
-         
+
+
         else if (msg["event_name"] == "requestAdminLogout") {
             if ((!checkEngNum(msg["admin"]))) {
                 obj = Object()
@@ -1263,7 +1263,7 @@ io.on('connection', function(socket) {
                 }
 
             }
-        } 
+        }
         */
 
         // 已加密
@@ -1331,12 +1331,13 @@ io.on('connection', function(socket) {
                 //console.log("V6 : "+msg["user"])
             }
             //console.log("V7")
-        } 
+        }
         // 已加密
         // 注意，這是由 game.ejs 發出的消息，很少情況會跑到這
         // 至於...被 過濾參數檔..不知道回傳時，event_name 是要寫啥，例如 ... serverResponse_model_ready ......
         // 沒有設丟回去可接收的.... obj["event_name"] = "" 就這樣寫了
         else if (msg["event_name"] == "model_ready") {
+            console.log('RECEIVE MODEL READY');
 
             if (  (!checkEngNum(String(msg["room_id"]))) || (!checkEngNum(String(msg["user"])))  ) {
                 obj = Object()
@@ -1416,17 +1417,18 @@ io.on('connection', function(socket) {
             // PS 主導者怪是完整的，其他的都是少怪
         2 開     "wave_spawner_request_spawn_enemy" , "enemy_be_attacked" : 狀況同第一項
         3 三個都開 : 狀況同第一項
-    
+
     */
 
     // 主導玩家的事件 : all_playing_room_master[room_id] ，enemy-be-attacked , castle-be-attacked , wave-spawner-request-spawn-enemy
     // 傳輸遊戲中的事件
     socket.on("playingEvent", function(msg) {
+        //console.log('PLAYING EVENT: ' + JSON.stringify(msg) + '\n\n')
         //console.log('\n\nLLLL Receive clietn request, event name: ' + JSON.stringify(msg)+"\n\n");
         if (msg["event_name"] == "enemy_be_attacked") {
 
             if(msg["user"]==all_playing_room_master[room_id]){
-                
+
                 obj = msg
                 obj["event_name"] = "enemy_get_damaged"
                     io.to(msg["room_id"]).emit("playingEvent", obj)
@@ -1434,21 +1436,22 @@ io.on('connection', function(socket) {
             }else{
                 //console.log("A1 no : "+msg["user"])
             }
-            
+
         } else if (msg["event_name"] == "castle_be_attacked") {
             if(msg["user"]==all_playing_room_master[room_id]){
                 obj = msg
                 obj["event_name"] = "castle_get_damaged"
                 io.to(msg["room_id"]).emit("playingEvent", obj)
                 //console.log("A2 yes : "+msg["user"])
-            
+
             }else{
                 //console.log("A2 no : "+msg["user"])
             }
-            
+
         } else if (msg["event_name"] == "request_create_tower") {
             obj = msg
             obj["event_name"] = "create_tower_success"
+            console.log('REQUEST CREATE TOWER: ' + JSON.stringify(obj) + '\n\n')
             io.to(msg["room_id"]).emit("playingEvent", obj)
         } else if (msg["event_name"] == "request_upgrade_tower") {
             obj = msg
@@ -1468,30 +1471,31 @@ io.on('connection', function(socket) {
             }
         }
          else if (msg["event_name"] == "tower_be_attacked") {
-            
+
                 obj = msg
                 obj["event_name"] = "tower_get_damaged"
                 io.to(msg["room_id"]).emit("playingEvent", obj)
-           
+
         } else if (msg["event_name"] == "wave_spawner_request_spawn_enemy") {
             if(msg["user"]==all_playing_room_master[room_id]){
                 obj = msg
+                console.log('REQUEST SPAWN ENEMY: ' + JSON.stringify(obj) + '\n\n')
                 obj["enemy_id"] = getCreateEnemyId(obj["enemy_type"], obj["ws_faction"], msg["room_id"])
                 obj["event_name"] = "wave_spawner_create_enemy"
                 obj.healthPoint = Math.ceil(obj.time / 60000) * 100;
                 obj.reward = Math.ceil(obj.time / 60000) * 5;
                 obj.targetCastle = obj.ws_faction == 'RED' ? '#BLACK-castle' : '#RED-castle';
-                
+
                 //this.enemyCounter++;
 
                 //console.log('SSSS : ' + JSON.stringify(obj));
                 io.to(msg["room_id"]).emit("playingEvent", obj)
                 //console.log("A3 yes : "+msg["user"])
-            
+
             }else{
                // console.log("A3 no : "+msg["user"])
             }
-            
+
         } else if (msg["event_name"] == "spawner_request_set_autospawn") {
 
             obj = msg
@@ -1506,8 +1510,9 @@ io.on('connection', function(socket) {
 
         }else if (msg["event_name"] == "spawner_request_addto_spawnbuffer") {
                 obj = msg
+                console.log('REQUEST ADD TO BUFFER: ' + JSON.stringify(obj) + '\n\n')
                 obj["event_name"] = "spawner_execute_addto_spawnbuffer"
-               
+
             if(obj.autoSpawn){
                 if(msg["user"]==all_playing_room_master[room_id]){
                     io.to(msg["room_id"]).emit("playingEvent", obj)
@@ -1522,7 +1527,7 @@ io.on('connection', function(socket) {
         } else if (msg["event_name"] == "request_update_cash") {
                 obj = msg
                 obj["event_name"] = "execute_update_cash"
-               
+
             if(obj.userEmit){
                 if(msg["user"]==all_playing_room_master[room_id]){
                     io.to(msg["room_id"]).emit("playingEvent", obj)
@@ -1534,7 +1539,7 @@ io.on('connection', function(socket) {
                  io.to(msg["room_id"]).emit("playingEvent", obj)
 
             }
-        } 
+        }
         // 接收到，使用者遊戲中
 
         // 寫 socket.join 的

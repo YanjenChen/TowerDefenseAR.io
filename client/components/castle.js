@@ -101,7 +101,7 @@
 
             this.currentHP = this.data.healthPoint;
 
-            if (this.data.faction === this.el.sceneEl.systems[GAME_SYS_NAME].data.userFaction) {
+            if (this.data.faction === this.system.networkManager.userFaction) {
 
                 this.system.uiManager.updateHealthPoint(this.currentHP);
 
@@ -141,7 +141,7 @@
         onGetDamage: function(evt) {
 
             this.currentHP -= evt.detail.damage;
-            if (this.data.faction === this.el.sceneEl.systems[GAME_SYS_NAME].data.userFaction) {
+            if (this.data.faction === this.system.networkManager.userFaction) {
 
                 this.system.uiManager.updateHealthPoint(this.currentHP);
 

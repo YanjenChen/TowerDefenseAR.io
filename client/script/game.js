@@ -28,10 +28,11 @@
         },
         init: function() {
             let self = this;
-            let gameManager = this.gameManager = new GameManager(this.el, CONFIG_DIR, this.data.ar ? 'ar' : 'vr');
             let networkManager = this.networkManager = new NetworkManager(this.el, this.data.mode);
+            let gameManager = this.gameManager = new GameManager(this.el, CONFIG_DIR, this.data.ar ? 'ar' : 'vr');
             let uiManager = this.uiManager = new UIManager(this.el);
             this.cashManager = null; // Will init in gameManager.
+            this.isGameing = false;
 
             networkManager.addEventListener('client_start_game', this.onStartGame.bind(this));
             networkManager.addEventListener('playingEvent', this.onExecute.bind(this));
@@ -40,11 +41,11 @@
             gameManager.loadConfig();
         },
         tick: function(time, timedelta) {
-            if (this.cashManager)
+            if (this.cashManager && this.isGameing)
                 this.cashManager.tick(time, timedelta);
         },
         onStartGame: function() {
-            //console.warn('Client start game.');
+            console.warn('CLIENT START GAME.');
 
             // Insert cursor under camera.
             let cursor = document.createElement('a-entity');
@@ -57,6 +58,7 @@
 
             //console.log('Dynamic scene play.');
             this.el.play();
+            this.isGameing = true;
             //this.gameManager.dynamicScene.play();
         },
         onExecute: function(content) {
@@ -77,6 +79,7 @@
                     break;
                 case 'create_tower_success':
                     if (this.gameManager.dynamicScene.querySelector('#' + content['id']) != null) {
+                        console.log('CREATE TOWER ON ID: ', content['id']);
                         this.gameManager.dynamicScene.querySelector('#' + content['id']).emit('create-tower', content);
                         // this.cashManager.executeUpdateCash(content['amount'], content['faction']);
                         // this.cashManager.moneytowerbuild(content['ampamount'], content['faction']);
@@ -106,7 +109,7 @@
                 case 'wave_spawner_create_enemy':
                     if (this.gameManager.dynamicScene.querySelector('#' + content['id']) != null) {
                         //console.log(content['ws_faction'] == 'A' ? '#faction-B-castle' : '#faction-A-castle');
-
+                        //console.log('CREATE ENEMY WITH ID:  ', content['enemy_id'], typeof(content['enemy_id']));
                         this.gameManager.dynamicScene.querySelector('#' + content['id']).emit('spawn_enemy', {
                             faction: content['ws_faction'],
                             healthPoint: content['healthPoint'],
@@ -115,6 +118,8 @@
                             targetCastle: content['targetCastle'],
                             type: content['type']
                         });
+                    } else {
+                        console.warn('Cannot find spawner with id: ', content['id']);
                     }
                     break;
                 case 'spawner_execute_set_autospawn':

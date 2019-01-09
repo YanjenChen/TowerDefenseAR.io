@@ -229,14 +229,17 @@
 
             if (selectedBase === null || selectedBase.getUIsets === undefined) {
 
+                // console.log('SELECTED BASE IS NULL');
                 this.system.uiManager.updateObjectControl([]);
 
             } else if (!placeable && selectedBase.isTowerBase === true && selectedBase.el.is('empty')) {
 
+                // console.log('NOT PLACABLE');
                 this.system.uiManager.updateObjectControl([]);
 
             } else {
 
+                // console.log('EMPTY PLACABLE');
                 this.system.uiManager.updateObjectControl(selectedBase.getUIsets());
 
             }

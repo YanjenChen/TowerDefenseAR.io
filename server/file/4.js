@@ -32,10 +32,10 @@ function getCreateEnemyId(enemy_type, faction, room_id) {
     //da = new Date()
     //ds = da.getFullYear()+"-"+da.getMonth()+"-"+da.getDay()+" "+da.getHours()+":"+da.getMinutes()+":"+da.getSeconds()+":"+da.getMilliseconds()
     //ds = "enemy_"+enemy_type+"_"+faction+"_"+ds
-    ds = "enemy-" + game_enemy[room_id]["counter"]
+    ds = game_enemy[room_id]["counter"]
     game_enemy[room_id]["counter"] = game_enemy[room_id]["counter"] + 1
     // "enemy-A-12"
-    return ds
+    return parseInt(ds)
 }
 
 
@@ -149,9 +149,10 @@ function checkRoomAllUser_ModelSocketReady() {
                 break
             }
         }
-        console.log("\nReady : room_id : "+room_id+" , bb : "+bb)
+        // console.log("\nReady : room_id : "+room_id+" , bb : "+bb)
 
         if (bb) {
+            console.log("\nReady : room_id : "+room_id+" , bb : "+bb)
 
             // 'client_start_game'
             //io.to(room_id).emit('client_start_game',{event_name:"client_start_game"})
@@ -169,12 +170,11 @@ function checkRoomAllUser_ModelSocketReady() {
 
             //
 
-            //this.sceneEl.emit('client_start_game'); 
-
+            //this.sceneEl.emit('client_start_game');
             io.to(room_id).emit("client_start_game", {
                 event_name: "client_start_game"
             })
-
+            console.log('SEND CLIENT START GAME.');
 
             // 設定本Room主導者玩家
             if(!all_playing_room_master[room_id]){

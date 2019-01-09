@@ -4,10 +4,17 @@
 <head>
     <title>Valhalla - Tower Defense AR</title>
 
+    <input id='room_id' value="<%=inobj['room_id']%>" type='hidden'>
+    <input id='user' value="<%=inobj['user']%>" type='hidden'>
+    <input id='user_faction' value="<%=inobj['user_faction']%>" type='hidden'>
+
     <script src="lib/aframe.js"></script>
     <script src="lib/pathfinding-browser.js"></script>
     <script src="https://cdn.rawgit.com/donmccurdy/aframe-extras/v5.0.0/dist/aframe-extras.min.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <!--
+    <script src="/socket.io/socket.io.js"></script>
+-->
 
     <!--
     LOAD COMPONENTS
@@ -34,7 +41,7 @@
 </head>
 
 <body>
-    <a-scene background="color: grey" tdar-game="mode: single-player; ar: false;" vr-mode-ui="enabled: false">
+    <a-scene background="color: grey" tdar-game="mode: single-player; ar: false;" vr-mode-ui="enabled: false" light="defaultLightsEnabled: false">
         <a-entity position="0 10 8" rotation="-70 0 0" camera swipe-control wasd-controls></a-entity>
     </a-scene>
 
